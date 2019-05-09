@@ -1,4 +1,4 @@
 {
     "python.linting.pylintEnabled": true,
-    "python.pythonPath": "C:\\ProgramData\\Miniconda3\\envs\\flask\\python.exe"
+    "python.pythonPath": "C:\\Users\\michang\\AppData\\Local\\Continuum\\miniconda3\\envs\\webapp\\python.exe"
 }
