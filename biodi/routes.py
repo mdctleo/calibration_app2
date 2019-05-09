@@ -42,11 +42,11 @@ def power():
         flash("\n Effect: " + effect + "   Alpha: " + alpha + "   Power: " + power + "   Test: " + test)
 
 
-    # if (form.validate_on_submit()):
-    #     flash(' Effect: ' + effect + '\n Alpha: ' + alpha + '\n Power: ' + power + '\n Test: ' + test)
-    #     flash('Alpha' + alpha)
-    #     flash('Power ' + power)
-    #     flash('Test' + test)
+    if (form.validate_on_submit()):
+        flash(' Effect: ' + effect + '\n Alpha: ' + alpha + '\n Power: ' + power + '\n Test: ' + test)
+        flash('Alpha' + alpha)
+        flash('Power ' + power)
+        flash('Test' + test)
 
     return render_template('power.html', form=form)
 
