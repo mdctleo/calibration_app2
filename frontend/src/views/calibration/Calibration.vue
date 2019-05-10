@@ -4,7 +4,8 @@
     :isotopes="this.isotopes"
     :counters="this.counters"
     v-on:query = getCalibrationFactors></IsotopeModelSelect>
-    <CalibrationTable :calibrationFactors="this.calibrationFactors"></CalibrationTable>
+    <CalibrationTable :calibrationFactors="this.calibrationFactors"
+      :loading="this.loading"></CalibrationTable>
   </div>
 </template>
 
@@ -28,11 +29,13 @@ export default {
     return {
       counters:  [],
       isotopes: [],
-      calibrationFactors: []
+      calibrationFactors: [],
+      loading: false
     }
   },
   methods: {
     getCalibrationFactors() {
+      this.loading = true;
       api.getCalibrationFactors(store.getSelectedCounter(), store.getSelectedIsotope())
               .then((response) => {
                 this.calibrationFactors = response.data;
@@ -40,6 +43,7 @@ export default {
                   console.log(moment(calibrationFactor.createdOn).format('DD-MM-YYYY, h:mm:ss'));
                   calibrationFactor.createdOn = moment(calibrationFactor.createdOn).format('DD-MM-YYYY, h:mm:ss')
                 });
+                this.loading = false;
               })
               .catch((error) => {
                 console.log(error)

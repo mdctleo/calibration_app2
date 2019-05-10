@@ -2,6 +2,7 @@
     <el-table
             class="el-table"
             id="table"
+            v-loading="this.loading"
             :data="this.calibrationFactors"
             stripe>
         <el-table-column
@@ -30,7 +31,8 @@
     export default {
         name: 'CalibrationTable',
         props: {
-          calibrationFactors: Array
+          calibrationFactors: Array,
+          loading: Boolean
         }
     }
 </script>
