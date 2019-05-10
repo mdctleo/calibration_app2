@@ -3,6 +3,7 @@ from biodi import app_biodi
 from biodi.forms import LoginForm, powerForm
 from flask_login import current_user, login_user,logout_user, login_required
 from biodi.models import User
+from biodi.methods.statistics import powerFunc
 
 @app_biodi.route('/')
 @app_biodi.route('/index')
@@ -31,15 +32,17 @@ def power():
 
     if (request.method == 'POST'):
         effect = request.form['effect']
+        nobs = request.form['nobs']
         alpha = request.form['alpha']
         power = request.form['power']
         test = request.form['test']
 
         # output the user input on the shell
-        print("\nEffect: " + effect + "     Alpha: " + alpha + "    Power: " + power + "    Test: " + test +"\n")
+        print("\nEffect: " + effect  + "      nobs: " + nobs + "     Alpha: " + alpha + "    Power: " + power + "    Test: " + test +"\n")
 
         # output the user input on the webpage
-        flash("\n Effect: " + effect + "   Alpha: " + alpha + "   Power: " + power + "   Test: " + test)
+        # flash("\n Effect: " + effect + " nobs: " + nobs + "   Alpha: " + alpha + "   Power: " + power + "   Test: " + test)
+        # powerFunc(effect, alpha, power, nobs, test)
 
 
     if (form.validate_on_submit()):

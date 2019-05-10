@@ -11,4 +11,5 @@ migrate = Migrate(app_biodi, db)
 login = LoginManager(app_biodi)
 login.login_view = 'login'
 
-from biodi import routes, models
+from biodi import routes, models#, statistics
+# from biodi.methods import statistics
