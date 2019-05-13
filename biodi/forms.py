@@ -15,4 +15,5 @@ class powerForm(FlaskForm):
     alpha = SelectField('Alpha', choices=[(0.05, '0.05'), (0.01, '0.01')]) 
     power = FloatField('Power', default=0.8, validators=[DataRequired()])
     test = SelectField('Test', choices=[('independent', 'independent samples'), ('paired', 'paired samples')])
+    alternative = SelectField('Alternative', choices=[('two-sided', 'two-sided'), ('larger', 'larger'), ('smaller', 'smaller')])
     submit2 = SubmitField('Submit')

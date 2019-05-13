@@ -3,7 +3,8 @@ from biodi import app_biodi
 from biodi.forms import LoginForm, powerForm
 from flask_login import current_user, login_user,logout_user, login_required
 from biodi.models import User
-from biodi.methods.statistics import powerFunc
+# from biodi.methods.statistics import powerFunc
+from statsmodels.stats.power import TTestPower, TTestIndPower
 
 @app_biodi.route('/')
 @app_biodi.route('/index')
@@ -77,16 +78,17 @@ def effectCalc():
         alpha = request.form['alpha']
         power = request.form['power']
         test = request.form['test']
+        alternative = request.form['alternative']
 
         
 
 
         # # output the user input on the shell
-        print("\nnobs: " + nobs  + "    Alpha: " +  alpha  + "     Power: " + power  + "   Test: " + test +"\n")
+        print("\nnobs: " + nobs  + "    Alpha: " +  alpha  + "     Power: " + power  + "   Test: " + test + "   Alternative: " + alternative + "\n")
         
-        # nobs = int(nobs)
-        # alpha = float(alpha)
-        # power = float(power)
+        nobs = int(nobs)
+        alpha = float(alpha)
+        power = float(power)
 
         # print(type(effect))
         # print(type(nobs))
@@ -94,16 +96,24 @@ def effectCalc():
         # print(type(power))
         # print(type(test))
 
-        nobs = 5
-        alpha = 0.05
-        power = 0.7
-        test = "independent"
+        # nobs = 5
+        # alpha = 0.05
+        # power = 0.7
+        # test = "independent"
+
+        if (test == 'independent'):
+            result = TTestPower().solve_power(effect_size=effect, nobs=nobs, alpha=alpha, power=power, alternative=alternative)
+        elif (test == 'paired'):
+            result = TTestIndPower().solve_power(effect_size=effect, nobs1=nobs, alpha=alpha, power=power, alternative=alternative)
+
+        print("\nThe Effect size should be {}\n".format(str(result)))
+        flash("The Effect size should be {}".format(str(result)))
 
 
         # # output the user input on the webpage
         # flash("\nnobs: " + nobs + "  |  " + " Alpha: " +  alpha + "  |  " + " Power: " + power + "  |  " + " Test: " + test +"\n")
 
-        powerFunc(effect, nobs, alpha, power, test)
+        # powerFunc(effect, nobs, alpha, power, test)
 
     return render_template('powerForms/effectCalc.html', form=form)
 
@@ -124,20 +134,29 @@ def nobsCalc():
         alpha = request.form['alpha']
         power = request.form['power']
         test = request.form['test']
+        alternative = request.form['alternative']
 
 
         # output the user input on the shell
-        print("\nEffect: " + effect + "    Alpha: " +  alpha  + "     Power: " + power  + "   Test: " + test + "\n")
+        # print("\nEffect: " + effect + "    Alpha: " +  alpha  + "     Power: " + power  + "   Test: " + test + "\n")
         
         effect = float(effect)
         alpha = float(alpha)
         power = float(power)
 
-        print(type(effect))
-        print(type(nobs))
-        print(type(alpha))
-        print(type(power))
-        print(type(test))
+        # print(type(effect))
+        # print(type(nobs))
+        # print(type(alpha))
+        # print(type(power))
+        # print(type(test))
+
+        if (test == 'independent'):
+            result = TTestPower().solve_power(effect_size=effect, nobs=nobs, alpha=alpha, power=power, alternative=alternative)
+        elif (test == 'paired'):
+            result = TTestIndPower().solve_power(effect_size=effect, nobs1=nobs, alpha=alpha, power=power, alternative=alternative)
+
+        print("\nThe Sample size should be {}\n".format(str(result)))
+        flash("The Sample size should be {}".format(str(result)))
 
         # # output the user input on the webpage
         # flash("\nEffect: " + effect + "  |  " + " Alpha: " +  alpha + "  |  " + " Power: " + power + "  |  " + " Test: " + test +"\n")
@@ -163,6 +182,7 @@ def powerCalc():
         alpha = request.form['alpha']
         power = None
         test = request.form['test']
+        alternative = request.form['alternative']
 
 
         #  # output the user input on the shell
@@ -172,16 +192,26 @@ def powerCalc():
         nobs = float(nobs)
         alpha = float(alpha)
 
-        print(type(effect))
-        print(type(nobs))
-        print(type(alpha))
-        print(type(power))
-        print(type(test))
+        # print(type(effect))
+        # print(type(nobs))
+        # print(type(alpha))
+        # print(type(power))
+        # print(type(test))
+
+        if (test == 'independent'):
+            result = TTestPower().solve_power(effect_size=effect, nobs=nobs, alpha=alpha, power=power, alternative=alternative)
+        elif (test == 'paired'):
+            result = TTestIndPower().solve_power(effect_size=effect, nobs1=nobs, alpha=alpha, power=power, alternative=alternative)
+
+        print("\nThe Power should be {}\n".format(str(result)))
+        flash("The Power should be {}".format(str(result)))
 
         # # output the user input on the webpage
         # flash("\nEffect: " + effect  + "  |  " + " nobs: " + nobs + "  |  " + " Alpha: " +  alpha + "  |  " + " Test: " + test +"\n")
 
         # powerFunc(float(effect), int(nobs), float(alpha), power, test)
+
+        
 
     return render_template('powerForms/powerCalc.html', form=form)
 

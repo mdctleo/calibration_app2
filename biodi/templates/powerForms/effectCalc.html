@@ -36,6 +36,12 @@
         {{ form.test }}
     </p>
 
+    <p>
+        <!-- {{ form.test.label }}<br> -->
+        <h3>Alternative</h3>
+        {{ form.alternative }}
+    </p>
+
     <p>{{ form.submit2() }}</p>
 
     {% for message in get_flashed_messages() %}
