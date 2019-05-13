@@ -16,6 +16,7 @@ import logging
 from logging import Formatter, FileHandler
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
+# TODO: remove CORS, we dont really need it for production
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_login import LoginManager

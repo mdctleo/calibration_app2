@@ -4,7 +4,6 @@ from flask import render_template, flash, redirect, url_for, redirect, request
 from forms import LoginForm, powerForm
 from flask_login import current_user, login_user, logout_user, login_required
 from user.Model import User
-from statsmodels.stats.power import TTestPower, TTestIndPower
 from functions.functions import powerFunc
 
 
