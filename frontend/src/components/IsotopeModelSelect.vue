@@ -37,8 +37,8 @@
         },
         data() {
             return {
-                selectedCounter: "",
-                selectedIsotope: ""
+                selectedCounter: null,
+                selectedIsotope: null
             }
         }
     }
