@@ -9,6 +9,7 @@ class Isotope(db.Model):
     isotopeName = db.Column(ISOTOPE_C_ISOTOPE_NAME, db.String(8), primary_key=True)
     halfLife = db.Column(ISOTOPE_C_HALF_LIFE, db.Float, nullable=False)
     createdBy = db.Column(ISOTOPE_C_ISOTOPE_CREATED_BY, db.String(100), nullable=False)
+    # TODO: Add in relation to user table
     # createdBy = db.Column(db.String(100), db.ForeignKey(USERS_T_NAME + '.' + USERS_C_USERNAME), nullable=False)
     calibrationFactor = db.relationship('CalibrationFactor', backref=ISOTOPE_T_NAME)
 

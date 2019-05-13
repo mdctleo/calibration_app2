@@ -1,5 +1,5 @@
 const axios = require('axios');
-const BASE_URL = "http://localhost:5050";
+const BASE_URL = "http://localhost:5000";
 
 export const getCalibrationFactors = async (model, isotope) => {
     let endpoint = BASE_URL + "/calibrations";

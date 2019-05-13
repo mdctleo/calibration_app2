@@ -15,6 +15,7 @@ class CalibrationFactor(db.Model):
     createdBy = db.Column(CALIBRATION_C_CREATED_BY, db.String(100), nullable=False)
     gammaCounter = db.Column(CALIBRATION_C_GAMMA_COUNTER, db.String(100),
                              db.ForeignKey(GAMMA_COUNTERS_T_NAME + '.' +  GAMMA_COUNTERS_C_MODEL), nullable=False)
+    # TODO: Add in relation to User table
     # createdBy = db.Column(CALIBRATION_C_CREATED_BY, db.String(100),
     #                       db.ForeignKey(USERS_T_NAME + '.' + USERS_C_USERNAME))
 
