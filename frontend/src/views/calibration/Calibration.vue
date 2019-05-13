@@ -40,9 +40,9 @@ export default {
               .then((response) => {
                 this.calibrationFactors = response.data;
                 this.calibrationFactors.forEach((calibrationFactor) => {
-                  console.log(moment(calibrationFactor.createdOn).format('DD-MM-YYYY, h:mm:ss'));
                   calibrationFactor.createdOn = moment(calibrationFactor.createdOn).format('DD-MM-YYYY, h:mm:ss')
                 });
+                console.log(this.calibrationFactors);
                 this.loading = false;
               })
               .catch((error) => {

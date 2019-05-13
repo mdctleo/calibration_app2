@@ -64,7 +64,6 @@ class DatabaseHelper:
                 filters.append(CalibrationFactor.isotopeName == isotopeName)
 
             result = CalibrationFactor.query.filter(*filters).all()
-            print(CalibrationFactor.query.filter(*filters))
 
         except SQLAlchemyError:
             raise BaseException("Server Errror")
