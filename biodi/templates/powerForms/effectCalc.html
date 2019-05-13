@@ -3,9 +3,9 @@
 {% block content %}
 
 <div class="car-body border-top">
-    <a href="effectCalc" class="btn btn-primary btn-lg">Calculate Effect</a>
-    <a href="nobsCalc" class="btn btn-primary btn-lg">Calculate Number of Observation</a>
-    <a href="powerCalc" class="btn btn-primary btn-lg">Calculate Power</a>
+    <a href="effectCalc" class="btn btn-primary btn-lg">Effect Size</a>
+    <a href="nobsCalc" class="btn btn-primary btn-lg">Sample Size</a>
+    <a href="powerCalc" class="btn btn-primary btn-lg">Statistical Power</a>
 </div>
 
 <form action="/effectCalc" method="POST" novalidate>
@@ -45,7 +45,6 @@
     <p>{{ form.submit2() }}</p>
 
     {% for message in get_flashed_messages() %}
-        <h3>Here are your inputs</h3>
         {{ message }}
     {% endfor %}
 
