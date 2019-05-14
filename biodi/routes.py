@@ -7,6 +7,10 @@ from biodi.models import User
 from statsmodels.stats.power import TTestPower, TTestIndPower
 import math as m
 
+import plotly
+import plotly.graph_objs as go
+import json
+
 @app_biodi.route('/')
 @app_biodi.route('/index')
 @login_required
@@ -33,9 +37,32 @@ def power():
 # https://www.reddit.com/r/flask/comments/a5hxdi/how_to_give_a_drop_down_list_a_selected_value/
 '''
 
+# create graph
+def create_plot(feature):
+    if (feature == 'Bar'):
+        trace1 = go.Bar(
+            x = [1, 2, 3],
+            y = [4, 1, 2],
+            name = 'SF'
+        )
+        trace2 = go.Bar(
+            x = [1, 2, 3],
+            y = [2, 4, 5],
+            name = 'Montreal'
+        ) 
+
+        data = [trace1, trace2]
+
+    graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
+    return graphJSON
+
+
 @app_biodi.route('/effectCalc', methods=['GET', 'POST'])
 def effectCalc():
     form = powerForm()
+
+    feature = 'Bar'
+    bar = create_plot(feature)
 
     # Setting the default value of alpha as 0.05
     if request.method == 'GET':
@@ -71,12 +98,15 @@ def effectCalc():
         print("\nThe Effect size should be %.2f\n" % result)
         flash("The Effect size should be %.2f\n" % result)
 
-    return render_template('powerForms/effectCalc.html', form=form)
+    return render_template('powerForms/effectCalc.html', form=form, plot=bar)
 
 
 @app_biodi.route('/nobsCalc', methods=['GET', 'POST'])
 def nobsCalc():
     form = powerForm()
+
+    feature = 'Bar'
+    bar = create_plot(feature)
 
     # Setting the default value of alpha as 0.05
     if request.method == 'GET':
@@ -109,12 +139,15 @@ def nobsCalc():
         flash("The Sample size should be {}\n".format(m.ceil(result)))
 
 
-    return render_template('powerForms/nobsCalc.html', form=form)
+    return render_template('powerForms/nobsCalc.html', form=form, plot=bar)
 
 
 @app_biodi.route('/powerCalc', methods=['GET', 'POST'])
 def powerCalc():
     form = powerForm()
+
+    feature = 'Bar'
+    bar = create_plot(feature)
 
     # Setting the default value of alpha as 0.05
     if request.method == 'GET':
@@ -146,7 +179,7 @@ def powerCalc():
         print("\nThe Power should be %.2f\n" % result)
         flash("The Power should be %.2f\n" % result)        
 
-    return render_template('powerForms/powerCalc.html', form=form)
+    return render_template('powerForms/powerCalc.html', form=form, plot=bar)
 
 # how to get dash plotly graph on flask: check this link below
 # https://medium.com/@olegkomarov_77860/how-to-embed-a-dash-app-into-an-existing-flask-app-ea05d7a2210b
