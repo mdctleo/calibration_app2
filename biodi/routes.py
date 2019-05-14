@@ -148,6 +148,8 @@ def powerCalc():
 
     return render_template('powerForms/powerCalc.html', form=form)
 
+# how to get dash plotly graph on flask: check this link below
+# https://medium.com/@olegkomarov_77860/how-to-embed-a-dash-app-into-an-existing-flask-app-ea05d7a2210b
 
 
 @app_biodi.route('/login',methods=['GET', 'POST'])

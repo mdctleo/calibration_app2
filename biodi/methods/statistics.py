@@ -27,3 +27,4 @@ def powerFunc(effect,alpha,power,nobs,test):
     elif nobs is None:
         print("The sample size should be %.2f\n" % result)
         flash("The sample size should be %.2f\n" % result)
+0
