@@ -3,8 +3,8 @@ from marshmallow import Schema, fields
 
 class StandardResponse:
     def __init__(self, message):
-        self.payload = message
+        self.message = message
 
 
 class StandardResponseSchema(Schema):
-    payload = fields.Str()
+    message = fields.Str()

@@ -16,29 +16,43 @@
                     :value="item.model">
             </el-option>
         </el-select>
-        <el-button @click="setState" type="success" class="button">Query</el-button>
+        <el-button @click="$emit('query')" type="success" class="button">Query</el-button>
     </div>
 </template>
 
 <script>
-    import {store} from '../Store'
+    import store from '../store/Store.js'
+    import * as type from '../store/Types'
+
     export default {
         name: 'IsotopeModelSelect',
         props:{
             counters: Array,
             isotopes: Array
         },
-        methods: {
-            setState (event) {
-                store.setSelectedCounter(this.selectedCounter);
-                store.setSelectedIsotope(this.selectedIsotope);
-                this.$emit('query');
-            }
-        },
-        data() {
-            return {
-                selectedCounter: null,
-                selectedIsotope: null
+        computed: {
+            selectedIsotope: {
+                get () {
+                    return store.state.selectedIsotope
+                },
+                set (value) {
+                    store.dispatch({
+                        type: type.setSelectedIsotope,
+                        selectedIsotope: value
+                    })
+                }
+            },
+
+            selectedCounter: {
+                get () {
+                    return store.state.selectedCounter
+                },
+                set (value) {
+                    store.dispatch({
+                        type: type.setSelectedCounter,
+                        selectedCounter: value
+                    })
+                }
             }
         }
     }

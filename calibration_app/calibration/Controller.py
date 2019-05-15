@@ -1,6 +1,6 @@
 from calibration_app.calibration import bp
 from flask import request
-from calibration_app.calibration.Model import CalibrationFactor, CalibrationFactorSchema, DatabaseHelper as db
+from calibration_app.calibration.Model import CalibrationFactor, CalibrationFactorSchema, CalibrationFactorGraphSchema, DatabaseHelper as db
 from flask import jsonify
 from response.response import StandardResponse, StandardResponseSchema
 from exceptions.Exceptions import *
@@ -36,6 +36,16 @@ def getCalibrationFactors(model, isotopeName):
     response = CalibrationFactorSchema(many=True).dump(result)
     return jsonify(response), 200
 
+def getCalibrationFactorsGraph(model, isotopeName):
+    try:
+        result = db.getCalibrationFactorsGraph(model, isotopeName)
+    except BaseException as e:
+        response = BaseExceptionSchema().dump(e)
+        return jsonify(response), 500
+
+    response = CalibrationFactorGraphSchema(many=True).dump(result)
+    return jsonify(response), 200
+
 
 @bp.route('/calibration', methods=['POST'])
 # @bp.route('/calibration/<id>', methods=['GET', 'PUT', 'DELETE'])
@@ -69,10 +79,15 @@ def calibration():
 
 @bp.route('/calibrations', methods=['GET'])
 def calibrations():
-    print("Got here")
     if request.method == 'GET':
         model = request.args.get('model')
         isotopeName = request.args.get('isotope')
-        print(model)
-        print(isotopeName)
         return getCalibrationFactors(model, isotopeName)
+
+@bp.route('/calibrations/graph', methods=['GET'])
+def calibrationsGraph():
+    if request.method == 'GET':
+        model = request.args.get('model')
+        isotopeName = request.args.get('isotope')
+        return getCalibrationFactorsGraph(model, isotopeName)
+

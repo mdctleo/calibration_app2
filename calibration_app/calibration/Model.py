@@ -19,9 +19,10 @@ class CalibrationFactor(db.Model):
     # createdBy = db.Column(CALIBRATION_C_CREATED_BY, db.String(100),
     #                       db.ForeignKey(USERS_T_NAME + '.' + USERS_C_USERNAME))
 
-    def __init__(self, factor, isotopeName, createdBy, gammaCounter):
+    def __init__(self, factor, isotopeName, createdOn, createdBy, gammaCounter):
         self.factor = factor
         self.isotopeName = isotopeName
+        self.createdOn = createdOn
         self.createdBy = createdBy
         self.gammaCounter = gammaCounter
 
@@ -36,6 +37,14 @@ class CalibrationFactorSchema(Schema):
     isotopeName = fields.String()
     createdBy = fields.String()
     gammaCounter = fields.String()
+
+
+class CalibrationFactorGraphSchema(Schema):
+    isotopeName = fields.String()
+    factor = fields.List(fields.Float())
+    gammaCounter = fields.String()
+    createdOn = fields.List(fields.Date())
+
 
 
 class DatabaseHelper:
@@ -85,6 +94,28 @@ class DatabaseHelper:
             raise BaseException("Server Error")
 
         return True
+
+    @staticmethod
+    def getCalibrationFactorsGraph(model, isotopeName):
+        try:
+            filters = []
+
+            if model is not None:
+                filters.append(CalibrationFactor.gammaCounter == model)
+
+            if isotopeName is not None:
+                filters.append(CalibrationFactor.isotopeName == isotopeName)
+
+            result = CalibrationFactor.query.filter(*filters)\
+                .group_by(CalibrationFactor.isotopeName)\
+                .group_by(CalibrationFactor.gammaCounter)\
+                .order_by(CalibrationFactor.createdOn)
+
+        except SQLAlchemyError:
+            raise BaseException("Server Errror")
+
+        return result
+
 
     # @staticmethod
     # def updateIsotope(isotopeToUpdate, newIsotope, createdBy):
