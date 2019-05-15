@@ -45,9 +45,7 @@
 
                 Plotly.newPlot('calibrationGraph', data, layout);
                 this.loading = false;
-
             }
-
         },
 
         mounted () {
