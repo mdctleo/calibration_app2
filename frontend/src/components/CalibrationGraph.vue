@@ -1,5 +1,5 @@
 <template>
-    <div id="calibrationGraph" class="calibrationGraph">
+    <div id="calibrationGraph" class="calibrationGraph" v-loading="this.loading">
 
     </div>
     
@@ -10,30 +10,48 @@
     export default {
         name: "CalibrationGraph",
         props: {
-            traces: Array
+            traces: Object
+        },
+        data () {
+            return {
+                loading: false
+            }
+        },
+        watch: {
+          traces: function () {
+              this.plot()
+          }
         },
         methods: {
             plot () {
-                var trace1 = {
-                    x: this.time,
-                    y: this.calibrationFactors,
-                    mode: 'lines+markers'
-                };
+                this.loading = true;
+                let data = [];
+                Object.entries(this.traces).forEach((trace) => {
+                    let isotopeName = trace[0];
+                    let values = trace[1];
+                    let traceFormat = {
+                        x: values[0],
+                        y: values[1],
+                        mode: 'lines+markers',
+                        name: isotopeName
+                    };
+                    data.push(traceFormat)
+                });
 
-                var data = [ trace1 ];
 
-                var layout = {
-                    title:'Line and Scatter Plot'
+                let layout = {
+                    title:'Calibration Factor v.s. Time'
                 };
 
                 Plotly.newPlot('calibrationGraph', data, layout);
+                this.loading = false;
 
             }
 
         },
-        mounted() {
-            this.plot();
 
+        mounted () {
+            this.plot()
         }
     }
 </script>

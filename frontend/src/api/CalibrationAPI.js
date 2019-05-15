@@ -19,3 +19,12 @@ export const getIsotopes = async () => {
     let endpoint = BASE_URL + "/isotopes";
     return await axios.get(endpoint);
 }
+
+export const getCalibrationFactorsGraph = async (model, isotope) => {
+    let endpoint = BASE_URL + "/calibrations/graph";
+    return await axios.get(endpoint, {
+        params: {
+            model: model,
+            isotope: isotope
+        }})
+};

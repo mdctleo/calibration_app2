@@ -10,8 +10,8 @@
     <IsotopeModelSelect
     :isotopes="this.isotopes"
     :counters="this.counters"
-    v-on:query = getCalibrationFactors></IsotopeModelSelect>
-    <CalibrationGraph></CalibrationGraph>
+    v-on:query = "getCalibrationFactors(); getCalibrationFactorsGraph();"></IsotopeModelSelect>
+    <CalibrationGraph :traces="this.traces" :loading="this.loading"></CalibrationGraph>
     <CalibrationTable :calibrationFactors="this.calibrationFactors"
       :loading="this.loading"></CalibrationTable>
   </div>
@@ -39,7 +39,7 @@ export default {
       counters:  [],
       isotopes: [],
       calibrationFactors: [],
-      calibrationByIsotopes: {},
+      traces: {},
       loading: false,
       error: null
     }
@@ -63,7 +63,23 @@ export default {
               })
               .catch((error) => {
                 console.log(error);
-                this.error = error.response.data.message
+                this.error = error.response.data.message;
+              })
+              .finally(() => {
+                this.loading = false;
+              })
+    },
+    getCalibrationFactorsGraph() {
+      this.loading = true;
+      api.getCalibrationFactorsGraph(this.selectedCounter, this.selectedIsotope)
+              .then((response) => {
+                this.traces = response.data;
+
+              })
+              .catch((error) => {
+                console.log(error);
+                this.errror = error.response.data.message;
+
               })
               .finally(() => {
                 this.loading = false;

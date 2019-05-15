@@ -40,10 +40,8 @@ class CalibrationFactorSchema(Schema):
 
 
 class CalibrationFactorGraphSchema(Schema):
-    isotopeName = fields.String()
-    factor = fields.List(fields.Float())
-    gammaCounter = fields.String()
-    createdOn = fields.List(fields.Date())
+    createdOns = fields.List(fields.DateTime())
+    factors = fields.List(fields.Float())
 
 
 
@@ -107,9 +105,7 @@ class DatabaseHelper:
                 filters.append(CalibrationFactor.isotopeName == isotopeName)
 
             result = CalibrationFactor.query.filter(*filters)\
-                .group_by(CalibrationFactor.isotopeName)\
-                .group_by(CalibrationFactor.gammaCounter)\
-                .order_by(CalibrationFactor.createdOn)
+                .order_by(CalibrationFactor.createdOn).all()
 
         except SQLAlchemyError:
             raise BaseException("Server Errror")

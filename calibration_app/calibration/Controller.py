@@ -38,12 +38,23 @@ def getCalibrationFactors(model, isotopeName):
 
 def getCalibrationFactorsGraph(model, isotopeName):
     try:
-        result = db.getCalibrationFactorsGraph(model, isotopeName)
+        results = db.getCalibrationFactorsGraph(model, isotopeName)
+        response = {}
+        for calibrationFactor in results:
+            if not calibrationFactor.isotopeName in response:
+                response[calibrationFactor.isotopeName] = [[], []]
+                response[calibrationFactor.isotopeName][0].append(calibrationFactor.createdOn)
+                response[calibrationFactor.isotopeName][1].append(calibrationFactor.factor)
+            else:
+                response[calibrationFactor.isotopeName][0].append(calibrationFactor.createdOn)
+                response[calibrationFactor.isotopeName][1].append(calibrationFactor.factor)
+
     except BaseException as e:
         response = BaseExceptionSchema().dump(e)
         return jsonify(response), 500
 
-    response = CalibrationFactorGraphSchema(many=True).dump(result)
+    print(response)
+    print(type(response))
     return jsonify(response), 200
 
 
@@ -89,5 +100,10 @@ def calibrationsGraph():
     if request.method == 'GET':
         model = request.args.get('model')
         isotopeName = request.args.get('isotope')
+        if model is None:
+            result = StandardResponse("Graphs need at least a model selected")
+            response = StandardResponseSchema().dump(result)
+            # 200 so it does not trigger an error response in the frontend, no graph would be plotted
+            return jsonify(response), 200
         return getCalibrationFactorsGraph(model, isotopeName)
 
