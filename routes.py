@@ -1,9 +1,9 @@
+from app import app
 from flask import render_template, flash, redirect,url_for, redirect, request
-from biodi import app_biodi
-from biodi.forms import LoginForm, powerForm
+
+from forms import LoginForm, powerForm
 from flask_login import current_user, login_user,logout_user, login_required
-from biodi.models import User
-# from biodi.methods.statistics import powerFunc
+from user.Model import User
 from statsmodels.stats.power import TTestPower, TTestIndPower
 import math as m
 
@@ -11,14 +11,19 @@ import plotly
 import plotly.graph_objs as go
 import json
 
-@app_biodi.route('/')
-@app_biodi.route('/index')
+
+# TODO: Refactor this
+
+
+@app.route('/')
+@app.route('/index')
 @login_required
 def index():
-    text = {'content':'Home'} 
+    print("Got here")
+    text = {'content':'Home'}
     return render_template('index.html',title='medphys',text=text)
 
-@app_biodi.route('/gcbiodi')
+@app.route('/gcbiodi')
 def gc_biodi():
     text = {'content':'Hello world biodi'}
     user = {'username':'Carlos'}
@@ -26,38 +31,13 @@ def gc_biodi():
     return render_template('gcbiodi.html',text=text,user=user)
 
 # connecting to power.html
-@app_biodi.route('/power')
+@app.route('/power')#, methods=['GET', 'POST'])
 def power():
     form = powerForm()
 
     return render_template('power.html', form=form)
 
-'''
-# https://pythonspot.com/flask-web-forms/
-# https://www.reddit.com/r/flask/comments/a5hxdi/how_to_give_a_drop_down_list_a_selected_value/
-'''
-
-# create graph
-def create_plot(feature):
-    if (feature == 'Bar'):
-        trace1 = go.Bar(
-            x = [1, 2, 3],
-            y = [4, 1, 2],
-            name = 'SF'
-        )
-        trace2 = go.Bar(
-            x = [1, 2, 3],
-            y = [2, 4, 5],
-            name = 'Montreal'
-        ) 
-
-        data = [trace1, trace2]
-
-    graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
-    return graphJSON
-
-
-@app_biodi.route('/effectCalc', methods=['GET', 'POST'])
+@app.route('/effectCalc', methods=['GET', 'POST'])
 def effectCalc():
     form = powerForm()
 
@@ -78,9 +58,12 @@ def effectCalc():
         test = request.form['test']
         alternative = request.form['alternative']
 
-        # output the user input on the shell
+
+
+
+        # # output the user input on the shell
         print("\nnobs: " + nobs  + "    Alpha: " +  alpha  + "     Power: " + power  + "   Test: " + test + "   Alternative: " + alternative + "\n")
-        
+
         nobs = int(nobs)
         alpha = float(alpha)
         power = float(power)
@@ -101,7 +84,7 @@ def effectCalc():
     return render_template('powerForms/effectCalc.html', form=form, plot=bar)
 
 
-@app_biodi.route('/nobsCalc', methods=['GET', 'POST'])
+@app.route('/nobsCalc', methods=['GET', 'POST'])
 def nobsCalc():
     form = powerForm()
 
@@ -125,7 +108,7 @@ def nobsCalc():
 
         # output the user input on the shell
         # print("\nEffect: " + effect + "    Alpha: " +  alpha  + "     Power: " + power  + "   Test: " + test + "\n")
-        
+
         effect = float(effect)
         alpha = float(alpha)
         power = float(power)
@@ -142,7 +125,7 @@ def nobsCalc():
     return render_template('powerForms/nobsCalc.html', form=form, plot=bar)
 
 
-@app_biodi.route('/powerCalc', methods=['GET', 'POST'])
+@app.route('/powerCalc', methods=['GET', 'POST'])
 def powerCalc():
     form = powerForm()
 
@@ -184,11 +167,15 @@ def powerCalc():
 # how to get dash plotly graph on flask: check this link below
 # https://medium.com/@olegkomarov_77860/how-to-embed-a-dash-app-into-an-existing-flask-app-ea05d7a2210b
 
+'''
+# https://pythonspot.com/flask-web-forms/
+# https://www.reddit.com/r/flask/comments/a5hxdi/how_to_give_a_drop_down_list_a_selected_value/
+'''
 
-@app_biodi.route('/login',methods=['GET', 'POST'])
+@app.route('/login',methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))        
+        return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
@@ -200,7 +187,7 @@ def login():
     return render_template('login.html', title='Sign In', form=form,user='test')
 
 
-@app_biodi.route('/logout')
+@app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('index'))
