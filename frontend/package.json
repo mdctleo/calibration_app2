@@ -5,12 +5,14 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "postbuild": "./postbuild.sh"
   },
   "dependencies": {
     "axios": "^0.18.0",
     "core-js": "^2.6.5",
     "element-ui": "^2.8.2",
+    "json-2-csv": "^3.5.3",
     "moment": "^2.24.0",
     "plotly.js": "^1.47.4",
     "vue": "^2.6.10",

@@ -14,3 +14,8 @@ CALIBRATION_C_GAMMA_COUNTER = "gamma_counter"
 
 GAMMA_COUNTERS_T_NAME = "gamma_counters"
 GAMMA_COUNTERS_C_MODEL = "model"
+
+CSV_T_NAME = "csv"
+CSV_C_ID = "id"
+CSV_C_NAME = "name"
+CSV_C_DATA = "data"

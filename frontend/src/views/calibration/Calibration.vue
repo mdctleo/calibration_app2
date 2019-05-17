@@ -74,7 +74,11 @@ export default {
       api.getCalibrationFactorsGraph(this.selectedCounter, this.selectedIsotope)
               .then((response) => {
                 this.traces = response.data;
-
+                this.traces.forEach((trace) => {
+                  trace[0].forEach((time, index) => {
+                    trace[0][index] = moment(time).format('DD-MM-YYYY, h:mm:ss');
+                  })
+                })
               })
               .catch((error) => {
                 console.log(error);

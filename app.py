@@ -47,10 +47,12 @@ from user import Model as userModel
 from calibration_app.isotope import bp as isotope_bp, Model as isotopeModel
 from calibration_app.calibration import bp as calibration_bp, Model as calibrationModel
 from calibration_app.counter import bp as counter_bp, Model as gammaCounterModel
+from calibration_app.csv import bp as csv_bp, Model as csvModel
 
 app.register_blueprint(isotope_bp)
 app.register_blueprint(calibration_bp)
 app.register_blueprint(counter_bp)
+app.register_blueprint(csv_bp)
 
 db.create_all()
 db.session.commit()
