@@ -5,6 +5,7 @@ from forms import LoginForm, powerForm
 from flask_login import current_user, login_user,logout_user, login_required
 from user.Model import User
 from statsmodels.stats.power import TTestPower, TTestIndPower
+from methods.statistics import *
 import math as m
 
 import plotly
@@ -59,27 +60,10 @@ def effectCalc():
         alternative = request.form['alternative']
 
 
-
-
-        # # output the user input on the shell
+        # output the user input on the shell
         print("\nnobs: " + nobs  + "    Alpha: " +  alpha  + "     Power: " + power  + "   Test: " + test + "   Alternative: " + alternative + "\n")
 
-        nobs = int(nobs)
-        alpha = float(alpha)
-        power = float(power)
-
-        # nobs = 5
-        # alpha = 0.05
-        # power = 0.7
-        # test = "independent"
-
-        if (test == 'independent'):
-            result = TTestPower().solve_power(effect_size=effect, nobs=nobs, alpha=alpha, power=power, alternative=alternative)
-        elif (test == 'paired'):
-            result = TTestIndPower().solve_power(effect_size=effect, nobs1=nobs, alpha=alpha, power=power, alternative=alternative)
-
-        print("\nThe Effect size should be %.2f\n" % result)
-        flash("The Effect size should be %.2f\n" % result)
+        powerFunc(effect, float(alpha), float(power), int(nobs), test, alternative)
 
     return render_template('powerForms/effectCalc.html', form=form, plot=bar)
 
@@ -105,21 +89,7 @@ def nobsCalc():
         test = request.form['test']
         alternative = request.form['alternative']
 
-
-        # output the user input on the shell
-        # print("\nEffect: " + effect + "    Alpha: " +  alpha  + "     Power: " + power  + "   Test: " + test + "\n")
-
-        effect = float(effect)
-        alpha = float(alpha)
-        power = float(power)
-
-        if (test == 'independent'):
-            result = TTestPower().solve_power(effect_size=effect, nobs=nobs, alpha=alpha, power=power, alternative=alternative)
-        elif (test == 'paired'):
-            result = TTestIndPower().solve_power(effect_size=effect, nobs1=nobs, alpha=alpha, power=power, alternative=alternative)
-
-        print("\nThe Sample size should be {}\n".format(m.ceil(result)))
-        flash("The Sample size should be {}\n".format(m.ceil(result)))
+        powerFunc(float(effect), float(alpha), float(power), nobs, test, alternative)
 
 
     return render_template('powerForms/nobsCalc.html', form=form, plot=bar)
@@ -129,8 +99,9 @@ def nobsCalc():
 def powerCalc():
     form = powerForm()
 
-    feature = 'Bar'
-    bar = create_plot(feature)
+    feature = 'Line'
+    plot = create_plot(feature)
+    table = createTable()
 
     # Setting the default value of alpha as 0.05
     if request.method == 'GET':
@@ -150,19 +121,11 @@ def powerCalc():
         #  # output the user input on the shell
         print("\nEffect: " + effect  + "    nobs: " + nobs  + "    Alpha: " +  alpha  + "   Test: " + test +"\n")
 
-        effect = float(effect)
-        nobs = float(nobs)
-        alpha = float(alpha)
+        powerFunc(float(effect), float(alpha), power, int(nobs), test, alternative)    
 
-        if (test == 'independent'):
-            result = TTestPower().solve_power(effect_size=effect, nobs=nobs, alpha=alpha, power=power, alternative=alternative)
-        elif (test == 'paired'):
-            result = TTestIndPower().solve_power(effect_size=effect, nobs1=nobs, alpha=alpha, power=power, alternative=alternative)
+        plot, table = createLineGraphAndTable(int(nobs), float(alpha), power, alternative, test)
 
-        print("\nThe Power should be %.2f\n" % result)
-        flash("The Power should be %.2f\n" % result)        
-
-    return render_template('powerForms/powerCalc.html', form=form, plot=bar)
+    return render_template('powerForms/powerCalc.html', form=form, plot=plot, plot2=table)
 
 # how to get dash plotly graph on flask: check this link below
 # https://medium.com/@olegkomarov_77860/how-to-embed-a-dash-app-into-an-existing-flask-app-ea05d7a2210b

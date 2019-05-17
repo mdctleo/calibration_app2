@@ -46,13 +46,20 @@
     {% for message in get_flashed_messages() %}
         {{ message }}
 
-        <div class="col-md-6">
-            <div class="chart" id="bargraph">
-                <script>
-                    var graphs = {{plot | safe}};
-                    Plotly.plot('bargraph',graphs,{});
-                </script>
-            </div>
+
+        <div class="chart" id="bargraph">
+            <script>
+                var graphs = {{plot | safe}};
+                Plotly.plot('bargraph',graphs,{});
+            </script>
+        </div>
+
+
+        <div class="chart" id="table">
+            <script>
+                var tables = {{plot2 | safe}};
+                Plotly.plot('table',tables,{});
+            </script>
         </div>
         
     {% endfor %}
