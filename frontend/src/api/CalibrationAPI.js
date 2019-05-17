@@ -18,7 +18,7 @@ export const getCounters = async () => {
 export const getIsotopes = async () => {
     let endpoint = BASE_URL + "/isotopes";
     return await axios.get(endpoint);
-}
+};
 
 export const getCalibrationFactorsGraph = async (model, isotope) => {
     let endpoint = BASE_URL + "/calibrations/graph";
@@ -29,16 +29,9 @@ export const getCalibrationFactorsGraph = async (model, isotope) => {
         }})
 };
 
-export const postCsvFiles = async (files) => {
+export const postCsvFiles = async (filesJson) => {
     let endpoint = BASE_URL + "/csv";
-    let data = new FormData();
-    data.append('file', files[0]);
-    console.log(data);
-    return await axios({
-        method: 'post',
-        url: endpoint,
-        data: data,
-        charset: "ISO-8859-1",
-        config: { headers: {'Content-Type': 'multipart/form-data'}}
+    return await axios.post(endpoint, {
+        files: filesJson
     })
 };
