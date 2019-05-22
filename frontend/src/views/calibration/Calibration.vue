@@ -82,7 +82,7 @@ export default {
               })
               .catch((error) => {
                 console.log(error);
-                this.errror = error.response.data.message;
+                this.error = error.response.data.message;
 
               })
               .finally(() => {

@@ -11,8 +11,8 @@
   "dependencies": {
     "axios": "^0.18.0",
     "core-js": "^2.6.5",
+    "csvtojson": "^2.0.8",
     "element-ui": "^2.8.2",
-    "json-2-csv": "^3.5.3",
     "moment": "^2.24.0",
     "plotly.js": "^1.47.4",
     "vue": "^2.6.10",

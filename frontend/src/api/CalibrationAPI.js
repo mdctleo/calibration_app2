@@ -30,7 +30,7 @@ export const getCalibrationFactorsGraph = async (model, isotope) => {
 };
 
 export const postCsvFiles = async (filesJson) => {
-    let endpoint = BASE_URL + "/csv";
+    let endpoint = BASE_URL + "/biodicsv";
     return await axios.post(endpoint, {
         files: filesJson
     })

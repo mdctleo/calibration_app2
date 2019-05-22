@@ -20,17 +20,16 @@
 
 <script>
     import * as api from '../../api/CalibrationAPI'
-    const converter = require('json-2-csv');
-    const utils = require('util');
-    const csv2jsonAsync = utils.promisify(converter.csv2json);
+
+    const csv = require('csvtojson');
     export default {
         name: "Csv.vue",
-        data () {
-          return {
-              files: [],
-              filesJson: [],
-              loading: false
-          }
+        data() {
+            return {
+                files: [],
+                filesJson: [],
+                loading: false
+            }
         },
         methods: {
 
@@ -39,27 +38,31 @@
                 let csv2jsonPromises = [];
                 let readFilePromises = [];
                 this.files.forEach((file) => {
+                    // read uploaded file data
                     readFilePromises.push(this.readFile(file.raw))
                 });
 
                 Promise.all(readFilePromises)
                     .then((csvFiles) => {
-                        return csvFiles.forEach((csvFile) => {
-                            csv2jsonPromises.push(csv2jsonAsync(csvFile))
-                        })
+                        // transform each csv file to json
+                        csvFiles.forEach((csvFile) => {
+                            csv2jsonPromises.push(csv().fromString(csvFile))
+                        });
+
+                        return Promise.all(csv2jsonPromises);
                     })
-                    .then(() => {
-                        return Promise.all(csv2jsonPromises)
-                    })
-                    .then((csvJsons) => {
-                        return csvJsons.forEach((csvJson, index) => {
+                    .then((csvJsonFiles) => {
+                        // replace explicit protocol names and create json to send
+                        csvJsonFiles.forEach((csvJsonFile, index) => {
+                            csvJsonFile.forEach((csvRow) => {
+                                this.replaceProtocolKey(csvRow);
+                            });
                             this.filesJson.push({
-                              filename: this.files[index].name,
-                              file: csvJson
+                                fileName: this.files[index].name,
+                                file: csvJsonFile
                             })
-                        })
-                    })
-                    .then(() => {
+                        });
+
                         return api.postCsvFiles(this.filesJson)
                     })
                     .then((response) => {
@@ -67,12 +70,32 @@
                         this.clearData();
                     })
                     .catch((error) => {
-                        console.log(error);
+                        console.log(error.response.data.message);
                         this.$refs.upload.abort();
                     })
                     .finally(() => {
                         this.loading = false;
                     })
+            },
+
+            replaceProtocolKey(csvRow) {
+                let protocolName = csvRow['Protocol name'];
+                let oldCountKey = protocolName + ' Counts';
+                let oldCPMKey = protocolName + ' CPM';
+                let oldErrorKey = protocolName + ' Error %';
+                let oldInfoKey = protocolName + ' Info';
+
+                csvRow['Counts'] = csvRow[oldCountKey];
+                csvRow['CPM'] = csvRow[oldCPMKey];
+                csvRow['Error %'] = csvRow[oldErrorKey];
+                csvRow['Info'] = csvRow[oldInfoKey];
+
+                delete csvRow[oldCountKey];
+                delete csvRow[oldCPMKey];
+                delete csvRow[oldErrorKey];
+                delete csvRow[oldInfoKey];
+                delete csvRow['Protocol name'];
+                delete csvRow['Protocol ID']
             },
 
 
@@ -93,7 +116,7 @@
                 })
             },
 
-            clearData () {
+            clearData() {
                 this.files = [];
                 this.filesJson = [];
                 this.$refs.upload.clearFiles();
