@@ -95,7 +95,6 @@
                 delete csvRow[oldErrorKey];
                 delete csvRow[oldInfoKey];
                 delete csvRow['Protocol name'];
-                delete csvRow['Protocol ID']
             },
 
 

@@ -7,7 +7,7 @@ from exceptions.Exceptions import *
 
 class Protocol(db.Model):
     __tablename__ = PROTOCOL_T_NAME
-    id = db.Column(PROTOCOL_C_ID, db.Integer, primary_key=True)
+    id = db.Column(PROTOCOL_C_ID, db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(PROTOCOL_C_NAME, db.String(8), nullable=False)
     biodiCsv = db.relationship('BiodiCsv', backref=PROTOCOL_T_NAME)
 
@@ -20,9 +20,10 @@ class Protocol(db.Model):
 
 class BiodiCsv(db.Model):
     __tablename__ = BIODI_CSV_T_NAME
+    id = db.Column(BIODI_CSV_C_ID, db.Integer, primary_key=True, autoincrement=True)
     fileName = db.Column(BIODI_CSV_C_FILE_NAME, db.String(45), primary_key=True)
-    protocolId = db.Column(BIODI_CSV_C_PROTOCOL_ID, db.Integer, nullable=False)
-    biodiCsvValues = db.relationship('BiodiCsvValues', backref=BIODI_CSV_T_NAME)
+    protocolId = db.Column(BIODI_CSV_C_PROTOCOL_ID, db.Integer, db.ForeignKey(PROTOCOL_T_NAME + '.' + PROTOCOL_C_ID), nullable=False)
+    biodiCsvValues = db.relationship('BiodiCsvRow', backref=BIODI_CSV_T_NAME)
 
     def __init__(self, fileName, protocolId):
         self.fileName = fileName
@@ -32,10 +33,10 @@ class BiodiCsv(db.Model):
         return '<BiodiCsv %r %r %r>' % (self.id, self.fileName, self.protocolId)
 
 
-class BiodiCsvValues(db.Model):
+class BiodiCsvRow(db.Model):
     __tablename__ = BIODI_CSV_VALUES_T_NAME
-    id = db.Column(BIODI_CSV_VALUES_C_ID, db.Integer, primary_key=True)
-    csvId = db.Column(BIODI_CSV_VALUES_C_CSV_ID, db.Integer, nullable=False)
+    id = db.Column(BIODI_CSV_VALUES_C_ID, db.Integer, primary_key=True, autoincrement=True)
+    csvId = db.Column(BIODI_CSV_VALUES_C_CSV_ID, db.Integer, db.ForeignKey(BIODI_CSV_T_NAME + '.' + BIODI_CSV_C_ID), nullable=False)
     rowNum = db.Column(BIODI_CSV_VALUES_C_ROW_NUM, db.Integer, nullable=False)
     measurementTime = db.Column(BIODI_CSV_VALUES_C_MEASUREMENT_DATETIME, db.DateTime)
     completionStatus = db.Column(BIODI_CSV_VALUES_C_COMPLETION_STATUS, db.Integer)
@@ -68,7 +69,7 @@ class BiodiCsvValues(db.Model):
         self.info = info
 
     def __repr__(self):
-        return '<BiodiCsvValues %r %r %r %r %r %r %r %r %r %r %r %r %r %r %r>' % \
+        return '<BiodiCsvRow %r %r %r %r %r %r %r %r %r %r %r %r %r %r %r>' % \
                (self.id, self.csvId, self.rowNum, self.measurementTime, self.completionStatus,
                 self.runId, self.rack, self.det, self.pos, self.time, self.sampleCode, self.counts,
                 self.cpm, self.error, self.info)
@@ -81,6 +82,7 @@ class ProtocolSchema(Schema):
 class BiodiCsvValuesSchema(Schema):
     # csvId = fields.Int(required=True)
     # rowNum = fields.Int(required=True)
+    protocolId = fields.Integer(data_key="Protocol ID")
     measurementTime = fields.DateTime(data_key='Measurement date & time')
     completionStatus = fields.Int(data_key='Completion status')
     runId = fields.Int(data_key='Run ID')
@@ -108,9 +110,9 @@ class BiodiCsvRequestSchema(Schema):
 class DatabaseHelper:
 
     @staticmethod
-    def createCsvs(csvs):
-        for csv in csvs:
-            db.session.add(csv)
+    def createCsvs(biodiCsvRows):
+        for row in biodiCsvRows:
+            db.session.add(row)
         try:
             db.session.commit()
         except SQLAlchemyError:
@@ -125,8 +127,10 @@ class DatabaseHelper:
         for meta in metas:
             db.session.add(meta)
         try:
-            csvIds = db.session.flush()
+            csvIds = []
             db.session.commit()
+            for meta in metas:
+                csvIds.append(meta.id)
         except SQLAlchemyError:
             db.session.rollback()
             db.session.remove()
