@@ -3,7 +3,7 @@ from flask import request
 import csv
 import json
 import os
-from calibration_app.biodi_csv.Model import BiodiCsv, BiodiCsvRow, BiodiCsvRequestSchema, DatabaseHelper as db
+from calibration_app.biodi_csv.Model import BiodiCsv, BiodiCsvSchema, BiodiCsvRow, BiodiCsvRowSchema, BiodiCsvRequestSchema, DatabaseHelper as db
 from werkzeug.utils import secure_filename
 from flask import jsonify
 from response.response import StandardResponse, StandardResponseSchema
@@ -14,7 +14,7 @@ from marshmallow import ValidationError
 def prepareMetas(files):
     metas = []
     for file in files:
-        metas.append(BiodiCsv(file["fileName"], file["file"][0]["protocolId"]))
+        metas.append(BiodiCsv(file["fileName"], file["file"][0]["protocolId"], 'Carlos'))
 
     return metas
 
@@ -28,7 +28,6 @@ def prepareCsvs(files, csvIds):
             biodiCsvRows.append(BiodiCsvRow(csvId, rowNum, row["measurementTime"], row["completionStatus"],
                                         row["runId"], row["rack"], row["det"], row["pos"], row["time"], row["sampleCode"],
                                         row["counts"], row["cpm"], row["error"], row["info"]))
-
     return biodiCsvRows
 
 
@@ -42,9 +41,28 @@ def createCsvs(files):
     except BaseException as e:
         raise e
 
+def getMetas():
+    try:
+        metas = db.getMetas()
+    except BaseException as e:
+        raise e
+
+    return metas
+
+def getCsv(csvId):
+    try:
+        metaData, csvRows = db.getCsv(csvId)
+        file = BiodiCsvRowSchema(many=True).dump(csvRows)
+        print(file)
+
+    except BaseException as e:
+        raise e
+    return csv
+
+
 
 @bp.route('/biodicsv', methods=['POST', 'GET'])
-def biodicsv():
+def biodiCsv():
     if request.method == 'POST':
         try:
             biodiCsvRequestDict = BiodiCsvRequestSchema().load(request.get_json())
@@ -56,12 +74,35 @@ def biodicsv():
             response = StandardResponseSchema().dump(result)
             return jsonify(response), 400
         except BaseException as e:
-            response = StandardResponseSchema().dump(e)
+            result = StandardResponse(e.message)
+            response = StandardResponseSchema().dump(result)
             return jsonify(response), 500
 
         result = StandardResponse("Success")
         response = StandardResponseSchema().dump(result)
         return jsonify(response), 200
     elif request.method == 'GET':
+        try:
+            result = getCsv(request.args.get('id'))
+        except BaseException as e:
+            result = StandardResponse(e.message)
+            response = StandardResponseSchema().dump(result)
+            return jsonify(response), 400
 
-        return "Not Implemented"
+        response = BiodiCsvSchema().dump(result)
+        return jsonify(response), 200
+
+
+
+@bp.route('/biodicsv-metas', methods=['GET'])
+def biodiCsvMetas():
+    if request.method == 'GET':
+        try:
+            result = getMetas()
+        except BaseException as e:
+            result = StandardResponse(e.message)
+            response = StandardResponseSchema().dump(result)
+            return jsonify(response), 500
+
+        response = BiodiCsvSchema(many=True).dump(result)
+        return jsonify(response), 200

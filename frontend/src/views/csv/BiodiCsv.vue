@@ -1,34 +1,42 @@
 <template>
-    <div>
-        <el-upload
-                class="upload-demo"
-                drag
-                action=""
-                :auto-upload="false"
-                :on-remove="handleRemove"
-                :on-change="handleUpload"
-                multiple
-                ref="upload"
-                v-loading="loading">
-            <i class="el-icon-upload"></i>
-            <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
-            <div class="el-upload__tip" slot="tip">Drag your BioDi files here</div>
-        </el-upload>
-        <el-button type="success" class="upload-submit" @click="handleSubmit">Submit</el-button>
+    <div v-loading="this.loading">
+        <el-alert
+                v-show="error"
+                :title="error"
+                type="error"
+                show-icon
+                @close="error = null">
+        </el-alert>
+        <BiodiCsvUpload v-on:submit="handleSubmit" ref="upload"></BiodiCsvUpload>
+        <BiodiCsvDownload :metas="this.metas" @download="downloadBiodiCsvs"></BiodiCsvDownload>
     </div>
 </template>
 
 <script>
     import * as api from '../../api/CalibrationAPI'
+    import BiodiCsvUpload from "../../components/BiodiCsvUpload";
+    import store from '../../store/Store.js'
+    import BiodiCsvDownload from "../../components/BiodiCsvDownload";
+    import {getBiodiCsvMetas} from "../../api/CalibrationAPI";
 
+    const moment = require('moment');
     const csv = require('csvtojson');
     export default {
-        name: "Csv.vue",
+        name: "BiodiCsv.vue",
+        components: {BiodiCsvDownload, BiodiCsvUpload},
         data() {
             return {
-                files: [],
                 filesJson: [],
-                loading: false
+                loading: false,
+                metas: [],
+                error: null
+            }
+        },
+        computed: {
+            files: {
+                get () {
+                    return store.state.files
+                }
             }
         },
         methods: {
@@ -63,17 +71,17 @@
                             })
                         });
 
-                        return api.postCsvFiles(this.filesJson)
+                        return api.postBiodiCsvFiles(this.filesJson)
                     })
                     .then((response) => {
                         console.log(response.data);
-                        this.clearData();
                     })
                     .catch((error) => {
-                        console.log(error.response.data.message);
-                        this.$refs.upload.abort();
+                        this.error = error.data.response.message;
                     })
                     .finally(() => {
+                        this.$refs.upload.clearData();
+                        this.filesJson =[];
                         this.loading = false;
                     })
             },
@@ -114,27 +122,46 @@
                     fileReader.readAsText(file)
                 })
             },
+            getBiodiCsvMetas() {
+                this.loading = true;
+                api.getBiodiCsvMetas()
+                    .then((response) => {
+                        response.data.forEach((meta) => {
+                            meta.createdOn = moment(meta.createdOn).format('DD-MM-YYYY, h:mm:ss');
+                        });
+                        this.metas = response.data;
+                    })
+                    .catch((error) => {
+                        this.error = error.data.response.message
 
-            clearData() {
-                this.files = [];
-                this.filesJson = [];
-                this.$refs.upload.clearFiles();
+                    })
+                    .finally(() => {
+                        this.loading = false;
+                    })
             },
 
-            handleRemove(file, fileList) {
-                this.files = fileList
+            downloadBiodiCsvs() {
+                this.loading = true;
+                api.getBiodiCsvs()
+                    .then((response) => {
+                        console.log(response.data);
+                    })
+                    .catch((error) => {
+                        this.error = error.response.data.message;
+                    })
+                    .finally(() => {
+                        this.loading = false;
+                    })
 
-            },
-            handleUpload(file, fileList) {
-                this.files = fileList;
-            },
+            }
+        },
+
+        created() {
+            this.getBiodiCsvMetas();
         }
     }
 </script>
 
 <style scoped>
-    .upload-submit {
-        margin-top: 10px;
-    }
 
 </style>

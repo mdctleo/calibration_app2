@@ -29,9 +29,19 @@ export const getCalibrationFactorsGraph = async (model, isotope) => {
         }})
 };
 
-export const postCsvFiles = async (filesJson) => {
+export const postBiodiCsvFiles = async (filesJson) => {
     let endpoint = BASE_URL + "/biodicsv";
     return await axios.post(endpoint, {
         files: filesJson
     })
+};
+
+export const getBiodiCsvMetas = async () => {
+    let endpoint = BASE_URL + "/biodicsv-metas";
+    return await axios.get(endpoint);
+};
+
+export const getBiodiCsvs = async () => {
+  let endpoint = BASE_URL + "/biodicsv";
+  return await axios.get(endpoint)
 };
