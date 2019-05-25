@@ -72,11 +72,15 @@ class BiodiCsvRow(db.Model):
         self.error = error
         self.info = info
 
+    # def __repr__(self):
+    #     return '<BiodiCsvRow %r %r %r %r %r %r %r %r %r %r %r %r %r %r %r>' % \
+    #            (self.id, self.csvId, self.rowNum, self.measurementTime, self.completionStatus,
+    #             self.runId, self.rack, self.det, self.pos, self.time, self.sampleCode, self.counts,
+    #             self.cpm, self.error, self.info)
+
     def __repr__(self):
-        return '<BiodiCsvRow %r %r %r %r %r %r %r %r %r %r %r %r %r %r %r>' % \
-               (self.id, self.csvId, self.rowNum, self.measurementTime, self.completionStatus,
-                self.runId, self.rack, self.det, self.pos, self.time, self.sampleCode, self.counts,
-                self.cpm, self.error, self.info)
+        return '<BiodiCsvRow %r>' % \
+               (self.rowNum)
 
 
 class ProtocolSchema(Schema):
@@ -137,9 +141,11 @@ class DatabaseHelper:
     @staticmethod
     def getCsv(csvId):
         try:
-            metaData = BiodiCsv.query.filter(BiodiCsv.id == csvId).first()
+            fileName = db.session.query(BiodiCsv).with_entities(BiodiCsv.fileName).filter(BiodiCsv.id == csvId).first()
             csvRows = db.session.query(BiodiCsv, BiodiCsvRow, Protocol)\
-                .with_entities(BiodiCsvRow.rowNum,
+                .with_entities(
+                               Protocol.id,
+                               Protocol.protocolName,
                                BiodiCsvRow.measurementTime,
                                BiodiCsvRow.completionStatus,
                                BiodiCsvRow.runId,
@@ -151,14 +157,14 @@ class DatabaseHelper:
                                BiodiCsvRow.counts,
                                BiodiCsvRow.cpm,
                                BiodiCsvRow.error,
-                               BiodiCsvRow.info,
-                               Protocol.protocolName)\
+                               BiodiCsvRow.info)\
                 .filter(BiodiCsv.id == csvId)\
-                .filter(BiodiCsv.protocolId == Protocol.id)\
-                .order_by(BiodiCsvRow.id).all()
+                .filter(BiodiCsvRow.csvId == BiodiCsv.id)\
+                .filter(Protocol.id == BiodiCsv.protocolId)\
+                .order_by(BiodiCsvRow.rowNum).all()
         except SQLAlchemyError as e:
             raise BaseException(e.__str__())
-        return metaData, csvRows
+        return fileName, csvRows
 
     @staticmethod
     def createMetas(metas):

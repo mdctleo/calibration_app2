@@ -3,12 +3,7 @@
         <el-table
                 class="el-table"
                 ref="multipleTable"
-                :data="this.metas"
-                @selection-change="handleSelectionChange">
-            <el-table-column
-                    class="el-table-column"
-                    type="selection">
-            </el-table-column>
+                :data="this.metas">
             <el-table-column
                     class="el-table-column"
                     property="createdOn"
@@ -24,11 +19,16 @@
                     property="createdBy"
                     label="created By">
             </el-table-column>
+            <el-table-column
+                    label="Operations">
+                <template slot-scope="scope">
+                    <el-button
+                            size="mini"
+                            type="primary"
+                            @click="handleDownload(scope.$index, scope.row); $emit('download')">Download</el-button>
+                </template>
+            </el-table-column>
         </el-table>
-        <div style="margin-top: 20px">
-            <el-button @click="$emit('download')">Download</el-button>
-            <el-button @click="toggleSelection()">Clear selection</el-button>
-        </div>
     </div>
 </template>
 
@@ -41,31 +41,22 @@
             metas: Array
         },
         computed: {
-          selections: {
+          biodiCsvToDownload: {
               get () {
                   return store.state.biodiCsvToDownload
               },
-              set (selections) {
+              set (id) {
                   store.dispatch({
                       type: type.setBiodiCsvToDownload,
-                      biodiCsvToDownload: selections
+                      biodiCsvToDownload: id
                   })
               }
           }
         },
 
         methods: {
-            toggleSelection(rows) {
-                if (rows) {
-                    rows.forEach(row => {
-                        this.$refs.multipleTable.toggleRowSelection(row);
-                    });
-                } else {
-                    this.$refs.multipleTable.clearSelection();
-                }
-            },
-            handleSelectionChange(selections) {
-                this.selections = selections
+            handleDownload(index, row) {
+                this.biodiCsvToDownload = row.id
             }
         }
     }

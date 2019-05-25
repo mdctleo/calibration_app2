@@ -8,7 +8,7 @@ export default new Vuex.Store({
         selectedCounter: null,
         selectedIsotope: null,
         files: [],
-        biodiCsvToDownload: []
+        biodiCsvToDownload: null
     },
     mutations: {
         setSelectedCounter (state, payload) {

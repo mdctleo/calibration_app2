@@ -34,14 +34,23 @@
         },
         computed: {
             files: {
-                get () {
+                get() {
                     return store.state.files
+                }
+            },
+
+            biodiCsvToDownload: {
+                get() {
+                    return store.state.biodiCsvToDownload
                 }
             }
         },
         methods: {
 
             handleSubmit() {
+                if (this.files.length === 0) {
+                    return
+                }
                 this.loading = true;
                 let csv2jsonPromises = [];
                 let readFilePromises = [];
@@ -142,9 +151,15 @@
 
             downloadBiodiCsvs() {
                 this.loading = true;
-                api.getBiodiCsvs()
+                api.getBiodiCsvs(this.biodiCsvToDownload)
                     .then((response) => {
-                        console.log(response.data);
+                        const url = window.URL.createObjectURL(new Blob([response.data]));
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.setAttribute('download', 'file.csv');
+                        document.body.appendChild(link);
+                        link.click();
+                        link.parentNode.removeChild(link);
                     })
                     .catch((error) => {
                         this.error = error.response.data.message;

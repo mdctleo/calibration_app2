@@ -2,13 +2,17 @@ from calibration_app.biodi_csv import bp
 from flask import request
 import csv
 import json
-import os
+from io import StringIO
 from calibration_app.biodi_csv.Model import BiodiCsv, BiodiCsvSchema, BiodiCsvRow, BiodiCsvRowSchema, BiodiCsvRequestSchema, DatabaseHelper as db
 from werkzeug.utils import secure_filename
 from flask import jsonify
 from response.response import StandardResponse, StandardResponseSchema
 from exceptions.Exceptions import *
 from marshmallow import ValidationError
+from flask import make_response
+from flask import Response
+
+
 
 
 def prepareMetas(files):
@@ -51,13 +55,22 @@ def getMetas():
 
 def getCsv(csvId):
     try:
-        metaData, csvRows = db.getCsv(csvId)
-        file = BiodiCsvRowSchema(many=True).dump(csvRows)
-        print(file)
+        fileName, csvRows = db.getCsv(csvId)
+        si = StringIO()
+        cw = csv.writer(si)
+        protocolName = csvRows[0][1]
+        count = protocolName + " Count"
+        cpm = protocolName + " CPM"
+        error = protocolName + " Error %"
+        info = protocolName + " Info"
+        cw.writerow(("Protocol ID", "Protocol Name", "Measurement date & time", "Completion status", "Run ID", "Rack",
+                     "Det", "Pos", "Time", "Sample code", count, cpm, error, info))
+        cw.writerows(csvRows)
+        file = si.getvalue()
 
     except BaseException as e:
         raise e
-    return csv
+    return file, fileName[0]
 
 
 
@@ -70,7 +83,7 @@ def biodiCsv():
         except ValidationError as e:
             result = StandardResponse("Failed to validate the CSV, please use only csv with headers:"
                                             "Protocol name, Measurement date & time, Completion status, Run ID, Rack, "
-                                            "Det, Pos, Time, Sample code, * Counts, * CPM, * Error %, % Info")
+                                            "Det, Pos, Time, Sample code, * Counts, * CPM, * Error %, * Info")
             response = StandardResponseSchema().dump(result)
             return jsonify(response), 400
         except BaseException as e:
@@ -83,14 +96,16 @@ def biodiCsv():
         return jsonify(response), 200
     elif request.method == 'GET':
         try:
-            result = getCsv(request.args.get('id'))
+            result, fileName = getCsv(request.args.get('id'))
         except BaseException as e:
             result = StandardResponse(e.message)
             response = StandardResponseSchema().dump(result)
             return jsonify(response), 400
 
-        response = BiodiCsvSchema().dump(result)
-        return jsonify(response), 200
+        response = make_response(result)
+        response.headers["Content-Disposition"] = "attachment; filename=" + fileName
+        response.headers["Content-Type"] = "test/csv; charset=UTF-8"
+        return response, 200
 
 
 

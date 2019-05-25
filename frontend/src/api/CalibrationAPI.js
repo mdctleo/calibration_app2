@@ -41,7 +41,12 @@ export const getBiodiCsvMetas = async () => {
     return await axios.get(endpoint);
 };
 
-export const getBiodiCsvs = async () => {
+export const getBiodiCsvs = async (id) => {
   let endpoint = BASE_URL + "/biodicsv";
-  return await axios.get(endpoint)
+  return await axios.get(endpoint, {
+      responseType: 'blob',
+      params: {
+          id: id
+      }
+  })
 };
