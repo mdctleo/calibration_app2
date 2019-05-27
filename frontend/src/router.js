@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from './views/calibration/Calibration.vue'
+import Calibration from "./views/calibration/Calibration";
 
 
 Vue.use(Router)
@@ -9,8 +9,8 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: Home
+      name: 'Calibration',
+      component: Calibration
     },
     {
       path: '/about',

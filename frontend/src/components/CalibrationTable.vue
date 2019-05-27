@@ -14,8 +14,21 @@
         </el-table-column>
         <el-table-column
                 class="el-table-column"
+                fixed
+                prop="isotopeName"
+                label="Isotope Name"
+                width="width: 100%">
+        </el-table-column>
+        <el-table-column
+                class="el-table-column"
                 prop="factor"
                 label="Calibration Factor"
+                width="width: 100%">
+        </el-table-column>
+        <el-table-column
+                class="el-table-column"
+                prop="gammaCounter"
+                label="Gamma Counter"
                 width="width: 100%">
         </el-table-column>
         <el-table-column

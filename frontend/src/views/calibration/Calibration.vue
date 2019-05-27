@@ -1,9 +1,17 @@
 <template>
   <div>
+    <el-alert
+            v-show="error"
+            :title="error"
+            type="error"
+            show-icon
+            @close="error = null">
+    </el-alert>
     <IsotopeModelSelect
     :isotopes="this.isotopes"
     :counters="this.counters"
-    v-on:query = getCalibrationFactors></IsotopeModelSelect>
+    v-on:query = "getCalibrationFactors(); getCalibrationFactorsGraph();"></IsotopeModelSelect>
+    <CalibrationGraph :traces="this.traces" :loading="this.loading"></CalibrationGraph>
     <CalibrationTable :calibrationFactors="this.calibrationFactors"
       :loading="this.loading"></CalibrationTable>
   </div>
@@ -13,15 +21,16 @@
 // @ is an alias to /src
 import CalibrationTable from '@/components/CalibrationTable.vue'
 import IsotopeModelSelect from '@/components/IsotopeModelSelect.vue'
-// import {getCalibrationFactors, getIsotopes, getCounters} from "./Controller";
 import * as api from '../../api/CalibrationAPI'
-import {store} from '../../Store'
+import { mapState } from 'vuex';
+import CalibrationGraph from '@/components/CalibrationGraph.vue'
 const moment = require('moment');
 
 
 export default {
-  name: 'home',
+  name: 'Calibration',
   components: {
+    CalibrationGraph,
     CalibrationTable,
     IsotopeModelSelect
   },
@@ -30,27 +39,54 @@ export default {
       counters:  [],
       isotopes: [],
       calibrationFactors: [],
-      loading: false
+      traces: {},
+      loading: false,
+      error: null
     }
   },
+  computed: {
+    ...mapState(['selectedCounter', 'selectedIsotope'])
+  },
+
   methods: {
+
+    // TODO: Refactor this
     getCalibrationFactors() {
       this.loading = true;
-      api.getCalibrationFactors(store.getSelectedCounter(), store.getSelectedIsotope())
+      api.getCalibrationFactors(this.selectedCounter, this.selectedIsotope)
               .then((response) => {
                 this.calibrationFactors = response.data;
                 this.calibrationFactors.forEach((calibrationFactor) => {
-                  console.log(moment(calibrationFactor.createdOn).format('DD-MM-YYYY, h:mm:ss'));
-                  calibrationFactor.createdOn = moment(calibrationFactor.createdOn).format('DD-MM-YYYY, h:mm:ss')
+                  // format display date
+                  calibrationFactor.createdOn = moment(calibrationFactor.createdOn).format('DD-MM-YYYY, h:mm:ss');
                 });
-                this.loading = false;
               })
               .catch((error) => {
-                console.log(error)
+                console.log(error);
+                this.error = error.response.data.message;
+              })
+              .finally(() => {
+                this.loading = false;
+              })
+    },
+    getCalibrationFactorsGraph() {
+      this.loading = true;
+      api.getCalibrationFactorsGraph(this.selectedCounter, this.selectedIsotope)
+              .then((response) => {
+                this.traces = response.data;
+
+              })
+              .catch((error) => {
+                console.log(error);
+                this.errror = error.response.data.message;
+
+              })
+              .finally(() => {
+                this.loading = false;
               })
     },
     getCounters: api.getCounters,
-    getIsotopes: api.getIsotopes
+    getIsotopes: api.getIsotopes,
   },
   created() {
     this.getCounters()
@@ -58,15 +94,21 @@ export default {
               this.counters = response.data
             })
             .catch((error) => {
-              console.log(error)
+              this.error = error.response.data.message
+            })
+            .finally(() => {
+              this.loading = false;
             });
     this.getIsotopes()
             .then((response) => {
               this.isotopes = response.data
             })
             .catch((error) => {
-              console.log(error)
-            });
+              this.error = error.response.data.message
+            })
+            .finally(() => {
+              this.loading = false;
+            })
 
   }
 }

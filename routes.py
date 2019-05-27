@@ -1,11 +1,12 @@
 from app import app
-from flask import render_template, flash, redirect,url_for, redirect, request
+from flask import render_template, flash, redirect, url_for, redirect, request
 
 from forms import LoginForm, powerForm
-from flask_login import current_user, login_user,logout_user, login_required
+from flask_login import current_user, login_user, logout_user, login_required
 from user.Model import User
 from statsmodels.stats.power import TTestPower, TTestIndPower
 from methods.statistics import *
+from functions.functions import powerFunc
 
 
 # TODO: Refactor this
@@ -16,15 +17,17 @@ from methods.statistics import *
 @login_required
 def index():
     print("Got here")
-    text = {'content':'Home'}
-    return render_template('index.html',title='medphys',text=text)
+    text = {'content': 'Home'}
+    return render_template('index.html', title='medphys', text=text)
+
 
 @app.route('/gcbiodi')
 def gc_biodi():
-    text = {'content':'Hello world biodi'}
-    user = {'username':'Carlos'}
+    text = {'content': 'Hello world biodi'}
+    user = {'username': 'Carlos'}
 
-    return render_template('gcbiodi.html',text=text,user=user)
+    return render_template('gcbiodi.html', text=text, user=user)
+
 
 # connecting to power.html
 @app.route('/power')
@@ -32,6 +35,7 @@ def power():
     form = powerForm()
 
     return render_template('power.html', form=form)
+
 
 @app.route('/effectCalc', methods=['GET', 'POST'])
 def effectCalc():
@@ -44,7 +48,6 @@ def effectCalc():
     if request.method == 'GET':
         form.alpha.default = 0.05
         form.process()
-
 
     if (request.method == 'POST'):
         effect = None
@@ -74,7 +77,6 @@ def nobsCalc():
         form.alpha.default = 0.05
         form.process()
 
-
     if (request.method == 'POST'):
         effect = request.form['effect']
         nobs = None
@@ -102,7 +104,6 @@ def powerCalc():
         form.alpha.default = 0.05
         form.process()
 
-
     if (request.method == 'POST'):
         effect = request.form['effect']
         nobs = request.form['nobs']
@@ -127,7 +128,8 @@ def powerCalc():
 # https://www.reddit.com/r/flask/comments/a5hxdi/how_to_give_a_drop_down_list_a_selected_value/
 '''
 
-@app.route('/login',methods=['GET', 'POST'])
+
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
@@ -138,8 +140,8 @@ def login():
             flash('Invalid username or password')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
-        return redirect(url_for('index'))        
-    return render_template('login.html', title='Sign In', form=form,user='test')
+        return redirect(url_for('index'))
+    return render_template('login.html', title='Sign In', form=form, user='test')
 
 
 @app.route('/logout')
