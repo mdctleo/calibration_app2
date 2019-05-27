@@ -1,14 +1,20 @@
 <template>
     <div v-loading="this.loading">
-        <el-alert
-                v-show="error"
-                :title="error"
-                type="error"
-                show-icon
-                @close="error = null">
-        </el-alert>
-        <BiodiCsvUpload v-on:submit="handleSubmit" ref="upload"></BiodiCsvUpload>
-        <BiodiCsvDownload :metas="this.metas" @download="downloadBiodiCsvs"></BiodiCsvDownload>
+        <el-row>
+            <el-alert
+                    v-show="error"
+                    :title="error"
+                    type="error"
+                    show-icon
+                    @close="error = null">
+            </el-alert>
+        </el-row>
+        <el-row>
+            <BiodiCsvUpload v-on:submit="handleSubmit" ref="upload"></BiodiCsvUpload>
+        </el-row>
+        <el-row>
+            <BiodiCsvDownload :metas="this.metas" @download="downloadBiodiCsvs"></BiodiCsvDownload>
+        </el-row>
     </div>
 </template>
 
@@ -90,7 +96,7 @@
                     })
                     .finally(() => {
                         this.$refs.upload.clearData();
-                        this.filesJson =[];
+                        this.filesJson = [];
                         this.loading = false;
                     })
             },

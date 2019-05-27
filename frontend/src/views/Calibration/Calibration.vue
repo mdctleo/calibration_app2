@@ -1,5 +1,6 @@
 <template>
     <div>
+        <el-row>
         <el-alert
                 v-show="error"
                 :title="error"
@@ -7,13 +8,20 @@
                 show-icon
                 @close="error = null">
         </el-alert>
+        </el-row>
+        <el-row>
         <IsotopeModelSelect
                 :isotopes="this.isotopes"
                 :counters="this.counters"
                 v-on:query="getCalibrationFactors(); getCalibrationFactorsGraph();"></IsotopeModelSelect>
+        </el-row>
+        <el-row>
         <CalibrationGraph :traces="this.traces"></CalibrationGraph>
+        </el-row>
+        <el-row>
         <CalibrationTable :calibrationFactors="this.calibrationFactors"
                           :loading="this.loading"></CalibrationTable>
+        </el-row>
     </div>
 </template>
 

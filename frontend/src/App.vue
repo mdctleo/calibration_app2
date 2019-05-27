@@ -4,28 +4,49 @@
         <!--      <router-link to="/">Calibration</router-link> |-->
         <!--      <router-link to="/csv">Csv</router-link>-->
         <!--    </div>-->
-        <el-col :span="12" type="flex">
-            <el-menu
-                    default-active="2"
-                    @open="handleOpen"
-                    @close="handleClose">
-                <el-menu-item index="1">
-                    <template slot="title">
-                        <i class="el-icon-location"></i>
-                        <span>Navigator One</span>
-                    </template>
-                </el-menu-item>
-                <el-menu-item index="2">
-                    <i class="el-icon-menu"></i>
-                    <span>Navigator Two</span>
-                </el-menu-item>
-                <el-menu-item index="3">
-                    <i class="el-icon-setting"></i>
-                    <span>Navigator Four</span>
-                </el-menu-item>
-            </el-menu>
-        </el-col>
-        <router-view/>
+        <el-container class="app-container">
+            <el-header id="header">Test</el-header>
+            <el-container>
+                <el-aside id="nav" class="nav">
+                    <el-menu class="menu"
+                             default-active="1"
+                             @open="handleOpen"
+                             @close="handleClose"
+                             router="true">
+                        <el-menu-item index="1" route="/dashboard">
+                            <template slot="title">
+                                <i class="el-icon-s-home"></i>
+                                <span>Dashboard</span>
+                            </template>
+                        </el-menu-item>
+                        <el-submenu index="2">
+                            <template slot="title">
+                                <i class="el-icon-s-data"></i>
+                                <span>Biodi</span>
+                            </template>
+                            <el-menu-item index="2-1" route="/calibrationfactor">Calibration Factors</el-menu-item>
+                            <el-menu-item index="2-2" route="/biodicsv">Biodi CSV</el-menu-item>
+                        </el-submenu>
+                        <el-submenu index="3" route="/statistics">
+                            <template slot="title">
+                                <i class="el-icon-s-operation"></i>
+                                <span>Statistics</span>
+                            </template>
+                            <el-menu-item index="3-1">Effect</el-menu-item>
+                            <el-menu-item index="3-2">Nobs</el-menu-item>
+                            <el-menu-item index="3-3">Power</el-menu-item>
+                        </el-submenu>
+                        <el-menu-item index="4">
+                            <template slot="title">
+                                <i class="el-icon-user-solid"></i>
+                                <span>Logout</span>
+                            </template>
+                        </el-menu-item>
+                    </el-menu>
+                </el-aside>
+                <router-view class="view"/>
+            </el-container>
+        </el-container>
     </div>
 </template>
 
@@ -43,8 +64,33 @@
         height: 100vh;
     }
 
-    #nav {
-        height: 100%;
+    .app-container {
+        height: 100vh;
+    }
+
+    #header {
+        font-size: xx-large;
+        float: left;
+        text-align: left;
+        color: #0DBFD5;
+        border-bottom: 2px solid #0DBFD5;
+    }
+
+    .nav {
+        height: 100vh;
+        width: 15% !important;
+        background-color: #C2EFF4 !important;
+    }
+
+    .menu {
+        height: 100vh;
+        /*background-color: #0e0c28;*/
+    }
+
+    .view {
+        width: 85%;
+        height: 100vh;
+        background-color: #efeff6;
     }
 
 

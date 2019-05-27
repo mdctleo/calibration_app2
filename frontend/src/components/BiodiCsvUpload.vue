@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-upload
-                class="upload-demo"
+                class="upload"
                 drag
                 action=""
                 :auto-upload="false"
@@ -53,6 +53,9 @@
 </script>
 
 <style scoped>
+    .upload {
+        margin-top: 10px;
+    }
     .upload-submit {
         margin-top: 10px;
     }

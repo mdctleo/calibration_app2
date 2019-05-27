@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Calibration from "./views/Calibration/Calibration";
 import Login from "./views/Login/Login";
+import DashBoard from "./views/Dashboard/Dashboard";
 
 
 Vue.use(Router)
@@ -12,6 +13,11 @@ export default new Router({
       path: '/',
       name: 'Login',
       component: Login
+    },
+    {
+      path: '/dashboard',
+      name: 'Dashboard',
+      component: () => import(/* webpackChunkName: "about" */ './views/Dashboard/Dashboard.vue')
     },
     {
       path: '/calibrationfactor',
@@ -25,6 +31,11 @@ export default new Router({
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import(/* webpackChunkName: "about" */ './views/BiodiCsv/BiodiCsv.vue')
+    },
+    {
+      path: '/statistics',
+      name: 'Statistics',
+      component: () => import(/* webpackChunkName: "about" */ './views/Statistics/Statistics.vue')
     }
   ]
 })
