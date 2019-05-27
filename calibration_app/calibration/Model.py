@@ -28,7 +28,8 @@ class CalibrationFactor(db.Model):
 
     def __repr__(self):
         return '<CalibrationFactor %r %r %r %r %r %r>' % (self.id, self.factor, self.isotopeName, self.createdOn, self.createdBy, self.gammaCounter)
-
+        # from calibration_app.calibration.Model import CalibrationFactor
+        # u = CalibrationFactor(id= , factor= , isotopeName= , createdOn= , createdBy= , gammaCounter= )
 
 class CalibrationFactorSchema(Schema):
     id = fields.Integer()
