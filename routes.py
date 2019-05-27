@@ -6,11 +6,6 @@ from flask_login import current_user, login_user,logout_user, login_required
 from user.Model import User
 from statsmodels.stats.power import TTestPower, TTestIndPower
 from methods.statistics import *
-import math as m
-
-import plotly
-import plotly.graph_objs as go
-import json
 
 
 # TODO: Refactor this
@@ -32,7 +27,7 @@ def gc_biodi():
     return render_template('gcbiodi.html',text=text,user=user)
 
 # connecting to power.html
-@app.route('/power')#, methods=['GET', 'POST'])
+@app.route('/power')
 def power():
     form = powerForm()
 
@@ -59,9 +54,8 @@ def effectCalc():
         test = request.form['test']
         alternative = request.form['alternative']
 
-
         # output the user input on the shell
-        print("\nnobs: " + nobs  + "    Alpha: " +  alpha  + "     Power: " + power  + "   Test: " + test + "   Alternative: " + alternative + "\n")
+        # print("\nnobs: " + nobs  + "    Alpha: " +  alpha  + "     Power: " + power  + "   Test: " + test + "   Alternative: " + alternative + "\n")
 
         powerFunc(effect, float(alpha), float(power), int(nobs), test, alternative)
 
@@ -117,12 +111,10 @@ def powerCalc():
         test = request.form['test']
         alternative = request.form['alternative']
 
-
-        #  # output the user input on the shell
-        print("\nEffect: " + effect  + "    nobs: " + nobs  + "    Alpha: " +  alpha  + "   Test: " + test +"\n")
+        # output the user input on the shell
+        # print("\nEffect: " + effect  + "    nobs: " + nobs  + "    Alpha: " +  alpha  + "   Test: " + test +"\n")
 
         powerFunc(float(effect), float(alpha), power, int(nobs), test, alternative)    
-
         plot, table = createLineGraphAndTable(int(nobs), float(alpha), power, alternative, test)
 
     return render_template('powerForms/powerCalc.html', form=form, plot=plot, plot2=table)

@@ -11,17 +11,17 @@ import json
 
 def powerFunc(effect,alpha,power,nobs,test, alternative):
     
-    print("test")
+    # print("test")
 
     if test == 'independent':
         analysis = TTestPower()
-        print("test")
+        # print("test")
         # this is where the program brakes, the parameters are right, I'm not sure why this is not working
-        result = analysis.solve_power(effect_size=None,nobs=8,alpha=0.05,power=0.8, alternative=alternative) 
-        print("test")
+        result = analysis.solve_power(effect_size=effect,nobs=nobs,alpha=alpha,power=power, alternative=alternative) 
+        # print("test")
     elif test == 'paired':
         analysis = TTestIndPower()
-        result = analysis.solve_power(effect_size=effect,nobs=nobs,alpha=alpha,power=power, alternative=alternative)
+        result = analysis.solve_power(effect_size=effect,nobs1=nobs,alpha=alpha,power=power, alternative=alternative)
 
     # result = str(result)
 
@@ -112,11 +112,20 @@ def createLineGraphAndTable(nobs, alpha, power, alternative, test):
                 x = es,
                 y = newArr[i],
                 mode = 'lines',
-                name = 'N_' + str(i+1)
+                name = 'nobs: ' + str(nobsArr[i])
             )
             data.append(trace)
 
-    lineGraph = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
+    # Adding title 
+    layout = dict(title = 'Need Title',
+                  xaxis = dict(title='Effect Size'),
+                  yaxis = dict(title='Power'),
+                  )
+
+    graph = dict(data = data, layout=layout)
+
+    # lineGraph = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
+    lineGraph = json.dumps(graph, cls=plotly.utils.PlotlyJSONEncoder)
     
     ## create Table
     # round the value of effect size into 2 decimal place
@@ -131,7 +140,7 @@ def createLineGraphAndTable(nobs, alpha, power, alternative, test):
 
     # prepare name colouns
     for j in range(len(newArr)):
-        column = 'Power N_'+ str(j + 1)
+        column = 'Power N: '+ str(nobsArr[j])
         nameArr.append(column)
 
     # prepare the values
@@ -143,6 +152,7 @@ def createLineGraphAndTable(nobs, alpha, power, alternative, test):
         header=dict(values=nameArr),
         cells=dict(values=resultArr)
     )
+
 
     tableData = [trace2]
 
