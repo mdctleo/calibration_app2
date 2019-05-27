@@ -4,6 +4,8 @@ from flask import render_template, flash, redirect, url_for, redirect, request
 from forms import LoginForm, powerForm
 from flask_login import current_user, login_user, logout_user, login_required
 from user.Model import User
+from statsmodels.stats.power import TTestPower, TTestIndPower
+from methods.statistics import *
 from functions.functions import powerFunc
 
 
@@ -28,7 +30,7 @@ def gc_biodi():
 
 
 # connecting to power.html
-@app.route('/power')  # , methods=['GET', 'POST'])
+@app.route('/power')
 def power():
     form = powerForm()
 
@@ -38,6 +40,9 @@ def power():
 @app.route('/effectCalc', methods=['GET', 'POST'])
 def effectCalc():
     form = powerForm()
+
+    feature = 'Bar'
+    bar = create_plot(feature)
 
     # Setting the default value of alpha as 0.05
     if request.method == 'GET':
@@ -52,22 +57,20 @@ def effectCalc():
         test = request.form['test']
         alternative = request.form['alternative']
 
-        # # output the user input on the shell
-        print(
-            "\nnobs: " + nobs + "    Alpha: " + alpha + "     Power: " + power + "   Test: " + test + "   Alternative: " + alternative + "\n")
+        # output the user input on the shell
+        # print("\nnobs: " + nobs  + "    Alpha: " +  alpha  + "     Power: " + power  + "   Test: " + test + "   Alternative: " + alternative + "\n")
 
-        nobs = int(nobs)
-        alpha = float(alpha)
-        power = float(power)
+        powerFunc(effect, float(alpha), float(power), int(nobs), test, alternative)
 
-        powerFunc(effect, alpha, power, nobs, test, alternative)
-
-    return render_template('powerForms/effectCalc.html', form=form)
+    return render_template('powerForms/effectCalc.html', form=form, plot=bar)
 
 
 @app.route('/nobsCalc', methods=['GET', 'POST'])
 def nobsCalc():
     form = powerForm()
+
+    feature = 'Bar'
+    bar = create_plot(feature)
 
     # Setting the default value of alpha as 0.05
     if request.method == 'GET':
@@ -82,18 +85,19 @@ def nobsCalc():
         test = request.form['test']
         alternative = request.form['alternative']
 
-        effect = float(effect)
-        alpha = float(alpha)
-        power = float(power)
+        powerFunc(float(effect), float(alpha), float(power), nobs, test, alternative)
 
-        powerFunc(effect, alpha, power, nobs, test, alternative)
 
-    return render_template('powerForms/nobsCalc.html', form=form)
+    return render_template('powerForms/nobsCalc.html', form=form, plot=bar)
 
 
 @app.route('/powerCalc', methods=['GET', 'POST'])
 def powerCalc():
     form = powerForm()
+
+    feature = 'Line'
+    plot = create_plot(feature)
+    table = createTable()
 
     # Setting the default value of alpha as 0.05
     if request.method == 'GET':
@@ -108,17 +112,16 @@ def powerCalc():
         test = request.form['test']
         alternative = request.form['alternative']
 
-        #  # output the user input on the shell
-        print("\nEffect: " + effect + "    nobs: " + nobs + "    Alpha: " + alpha + "   Test: " + test + "\n")
+        # output the user input on the shell
+        # print("\nEffect: " + effect  + "    nobs: " + nobs  + "    Alpha: " +  alpha  + "   Test: " + test +"\n")
 
-        effect = float(effect)
-        nobs = float(nobs)
-        alpha = float(alpha)
+        powerFunc(float(effect), float(alpha), power, int(nobs), test, alternative)    
+        plot, table = createLineGraphAndTable(int(nobs), float(alpha), power, alternative, test)
 
-        powerFunc(effect, alpha, power, nobs, test, alternative)
+    return render_template('powerForms/powerCalc.html', form=form, plot=plot, plot2=table)
 
-    return render_template('powerForms/powerCalc.html', form=form)
-
+# how to get dash plotly graph on flask: check this link below
+# https://medium.com/@olegkomarov_77860/how-to-embed-a-dash-app-into-an-existing-flask-app-ea05d7a2210b
 
 '''
 # https://pythonspot.com/flask-web-forms/

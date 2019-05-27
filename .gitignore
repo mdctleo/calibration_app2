@@ -88,6 +88,9 @@ db.sqlite3
 instance/
 .webassets-cache
 
+# vue stuff
+node_modules/
+
 # Scrapy stuff:
 .scrapy
 
