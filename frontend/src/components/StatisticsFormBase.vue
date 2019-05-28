@@ -4,21 +4,21 @@
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item :label="this.label0" prop="input0">
-                        <el-input v-model="form.input0"></el-input>
+                        <el-input v-model.number="form.input0" type="number"></el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item :label="this.label1" prop="input1">
-                        <el-input v-model="form.input1"></el-input>
+                        <el-input v-model.number="form.input1" type="number"></el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Alpha" prop="alpha">
-                        <el-select v-model="form.alpha" placeholder="Select Alpha">
+                        <el-select v-model.number="form.alpha" placeholder="Select Alpha">
                             <el-option label="0.05" value=0.05></el-option>
                             <el-option label="0.01" value=0.01></el-option>
                         </el-select>
@@ -69,11 +69,13 @@
                 },
                 rules: {
                     input0: [
-                        {required: true, message: 'This field is required', trigger: 'blur'}
+                        {required: true, message: 'This field is required', trigger: 'blur'},
+                        {type: 'float', message: 'This field must be a number'}
                     ],
 
                     input1: [
-                        {required: true, message: 'This field is required', trigger: 'blur'}
+                        {required: true, message: 'This field is required', trigger: 'blur'},
+                        {type: 'number', message: 'This field must be a number'}
                     ],
 
                     alpha: [
@@ -91,14 +93,14 @@
             }
         },
         props: {
-            label0: '',
-            label1: ''
+            label0: null,
+            label1: null
         },
         methods: {
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        alert('submit!');
+                        return this.$emit('submit')
                     } else {
                         console.log('error submit!!');
                         return false;

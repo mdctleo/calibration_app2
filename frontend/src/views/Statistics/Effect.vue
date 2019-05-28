@@ -9,7 +9,8 @@
 
     export default {
         name: "Effect",
-        components: {StatisticsFormBase}
+        components: {StatisticsFormBase},
+        methods""
     }
 </script>
 
