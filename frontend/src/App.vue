@@ -32,9 +32,9 @@
                                 <i class="el-icon-s-operation"></i>
                                 <span>Statistics</span>
                             </template>
-                            <el-menu-item index="3-1">Effect</el-menu-item>
-                            <el-menu-item index="3-2">Nobs</el-menu-item>
-                            <el-menu-item index="3-3">Power</el-menu-item>
+                            <el-menu-item index="3-1" route="/effect">Effect</el-menu-item>
+                            <el-menu-item index="3-2" route="/nobs">Nobs</el-menu-item>
+                            <el-menu-item index="3-3" route="/power">Power</el-menu-item>
                         </el-submenu>
                         <el-menu-item index="4">
                             <template slot="title">

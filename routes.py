@@ -19,8 +19,8 @@ def index():
     print("Got here")
     text = {'content': 'Home'}
     return render_template('index.html', title='medphys', text=text)
-
-
+#
+#
 @app.route('/gcbiodi')
 def gc_biodi():
     text = {'content': 'Hello world biodi'}
@@ -42,7 +42,7 @@ def effectCalc():
     form = powerForm()
 
     feature = 'Bar'
-    bar = create_plot(feature)
+    # bar = create_plot(feature)
 
     # Setting the default value of alpha as 0.05
     if request.method == 'GET':
@@ -62,7 +62,7 @@ def effectCalc():
 
         powerFunc(effect, float(alpha), float(power), int(nobs), test, alternative)
 
-    return render_template('powerForms/effectCalc.html', form=form, plot=bar)
+    return render_template('powerForms/effectCalc.html', form=form)
 
 
 @app.route('/nobsCalc', methods=['GET', 'POST'])
@@ -70,7 +70,7 @@ def nobsCalc():
     form = powerForm()
 
     feature = 'Bar'
-    bar = create_plot(feature)
+    # bar = create_plot(feature)
 
     # Setting the default value of alpha as 0.05
     if request.method == 'GET':
@@ -88,7 +88,7 @@ def nobsCalc():
         powerFunc(float(effect), float(alpha), float(power), nobs, test, alternative)
 
 
-    return render_template('powerForms/nobsCalc.html', form=form, plot=bar)
+    return render_template('powerForms/nobsCalc.html', form=form)
 
 
 @app.route('/powerCalc', methods=['GET', 'POST'])
@@ -96,8 +96,8 @@ def powerCalc():
     form = powerForm()
 
     feature = 'Line'
-    plot = create_plot(feature)
-    table = createTable()
+    # plot = create_plot(feature)
+    # table = createTable()
 
     # Setting the default value of alpha as 0.05
     if request.method == 'GET':
@@ -115,10 +115,10 @@ def powerCalc():
         # output the user input on the shell
         # print("\nEffect: " + effect  + "    nobs: " + nobs  + "    Alpha: " +  alpha  + "   Test: " + test +"\n")
 
-        powerFunc(float(effect), float(alpha), power, int(nobs), test, alternative)    
-        plot, table = createLineGraphAndTable(int(nobs), float(alpha), power, alternative, test)
+        powerFunc(float(effect), float(alpha), power, int(nobs), test, alternative)
+        # plot, table = createLineGraphAndTable(int(nobs), float(alpha), power, alternative, test)
 
-    return render_template('powerForms/powerCalc.html', form=form, plot=plot, plot2=table)
+    return render_template('powerForms/powerCalc.html', form=form)
 
 # how to get dash plotly graph on flask: check this link below
 # https://medium.com/@olegkomarov_77860/how-to-embed-a-dash-app-into-an-existing-flask-app-ea05d7a2210b
