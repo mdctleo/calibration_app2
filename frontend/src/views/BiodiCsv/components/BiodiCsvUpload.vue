@@ -18,8 +18,8 @@
 </template>
 
 <script>
-    import store from '../store/Store.js'
-    import * as type from '../store/Types'
+    import store from '../../../store/Store.js'
+    import * as type from '../../../store/Types'
 
     export default {
         name: "BiodiCsvUpload",

@@ -10,9 +10,7 @@
                 <el-aside id="nav" class="nav">
                     <el-menu class="menu"
                              default-active="1"
-                             @open="handleOpen"
-                             @close="handleClose"
-                             router="true">
+                             :router="true">
                         <el-menu-item index="1" route="/dashboard">
                             <template slot="title">
                                 <i class="el-icon-s-home"></i>

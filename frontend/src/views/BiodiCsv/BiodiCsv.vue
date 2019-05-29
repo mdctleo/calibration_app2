@@ -19,11 +19,11 @@
 </template>
 
 <script>
-    import * as api from '../../api/CalibrationAPI'
-    import BiodiCsvUpload from "../../components/BiodiCsvUpload";
+    import * as api from '../../api/api'
+    import BiodiCsvUpload from "./components/BiodiCsvUpload";
     import store from '../../store/Store.js'
-    import BiodiCsvDownload from "../../components/BiodiCsvDownload";
-    import {getBiodiCsvMetas} from "../../api/CalibrationAPI";
+    import BiodiCsvDownload from "./components/BiodiCsvDownload";
+    import {getBiodiCsvMetas} from "../../api/api";
 
     const moment = require('moment');
     const csv = require('csvtojson');

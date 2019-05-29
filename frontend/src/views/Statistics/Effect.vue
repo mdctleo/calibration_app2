@@ -5,12 +5,15 @@
 </template>
 
 <script>
-    import StatisticsFormBase from "../../components/StatisticsFormBase";
+    import StatisticsFormBase from "./components/StatisticsFormBase";
 
     export default {
         name: "Effect",
         components: {StatisticsFormBase},
-        methods""
+        methods: {
+            handleSubmit() {}
+
+        }
     }
 </script>
 
