@@ -54,7 +54,7 @@ app.register_blueprint(isotope_bp)
 app.register_blueprint(calibration_bp)
 app.register_blueprint(counter_bp)
 app.register_blueprint(csv_bp)
-# app.register_blueprint(statistics_bp)
+app.register_blueprint(statistics_bp)
 
 db.create_all()
 db.session.commit()

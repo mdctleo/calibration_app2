@@ -16,7 +16,7 @@
                 v-on:query="getCalibrationFactors(); getCalibrationFactorsGraph();"></IsotopeModelSelect>
         </el-row>
         <el-row>
-        <CalibrationGraph :traces="traces"></CalibrationGraph>
+        <CalibrationGraph :traces="this.traces"></CalibrationGraph>
         </el-row>
         <el-row>
         <CalibrationTable :calibrationFactors="calibrationFactors"
@@ -30,8 +30,7 @@
     import * as types from '../../store/modules/Calibration/types'
     import CalibrationTable from './components/CalibrationTable'
     import IsotopeModelSelect from './components/IsotopeModelSelect.vue'
-    import * as api from '../../api/api'
-    import {mapState, mapGetters} from 'vuex';
+    import {mapActions, mapState, mapGetters} from 'vuex';
     import CalibrationGraph from './components/CalibrationGraph.vue'
 
     const moment = require('moment');
@@ -45,6 +44,8 @@
         },
         computed: {
             ...mapGetters({
+                selectedCounter: 'selectedCounter',
+                selectedIsotope: 'selectedIsotope',
                 counters: 'counters',
                 isotopes: 'isotopes',
                 calibrationFactors: 'calibrationFactors',
@@ -55,118 +56,32 @@
         },
 
         methods: {
+            ...mapActions([
+                types.GET_CALIBRATION_FACTORS,
+                types.GET_CALIBRATION_FACTORS_GRAPH,
+                types.GET_COUNTERS,
+                types.GET_ISOTOPES
+            ]),
             getCalibrationFactors() {
-                this.$store.dispatch(types.GET_CALIBRATION_FACTORS)
+                this.$store.dispatch({
+                    type: types.GET_CALIBRATION_FACTORS,
+                    selectedIsotope: this.selectedIsotope,
+                    selectedCounter: this.selectedCounter
+                })
             },
-
+            //
             getCalibrationFactorsGraph() {
-                this.$store.dispatch(types.GET_CALIBRATION_FACTORS_GRAPH)
+                this.$store.dispatch({
+                    type: types.GET_CALIBRATION_FACTORS_GRAPH,
+                    selectedIsotope: this.selectedIsotope,
+                    selectedCounter: this.selectedCounter
+                })
             }
         },
 
         created() {
-            this.$store.dispatch(types.GET_COUNTERS);
-            this.$store.dispatch(types.GET_ISOTOPES);
+            this.getIsotopes();
+            this.getCounters();
         }
     }
-
-
-    // export default {
-    //     name: 'Calibration',
-    //     components: {
-    //         CalibrationGraph,
-    //         CalibrationTable,
-    //         IsotopeModelSelect
-    //     },
-    //     data() {
-    //         return {
-    //             counters: [],
-    //             isotopes: [],
-    //             calibrationFactors: [],
-    //             traces: {},
-    //             loading: false,
-    //             error: null
-    //         }
-    //     },
-    //     computed: {
-    //         ...mapState(['selectedCounter', 'selectedIsotope'])
-    //     },
-    //
-    //     methods: {
-    //
-    //         // TODO: Refactor this
-    //         getCalibrationFactors() {
-    //             this.loading = true;
-    //             api.getCalibrationFactors(this.selectedCounter, this.selectedIsotope)
-    //                 .then((response) => {
-    //                     this.calibrationFactors = response.data;
-    //                     this.calibrationFactors.forEach((calibrationFactor) => {
-    //                         // format display date
-    //                         calibrationFactor.createdOn = moment(calibrationFactor.createdOn).format('DD-MM-YYYY, h:mm:ss');
-    //                     });
-    //                 })
-    //                 .catch((error) => {
-    //                     console.log(error);
-    //                     this.error = error.response.data.message;
-    //                 })
-    //                 .finally(() => {
-    //                     this.loading = false;
-    //                 })
-    //         },
-    //         getCalibrationFactorsGraph() {
-    //             this.loading = true;
-    //             api.getCalibrationFactorsGraph(this.selectedCounter, this.selectedIsotope)
-    //                 .then((response) => {
-    //                     this.traces = response.data;
-    //                     Object.values(this.traces).forEach((trace) => {
-    //                         trace[0].forEach((time, index) => {
-    //                             trace[0][index] = moment(time).format('DD-MM-YYYY, h:mm:ss');
-    //                         })
-    //                     })
-    //                 })
-    //                 .catch((error) => {
-    //                     console.log(error);
-    //                     this.error = error.response.data.message;
-    //
-    //                 })
-    //                 .finally(() => {
-    //                     this.loading = false;
-    //                 })
-    //         },
-    //
-    //         getCounters() {
-    //             this.loading = true;
-    //             api.getCounters()
-    //                 .then((response) => {
-    //                     this.counters = response.data
-    //                 })
-    //                 .catch((error) => {
-    //                     this.error = error.response.data.message
-    //                 })
-    //                 .finally(() => {
-    //                     this.loading = false;
-    //                 });
-    //
-    //         },
-    //
-    //         getIsotopes() {
-    //             this.loading = true;
-    //             api.getIsotopes()
-    //                 .then((response) => {
-    //                     this.isotopes = response.data
-    //                 })
-    //                 .catch((error) => {
-    //                     this.error = error.response.data.message
-    //                 })
-    //                 .finally(() => {
-    //                     this.loading = false;
-    //                 })
-    //         }
-    //     },
-    //     created() {
-    //         this.getCounters();
-    //         this.getIsotopes();
-    //
-    //     }
-    // }
 </script>

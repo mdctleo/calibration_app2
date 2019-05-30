@@ -21,7 +21,6 @@
 </template>
 
 <script>
-    import store from '../../../store/Store.js'
     import * as type from '../../../store/modules/Calibration/types'
     import {mapState, mapGetters} from 'vuex';
 
@@ -35,10 +34,10 @@
         computed: {
             selectedIsotope: {
                 get () {
-                    return store.state.selectedIsotope
+                    return this.$store.state.calibration.selectedIsotope
                 },
                 set (value) {
-                    store.dispatch({
+                    this.$store.dispatch({
                         type: type.SET_SELECTED_ISOTOPE,
                         selectedIsotope: value
                     })
@@ -47,10 +46,10 @@
 
             selectedCounter: {
                 get () {
-                    return store.state.selectedCounter
+                    return this.$store.state.calibration.selectedCounter
                 },
                 set (value) {
-                    store.dispatch({
+                    this.$store.dispatch({
                         type: type.SET_SELECTED_COUNTER,
                         selectedCounter: value
                     })

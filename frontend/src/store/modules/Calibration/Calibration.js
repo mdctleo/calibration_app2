@@ -24,7 +24,6 @@ const actions = {
 
   // api calls
   getCounters: (context) => {
-        console.log("Got Here");
       context.commit('SET_LOADING', {loading: true});
       getCounters()
           .then((response) => {
@@ -52,9 +51,9 @@ const actions = {
           });
   },
 
-    getCalibrationFactors: (context) => {
+    getCalibrationFactors: (context, payload) => {
         context.commit('SET_LOADING', {loading: true});
-      getCalibrationFactors(context.selectedCounter, context.selectedIsotope)
+      getCalibrationFactors(payload.selectedCounter, payload.selectedIsotope)
           .then((response) => {
               let calibrationFactors = response.data;
               calibrationFactors.forEach((calibrationFactor) => {
@@ -72,23 +71,23 @@ const actions = {
           })
     },
 
-    getCalibrationFactorsGraph: (context) => {
+    getCalibrationFactorsGraph: (context, payload) => {
         context.commit('SET_LOADING', {loading: true});
-        console.log(context.get());
-        console.log(context.state.selectedIsotope);
-        getCalibrationFactorsGraph(context.selectedCounter, context.selectedIsotope)
+        getCalibrationFactorsGraph(payload.selectedCounter, payload.selectedIsotope)
             .then((response) => {
-                console.log(response.data);
-                let traces = response.data;
-                Object.values(traces).forEach((trace) => {
-                    trace[0].forEach((time, index) => {
-                        trace[0][index] = moment(time).format('DD-MM-YYYY, h:mm:ss');
-                    })
-                });
+                let traces = [];
+                if (response.status === 200) {
+                    traces = response.data;
+                    Object.values(traces).forEach((trace) => {
+                        trace[0].forEach((time, index) => {
+                            trace[0][index] = moment(time).format('DD-MM-YYYY, h:mm:ss');
+                        })
+                    });
+                }
+                console.log(traces);
                 context.commit('SET_TRACES', {traces: traces})
             })
             .catch((error) => {
-                console.log(error);
                 context.commit('SET_ERROR', {error: error.response.data.message})
             })
             .finally(() => {
@@ -108,12 +107,10 @@ const mutations = {
     },
 
     SET_ISOTOPES: (state, payload) => {
-        console.log(payload.isotopes);
         return state.isotopes = payload.isotopes
     },
 
     SET_COUNTERS: (state, payload) => {
-        console.log(payload.counters);
         return state.counters = payload.counters
     },
 

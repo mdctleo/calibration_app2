@@ -53,8 +53,6 @@ def getCalibrationFactorsGraph(model, isotopeName):
         response = BaseExceptionSchema().dump(e)
         return jsonify(response), 500
 
-    print(response)
-    print(type(response))
     return jsonify(response), 200
 
 
@@ -101,9 +99,10 @@ def calibrationsGraph():
         model = request.args.get('model')
         isotopeName = request.args.get('isotope')
         if model is None:
+            # Graphs need at least a model selected
             result = StandardResponse("Graphs need at least a model selected")
             response = StandardResponseSchema().dump(result)
             # 200 so it does not trigger an error response in the frontend, no graph would be plotted
-            return jsonify(response), 200
+            return jsonify(response), 204
         return getCalibrationFactorsGraph(model, isotopeName)
 

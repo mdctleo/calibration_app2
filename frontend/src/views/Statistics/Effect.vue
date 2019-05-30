@@ -1,6 +1,6 @@
 <template>
     <div>
-        <StatisticsFormBase label0="Number of Observation" label1="Power"></StatisticsFormBase>
+        <StatisticsFormBase label0="Number of Observation" label1="Power" v-on:submit="handleSubmit"></StatisticsFormBase>
     </div>
 </template>
 
