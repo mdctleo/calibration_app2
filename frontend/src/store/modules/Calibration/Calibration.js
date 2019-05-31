@@ -75,7 +75,7 @@ const actions = {
         context.commit('SET_LOADING', {loading: true});
         getCalibrationFactorsGraph(payload.selectedCounter, payload.selectedIsotope)
             .then((response) => {
-                let traces = [];
+                let traces = {};
                 if (response.status === 200) {
                     traces = response.data;
                     Object.values(traces).forEach((trace) => {
@@ -139,8 +139,8 @@ const getters = {
     isotopes: state => state.isotopes,
     calibrationFactors: state => state.calibrationFactors,
     traces: state => state.traces,
-    loading: state => state.loading,
-    error: state => state.error
+    calibrationLoading: state => state.loading,
+    calibrationError: state => state.error
 };
 
 
@@ -148,5 +148,5 @@ export default {
     state: defaultState,
     getters,
     actions,
-    mutations
+    mutations,
 };

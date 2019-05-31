@@ -21,7 +21,7 @@
 </template>
 
 <script>
-    import * as type from '../../../store/modules/Calibration/types'
+    import * as types from '../../../store/modules/Calibration/types'
     import {mapState, mapGetters} from 'vuex';
 
 
@@ -38,7 +38,7 @@
                 },
                 set (value) {
                     this.$store.dispatch({
-                        type: type.SET_SELECTED_ISOTOPE,
+                        type: types.SET_SELECTED_ISOTOPE,
                         selectedIsotope: value
                     })
                 }
@@ -50,7 +50,7 @@
                 },
                 set (value) {
                     this.$store.dispatch({
-                        type: type.SET_SELECTED_COUNTER,
+                        type: types.SET_SELECTED_COUNTER,
                         selectedCounter: value
                     })
                 }

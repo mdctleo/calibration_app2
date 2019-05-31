@@ -1,8 +1,9 @@
 from marshmallow import Schema, fields
 
 class StatisticFormSchema(Schema):
-    input0 = fields.Float()
-    input1 = fields.Float()
+    effect = fields.Float()
+    nobs = fields.Float()
+    power = fields.Float()
     alpha = fields.Float()
     test = fields.Str()
     alternative = fields.Str()

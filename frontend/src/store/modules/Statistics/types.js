@@ -4,3 +4,4 @@ export const SET_ALPHA = "setAlpha";
 export const SET_TEST = "setTest";
 export const SET_ALTERNATIVE = "setAlternative";
 export const SET_RESULT = "setResult";
+export const CALCULATE_EFFECT = "calculateEffect";

@@ -10,21 +10,16 @@ import json
 
 
 def powerFunc(effect,alpha,power,nobs,test, alternative):
-    
-    # print("test")
-
     if test == 'independent':
         analysis = TTestPower()
-        # print("test")
-        # this is where the program brakes, the parameters are right, I'm not sure why this is not working
-        result = analysis.solve_power(effect_size=effect,nobs=nobs,alpha=alpha,power=power, alternative=alternative) 
-        # print("test")
+        result = analysis.solve_power(effect_size=effect,nobs=nobs,alpha=alpha,power=power, alternative=alternative)
+        print(result)
     elif test == 'paired':
         analysis = TTestIndPower()
         result = analysis.solve_power(effect_size=effect,nobs1=nobs,alpha=alpha,power=power, alternative=alternative)
 
     # result = str(result)
-
+    # print(result)
     return result
 
     # if effect is None:

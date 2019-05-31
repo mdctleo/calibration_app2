@@ -56,6 +56,9 @@
 </template>
 
 <script>
+    import {mapActions} from "vuex";
+    import * as types from '../../../store/modules/Statistics/types'
+
     export default {
         name: "StatisticsFormBase",
         data() {
@@ -70,7 +73,7 @@
                 rules: {
                     input0: [
                         {required: true, message: 'This field is required', trigger: 'blur'},
-                        {type: 'float', message: 'This field must be a number'}
+                        {type: 'number', message: 'This field must be a number'}
                     ],
 
                     input1: [
@@ -97,9 +100,22 @@
             label1: null
         },
         methods: {
+            ...mapActions([
+                types.SET_INPUT_0,
+                types.SET_INPUT_1,
+                types.SET_ALPHA,
+                types.SET_TEST,
+                types.SET_ALTERNATIVE
+            ]),
+
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
+                        this.setInput0({input0: this.form.input0});
+                        this.setInput1({input1: this.form.input1});
+                        this.setAlpha({alpha: this.form.alpha});
+                        this.setTest({test: this.form.test});
+                        this.setAlternative({alternative: this.form.alternative});
                         return this.$emit('submit')
                     } else {
                         console.log('error submit!!');

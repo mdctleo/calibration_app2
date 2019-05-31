@@ -6,7 +6,6 @@ from flask_login import current_user, login_user, logout_user, login_required
 from user.Model import User
 from statsmodels.stats.power import TTestPower, TTestIndPower
 from methods.statistics import *
-from functions.functions import powerFunc
 
 
 # TODO: Refactor this

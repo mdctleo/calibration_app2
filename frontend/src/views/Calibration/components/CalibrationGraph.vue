@@ -19,7 +19,6 @@
         },
         watch: {
           traces: function () {
-              console.log(this.traces);
               this.plot()
           }
         },
@@ -42,7 +41,6 @@
                 let layout = {
                     title:'Calibration Factor v.s. Time'
                 };
-                console.log(data);
                 Plotly.newPlot('calibrationGraph', data, layout);
                 this.loading = false;
             }

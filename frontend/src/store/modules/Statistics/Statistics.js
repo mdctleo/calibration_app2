@@ -7,7 +7,8 @@ const defaultState = {
     test: null,
     alternative: null,
     result: null,
-    loading: false
+    loading: false,
+    error: null
 };
 
 const actions = {
@@ -37,12 +38,13 @@ const actions = {
 
     calculateEffect: (context, payload) => {
         context.commit('SET_LOADING', {loading: true});
-        calculateEffect()
+        calculateEffect(payload.statisticForm)
             .then((response) => {
-
+                console.log(response);
+                context.commit('SET_RESULT', {result: response.data.result})
             })
             .catch((error) => {
-
+                context.commit('SET_ERROR', {error: error.response.data.message})
             })
             .finally(() => {
                 context.commit('SET_LOADING', {loading: false})
@@ -77,17 +79,28 @@ const mutations = {
 
     SET_LOADING: (state, payload) => {
         return state.loading = payload.loading;
+    },
+
+    SET_ERROR: (state, payload) => {
+        return state.error = payload.error;
     }
 
 };
 
 const getters = {
-
+    input0: state => state.input0,
+    input1: state => state.input1,
+    alpha: state => state.alpha,
+    test: state => state.test,
+    alternative: state => state.alternative,
+    result: state => state.result,
+    statisticsLoading: state => state.loading,
+    statisticsError: state => state.error
 };
 
 export default {
     state: defaultState,
     getters,
     actions,
-    mutations
+    mutations,
 };

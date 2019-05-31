@@ -7,7 +7,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from user.Model import User
 from statsmodels.stats.power import TTestPower, TTestIndPower
 from methods.statistics import *
-from functions.functions import powerFunc
+from methods.statistics import powerFunc
 from marshmallow import ValidationError
 from response.response import StandardResponse, StandardResponseSchema
 from flask import jsonify
@@ -15,7 +15,7 @@ from flask import jsonify
 
 def calcEffect(statisticFormDict):
     effect = None
-    nobs = statisticFormDict['input0']
+    nobs = statisticFormDict['nobs']
     power = statisticFormDict['power']
     alpha = statisticFormDict['alpha']
     test = statisticFormDict['test']
@@ -29,54 +29,23 @@ def calcEffect(statisticFormDict):
 # TODO: Refactor this
 @bp.route('/effectCalc', methods=['GET'])
 def effectCalc():
-    # form = powerForm()
-
-    # feature = 'Bar'
-    # bar = create_plot(feature)
-
-    # Setting the default value of alpha as 0.05
     if request.method == 'GET':
-        # form.alpha.default = 0.05
-        # form.process()
-        input0 = request.args.get('input0')
-        input1 = request.args.get('input1')
+        nobs = request.args.get('nobs')
+        power = request.args.get('power')
         alpha = request.args.get('alpha')
         test = request.args.get('test')
         alternative = request.args.get('alternative')
         try:
             statisticFormDict = StatisticFormSchema().load(
-                {'input0': input0, 'input1': input1, 'alpha': alpha, 'test': test, 'alternative': alternative}
+                {'nobs': nobs, 'power': power, 'alpha': alpha, 'test': test, 'alternative': alternative}
             )
             result = calcEffect(statisticFormDict)
         except ValidationError as e:
             result = StandardResponse(e.__str__())
             response = StandardResponseSchema().dump(result)
             return jsonify(response), 400
-
-        response = StatisticFormResponseSchema().dump(result)
+        response = StatisticFormResponseSchema().dump({'result': result})
         return jsonify(response), 200
-
-
-
-
-
-
-
-
-    if (request.method == 'POST'):
-        effect = None
-        nobs = request.form['nobs']
-        alpha = request.form['alpha']
-        power = request.form['power']
-        test = request.form['test']
-        alternative = request.form['alternative']
-
-        # output the user input on the shell
-        # print("\nnobs: " + nobs  + "    Alpha: " +  alpha  + "     Power: " + power  + "   Test: " + test + "   Alternative: " + alternative + "\n")
-
-        powerFunc(effect, float(alpha), float(power), int(nobs), test, alternative)
-
-    return render_template('powerForms/effectCalc.html', form=form)
 
 
 @bp.route('/nobsCalc', methods=['GET'])

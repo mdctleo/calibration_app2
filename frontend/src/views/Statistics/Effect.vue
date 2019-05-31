@@ -1,22 +1,54 @@
 <template>
     <div>
-        <StatisticsFormBase label0="Number of Observation" label1="Power" v-on:submit="handleSubmit"></StatisticsFormBase>
+        <StatisticsFormBase label0="Number of Observation" label1="Power"
+                            v-on:submit="handleSubmit"></StatisticsFormBase>
+        <el-row>
+            <span class="result" v-show="this.result !== null">{{'Effect is :' + this.result}}</span>
+        </el-row>
     </div>
 </template>
 
 <script>
     import StatisticsFormBase from "./components/StatisticsFormBase";
+    import * as types from '../../store/modules/Statistics/types'
+    import {mapActions, mapGetters} from 'vuex';
 
     export default {
         name: "Effect",
         components: {StatisticsFormBase},
+        computed: {
+            ...mapGetters({
+                input0: 'input0',
+                input1: 'input1',
+                alpha: 'alpha',
+                test: 'test',
+                alternative: 'alternative',
+                loading: 'statisticsLoading',
+                error: 'statisticsError',
+                result: 'result'
+            })
+        },
         methods: {
-            handleSubmit() {}
-
+            ...mapActions([
+                types.CALCULATE_EFFECT
+            ]),
+            handleSubmit() {
+                let statisticForm = {
+                    nobs: this.input0,
+                    power: this.input1,
+                    alpha: this.alpha,
+                    test: this.test,
+                    alternative: this.alternative
+                };
+                this.calculateEffect({statisticForm: statisticForm})
+            }
         }
     }
 </script>
 
 <style scoped>
+    .result {
+        margin-top: 100px;
+    }
 
 </style>

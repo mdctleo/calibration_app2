@@ -50,8 +50,8 @@
                 isotopes: 'isotopes',
                 calibrationFactors: 'calibrationFactors',
                 traces: 'traces',
-                loading: 'loading',
-                error: 'error'
+                loading: 'calibrationLoading',
+                error: 'calibrationError'
             })
         },
 
