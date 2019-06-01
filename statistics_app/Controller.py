@@ -23,6 +23,37 @@ def calcEffect(statisticFormDict):
 
     return powerFunc(effect, float(alpha), float(power), int(nobs), test, alternative)
 
+def calcNobs(statisticFormDict):
+    nobs = None
+    effect = statisticFormDict['effect']
+    power = statisticFormDict['power']
+    alpha = statisticFormDict['alpha']
+    test = statisticFormDict['test']
+    alternative = statisticFormDict['alternative']
+
+    return powerFunc(effect, float(alpha), float(power), nobs, test, alternative)
+
+def calcPower(statisticFormDict):
+    power = None
+    effect = statisticFormDict['effect']
+    nobs = statisticFormDict['nobs']
+    alpha = statisticFormDict['alpha']
+    test = statisticFormDict['test']
+    alternative = statisticFormDict['alternative']
+
+    return powerFunc(float(effect), float(alpha), power, int(nobs), test, alternative)
+
+def calcPowerGraph(statisticFormDict):
+    power = None
+    effect = statisticFormDict['effect']
+    nobs = statisticFormDict['nobs']
+    alpha = statisticFormDict['alpha']
+    test = statisticFormDict['test']
+    alternative = statisticFormDict['alternative']
+    plot, table = createLineGraphAndTable(int(nobs), float(alpha), power, alternative, test)
+
+    return plot, table
+
 
 
 
@@ -39,66 +70,114 @@ def effectCalc():
             statisticFormDict = StatisticFormSchema().load(
                 {'nobs': nobs, 'power': power, 'alpha': alpha, 'test': test, 'alternative': alternative}
             )
-            result = calcEffect(statisticFormDict)
+            result= calcEffect(statisticFormDict)
         except ValidationError as e:
             result = StandardResponse(e.__str__())
             response = StandardResponseSchema().dump(result)
             return jsonify(response), 400
+        except Exception as e:
+            result = StandardResponse(e.__str__())
+            response = StandardResponseSchema().dump(result)
+            return jsonify(response), 500
+
         response = StatisticFormResponseSchema().dump({'result': result})
         return jsonify(response), 200
 
 
 @bp.route('/nobsCalc', methods=['GET'])
 def nobsCalc():
-    form = powerForm()
-
-    feature = 'Bar'
-    # bar = create_plot(feature)
-
-    # Setting the default value of alpha as 0.05
     if request.method == 'GET':
-        form.alpha.default = 0.05
-        form.process()
+        effect = request.args.get('effect')
+        alpha = request.args.get('alpha')
+        power = request.args.get('power')
+        test = request.args.get('test')
+        alternative = request.args.get('alternative')
 
-    if (request.method == 'POST'):
-        effect = request.form['effect']
-        nobs = None
-        alpha = request.form['alpha']
-        power = request.form['power']
-        test = request.form['test']
-        alternative = request.form['alternative']
+        try:
+            statisticFormDict = StatisticFormSchema().load(
+                {'effect': effect, 'power': power, 'alpha': alpha, 'test': test, 'alternative': alternative}
+            )
+            result = calcNobs(statisticFormDict)
+        except ValidationError as e:
+            result = StandardResponse(e.__str__())
+            response = StandardResponseSchema().dump(result)
+            return jsonify(response), 400
+        except Exception as e:
+            result = StandardResponse(e.__str__())
+            response = StandardResponseSchema().dump(result)
+            return jsonify(response), 500
 
-        powerFunc(float(effect), float(alpha), float(power), nobs, test, alternative)
-
-
-    return render_template('powerForms/nobsCalc.html')
+        response = StatisticFormResponseSchema().dump({'result': result})
+        return jsonify(response), 200
 
 
 @bp.route('/powerCalc', methods=['GET'])
 def powerCalc():
-    form = powerForm()
-
-    feature = 'Line'
-    # plot = create_plot(feature)
-    # table = createTable()
-
-    # Setting the default value of alpha as 0.05
     if request.method == 'GET':
-        form.alpha.default = 0.05
-        form.process()
+        effect = request.args.get('effect')
+        nobs = request.args.get('nobs')
+        alpha = request.args.get('alpha')
+        test = request.args.get('test')
+        alternative = request.args.get('alternative')
 
-    if (request.method == 'POST'):
-        effect = request.form['effect']
-        nobs = request.form['nobs']
-        alpha = request.form['alpha']
-        power = None
-        test = request.form['test']
-        alternative = request.form['alternative']
+        try:
+            statisticFormDict = StatisticFormSchema().load(
+                {'effect': effect, 'nobs': nobs, 'alpha': alpha, 'test': test, 'alternative': alternative}
+            )
+            result = calcPower(statisticFormDict)
+        except ValidationError as e:
+            result = StandardResponse(e.__str__())
+            response = StandardResponseSchema().dump(result)
+            return jsonify(response), 400
+        except Exception as e:
+            result = StandardResponse(e.__str__())
+            response = StandardResponseSchema().dump(result)
+            return jsonify(response), 500
 
-        # output the user input on the shell
-        # print("\nEffect: " + effect  + "    nobs: " + nobs  + "    Alpha: " +  alpha  + "   Test: " + test +"\n")
+        response = StatisticFormResponseSchema().dump({'result': result})
+        return jsonify(response), 200
 
-        powerFunc(float(effect), float(alpha), power, int(nobs), test, alternative)
-        # plot, table = createLineGraphAndTable(int(nobs), float(alpha), power, alternative, test)
 
-    return render_template('powerForms/powerCalc.html')
+@bp.route('/powerCalcGraph', methods=['GET'])
+def powerCalcGraph():
+    if request.method == 'GET':
+        effect = request.args.get('effect')
+        nobs = request.args.get('nobs')
+        alpha = request.args.get('alpha')
+        test = request.args.get('test')
+        alternative = request.args.get('alternative')
+
+        try:
+            statisticFormDict = StatisticFormSchema().load(
+                {'effect': effect, 'nobs': nobs, 'alpha': alpha, 'test': test, 'alternative': alternative}
+            )
+            plot, table = calcPowerGraph(statisticFormDict)
+        except Exception as e:
+            result = StandardResponse(e.__str__())
+            response = StandardResponseSchema().dump(result)
+            return jsonify(response), 500
+
+    response = plot
+    return response, 200
+
+@bp.route('/powerCalcTable', methods=['GET'])
+def powerCalcTable():
+    if request.method == 'GET':
+        effect = request.args.get('effect')
+        nobs = request.args.get('nobs')
+        alpha = request.args.get('alpha')
+        test = request.args.get('test')
+        alternative = request.args.get('alternative')
+
+        try:
+            statisticFormDict = StatisticFormSchema().load(
+                {'effect': effect, 'nobs': nobs, 'alpha': alpha, 'test': test, 'alternative': alternative}
+            )
+            plot, table = calcPowerGraph(statisticFormDict)
+        except Exception as e:
+            result = StandardResponse(e.__str__())
+            response = StandardResponseSchema().dump(result)
+            return jsonify(response), 500
+
+    response = table
+    return response, 200

@@ -1,3 +1,5 @@
+numpy
+plotly
 # Needs conda-forge channel
 python==3.7
 flask==1.0.2

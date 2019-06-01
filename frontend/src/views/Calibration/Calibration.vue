@@ -6,7 +6,7 @@
                 :title="error"
                 type="error"
                 show-icon
-                @close="error = null">
+                @close="setError({error: null})">
         </el-alert>
         </el-row>
         <el-row>
@@ -60,7 +60,8 @@
                 types.GET_CALIBRATION_FACTORS,
                 types.GET_CALIBRATION_FACTORS_GRAPH,
                 types.GET_COUNTERS,
-                types.GET_ISOTOPES
+                types.GET_ISOTOPES,
+                types.SET_ERROR
             ]),
             getCalibrationFactors() {
                 this.$store.dispatch({

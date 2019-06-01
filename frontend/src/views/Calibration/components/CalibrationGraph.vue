@@ -1,5 +1,5 @@
 <template>
-    <div id="calibrationGraph" class="calibrationGraph" v-loading="this.loading">
+    <div id="calibrationGraph" class="calibration-graph" v-loading="this.loading">
 
     </div>
     
@@ -53,7 +53,7 @@
 </script>
 
 <style scoped>
-    .calibrationGraph {
+    .calibration-graph {
         width: 90%;
         height: 100%;
         margin-left: auto;

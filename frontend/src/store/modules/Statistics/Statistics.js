@@ -1,4 +1,4 @@
-import {calculateEffect} from "../../../api/api";
+import {calculateEffect, calculateNobs, calculatePower, getPowerGraph, getPowerTable} from "../../../api/api";
 
 const defaultState = {
     input0: null,
@@ -8,7 +8,9 @@ const defaultState = {
     alternative: null,
     result: null,
     loading: false,
-    error: null
+    error: null,
+    powerGraph: {},
+    powerTable: []
 };
 
 const actions = {
@@ -36,12 +38,75 @@ const actions = {
         context.commit('SET_RESULT', payload)
     },
 
+    setError: (context, payload) => {
+        context.commit('SET_ERROR', payload)
+    },
+
     calculateEffect: (context, payload) => {
         context.commit('SET_LOADING', {loading: true});
         calculateEffect(payload.statisticForm)
             .then((response) => {
                 console.log(response);
                 context.commit('SET_RESULT', {result: response.data.result})
+            })
+            .catch((error) => {
+                context.commit('SET_ERROR', {error: error.response.data.message})
+            })
+            .finally(() => {
+                context.commit('SET_LOADING', {loading: false})
+            })
+    },
+
+    calculateNobs: (context, payload) => {
+        context.commit('SET_LOADING', {loading: true});
+        calculateNobs(payload.statisticForm)
+            .then((response) => {
+                console.log(response);
+                context.commit('SET_RESULT', {result: response.data.result})
+            })
+            .catch((error) => {
+                context.commit('SET_ERROR', {error: error.response.data.message})
+            })
+            .finally(() => {
+                context.commit('SET_LOADING', {loading: false})
+            })
+    },
+
+    calculatePower: (context, payload) => {
+        context.commit('SET_LOADING', {loading: true});
+        calculatePower(payload.statisticForm)
+            .then((response) => {
+                context.commit('SET_RESULT', {result: response.data.result})
+            })
+            .catch((error) => {
+                context.commit('SET_ERROR', {error: error.response.data.message})
+            })
+            .finally(() => {
+                context.commit('SET_LOADING', {loading: false})
+            })
+    },
+
+    getPowerGraph: (context, payload) => {
+        context.commit('SET_LOADING', {loading: true});
+        getPowerGraph(payload.statisticForm)
+            .then((response) => {
+                console.log(response);
+                context.commit('SET_POWER_GRAPH', {powerGraph: response.data});
+            })
+            .catch((error) => {
+                context.commit('SET_ERROR', {error: error.response.data.message})
+            })
+            .finally(() => {
+                context.commit('SET_LOADING', {loading: false})
+            })
+    },
+
+    getPowerTable: (context, payload) => {
+        context.commit('SET_LOADING', {loading: true});
+        getPowerTable(payload.statisticForm)
+            .then((response) => {
+                console.log(response);
+                context.commit('SET_POWER_TABLE', {powerTable: response.data});
             })
             .catch((error) => {
                 context.commit('SET_ERROR', {error: error.response.data.message})
@@ -83,6 +148,14 @@ const mutations = {
 
     SET_ERROR: (state, payload) => {
         return state.error = payload.error;
+    },
+
+    SET_POWER_GRAPH: (state, payload) => {
+        return state.powerGraph = payload.powerGraph;
+    },
+
+    SET_POWER_TABLE: (state, payload) => {
+        return state.powerTable = payload.powerTable;
     }
 
 };
@@ -95,7 +168,9 @@ const getters = {
     alternative: state => state.alternative,
     result: state => state.result,
     statisticsLoading: state => state.loading,
-    statisticsError: state => state.error
+    statisticsError: state => state.error,
+    powerGraph: state => state.powerGraph,
+    powerTable: state => state.powerTable
 };
 
 export default {

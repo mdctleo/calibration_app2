@@ -22,6 +22,10 @@ const actions = {
       context.commit('SET_SELECTED_ISOTOPE', payload)
     },
 
+    setError: (context, payload) => {
+      context.commit('SET_ERROR', payload)
+    },
+
   // api calls
   getCounters: (context) => {
       context.commit('SET_LOADING', {loading: true});
@@ -75,14 +79,16 @@ const actions = {
         context.commit('SET_LOADING', {loading: true});
         getCalibrationFactorsGraph(payload.selectedCounter, payload.selectedIsotope)
             .then((response) => {
+                console.log(response);
                 let traces = {};
                 if (response.status === 200) {
                     traces = response.data;
-                    Object.values(traces).forEach((trace) => {
-                        trace[0].forEach((time, index) => {
-                            trace[0][index] = moment(time).format('DD-MM-YYYY, h:mm:ss');
-                        })
-                    });
+                    console.log(traces);
+                    // Object.values(traces).forEach((trace) => {
+                    //     trace[0].forEach((time, index) => {
+                    //         trace[0][index] = moment(time).format('DD-MM-YYYY, h:mm:ss');
+                    //     })
+                    // });
                 }
                 console.log(traces);
                 context.commit('SET_TRACES', {traces: traces})

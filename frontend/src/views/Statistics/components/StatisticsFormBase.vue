@@ -105,7 +105,8 @@
                 types.SET_INPUT_1,
                 types.SET_ALPHA,
                 types.SET_TEST,
-                types.SET_ALTERNATIVE
+                types.SET_ALTERNATIVE,
+                types.SET_RESULT
             ]),
 
             submitForm(formName) {
@@ -123,6 +124,15 @@
                     }
                 });
             }
+        },
+
+        beforeMount() {
+            this.setInput0({input0: null});
+            this.setInput1({input1: null});
+            this.setAlpha({alpha: null});
+            this.setTest({test: null});
+            this.setAlternative({alternative: null});
+            this.setResult({result: null});
         }
     }
 </script>

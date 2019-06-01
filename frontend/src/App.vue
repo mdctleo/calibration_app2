@@ -59,11 +59,13 @@
         -moz-osx-font-smoothing: grayscale;
         text-align: center;
         color: #2c3e50;
-        height: 100vh;
+        height: 100%;
+        min-height: 100vh;
     }
 
     .app-container {
-        height: 100vh;
+        height: 100%;
+        min-height: 100vh;
     }
 
     #header {
@@ -75,19 +77,22 @@
     }
 
     .nav {
-        height: 100vh;
+        height: 100%;
+        min-height: 100vh;
         width: 15% !important;
         background-color: #C2EFF4 !important;
     }
 
     .menu {
-        height: 100vh;
+        height: 100%;
+        min-height: 100vh;
         /*background-color: #0e0c28;*/
     }
 
     .view {
         width: 85%;
-        height: 100vh;
+        height: 100%;
+        min-height: 100vh;
         background-color: #efeff6;
     }
 

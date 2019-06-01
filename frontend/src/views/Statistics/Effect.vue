@@ -1,5 +1,14 @@
 <template>
     <div>
+        <el-row>
+            <el-alert
+                    v-show="error"
+                    :title="error"
+                    type="error"
+                    show-icon
+                    @close="setError({error: null})">
+            </el-alert>
+        </el-row>
         <StatisticsFormBase label0="Number of Observation" label1="Power"
                             v-on:submit="handleSubmit"></StatisticsFormBase>
         <el-row>
@@ -30,7 +39,8 @@
         },
         methods: {
             ...mapActions([
-                types.CALCULATE_EFFECT
+                types.CALCULATE_EFFECT,
+                types.SET_ERROR
             ]),
             handleSubmit() {
                 let statisticForm = {

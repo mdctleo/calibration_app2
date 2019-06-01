@@ -5,6 +5,7 @@ from flask import jsonify
 from response.response import StandardResponse, StandardResponseSchema
 from exceptions.Exceptions import *
 from marshmallow import ValidationError
+from constants.CommonModel import PlotlyTrace, PlotlyGraph, PlotlyGraphSchema
 
 
 def createCalibrationFactor(calibrationFactorDict):
@@ -39,20 +40,29 @@ def getCalibrationFactors(model, isotopeName):
 def getCalibrationFactorsGraph(model, isotopeName):
     try:
         results = db.getCalibrationFactorsGraph(model, isotopeName)
-        response = {}
+        isotopeMap = {}
         for calibrationFactor in results:
-            if not calibrationFactor.isotopeName in response:
-                response[calibrationFactor.isotopeName] = [[], []]
-                response[calibrationFactor.isotopeName][0].append(calibrationFactor.createdOn)
-                response[calibrationFactor.isotopeName][1].append(calibrationFactor.factor)
+            if not calibrationFactor.isotopeName in isotopeMap:
+                isotopeMap[calibrationFactor.isotopeName] = [[], []]
+                isotopeMap[calibrationFactor.isotopeName][0].append(calibrationFactor.createdOn)
+                isotopeMap[calibrationFactor.isotopeName][1].append(calibrationFactor.factor)
             else:
-                response[calibrationFactor.isotopeName][0].append(calibrationFactor.createdOn)
-                response[calibrationFactor.isotopeName][1].append(calibrationFactor.factor)
+                isotopeMap[calibrationFactor.isotopeName][0].append(calibrationFactor.createdOn)
+                isotopeMap[calibrationFactor.isotopeName][1].append(calibrationFactor.factor)
+
+        graph = []
+        for isotope, values in isotopeMap.items():
+            graph.append(PlotlyTrace(mode='lines+markes', name=isotope, x=values[0], y=values[1]))
+
+        graph = PlotlyGraph(graph)
+        print(graph)
 
     except BaseException as e:
         response = BaseExceptionSchema().dump(e)
         return jsonify(response), 500
 
+    response = PlotlyGraphSchema().dump(graph)
+    print(response)
     return jsonify(response), 200
 
 

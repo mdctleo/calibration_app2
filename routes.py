@@ -28,14 +28,14 @@ from methods.statistics import *
 #     return render_template('gcbiodi.html', text=text, user=user)
 #
 #
-# # connecting to power.html
+# connecting to power.html
 # @app.route('/power')
 # def power():
 #     form = powerForm()
 #
 #     return render_template('power.html', form=form)
-#
-#
+# #
+# #
 # @app.route('/effectCalc', methods=['GET', 'POST'])
 # def effectCalc():
 #     form = powerForm()
@@ -62,7 +62,7 @@ from methods.statistics import *
 #         powerFunc(effect, float(alpha), float(power), int(nobs), test, alternative)
 #
 #     return render_template('powerForms/effectCalc.html', form=form)
-#
+
 #
 # @app.route('/nobsCalc', methods=['GET', 'POST'])
 # def nobsCalc():
