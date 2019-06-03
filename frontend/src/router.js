@@ -5,7 +5,7 @@ import Login from "./views/Login/Login";
 import DashBoard from "./views/Dashboard/Dashboard";
 
 
-Vue.use(Router)
+Vue.use(Router);
 
 export default new Router({
     routes: [
@@ -20,8 +20,8 @@ export default new Router({
             component: () => import(/* webpackChunkName: "about" */ './views/Dashboard/Dashboard.vue')
         },
         {
-            path: '/calibrationfactor',
-            name: 'calibrationFactor',
+            path: '/calibration',
+            name: 'calibration',
             component: () => import(/* webpackChunkName: "about" */ './views/Calibration/Calibration.vue')
         },
         {

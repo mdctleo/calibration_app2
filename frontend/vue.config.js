@@ -1,5 +1,6 @@
-var path = require('path')
+var path = require('path');
 // vue.config.js
 module.exports = {
-    // options...
+    outputDir: path.resolve( '../templates'),
+    assetsDir: '../static'
 };

@@ -22,7 +22,7 @@
                                 <i class="el-icon-s-data"></i>
                                 <span>Biodi</span>
                             </template>
-                            <el-menu-item index="2-1" route="/calibrationfactor">Calibration Factors</el-menu-item>
+                            <el-menu-item index="2-1" route="/calibration">Calibration Factors</el-menu-item>
                             <el-menu-item index="2-2" route="/biodicsv">Biodi CSV</el-menu-item>
                         </el-submenu>
                         <el-submenu index="3" route="/statistics">

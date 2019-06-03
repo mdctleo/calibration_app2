@@ -11,13 +11,13 @@ from methods.statistics import *
 # TODO: Refactor this
 
 
-# @app.route('/')
-# @app.route('/index')
+@app.route('/')
+@app.route('/index')
 # @login_required
-# def index():
-#     print("Got here")
-#     text = {'content': 'Home'}
-#     return render_template('index.html', title='medphys', text=text)
+def index():
+    print("Got here")
+    text = {'content': 'Home'}
+    return render_template('index.html', title='medphys', text=text)
 # #
 # #
 # @app.route('/gcbiodi')
