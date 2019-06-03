@@ -1,0 +1,12 @@
+export const SET_INPUT_0 = "setInput0";
+export const SET_INPUT_1 = "setInput1";
+export const SET_ALPHA = "setAlpha";
+export const SET_TEST = "setTest";
+export const SET_ALTERNATIVE = "setAlternative";
+export const SET_RESULT = "setResult";
+export const SET_ERROR = "setError";
+export const CALCULATE_EFFECT = "calculateEffect";
+export const CALCULATE_NOBS = "calculateNobs";
+export const CALCULATE_POWER = "calculatePower";
+export const GET_POWER_GRAPH = "getPowerGraph";
+export const GET_POWER_TABLE = "getPowerTable";

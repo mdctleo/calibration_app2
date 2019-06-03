@@ -6,7 +6,6 @@ from flask_login import current_user, login_user, logout_user, login_required
 from user.Model import User
 from statsmodels.stats.power import TTestPower, TTestIndPower
 from methods.statistics import *
-from functions.functions import powerFunc
 
 
 # TODO: Refactor this
@@ -14,111 +13,111 @@ from functions.functions import powerFunc
 
 @app.route('/')
 @app.route('/index')
-@login_required
+# @login_required
 def index():
     print("Got here")
     text = {'content': 'Home'}
     return render_template('index.html', title='medphys', text=text)
-
-
-@app.route('/gcbiodi')
-def gc_biodi():
-    text = {'content': 'Hello world biodi'}
-    user = {'username': 'Carlos'}
-
-    return render_template('gcbiodi.html', text=text, user=user)
-
-
+# #
+# #
+# @app.route('/gcbiodi')
+# def gc_biodi():
+#     text = {'content': 'Hello world biodi'}
+#     user = {'username': 'Carlos'}
+#
+#     return render_template('gcbiodi.html', text=text, user=user)
+#
+#
 # connecting to power.html
-@app.route('/power')
-def power():
-    form = powerForm()
+# @app.route('/power')
+# def power():
+#     form = powerForm()
+#
+#     return render_template('power.html', form=form)
+# #
+# #
+# @app.route('/effectCalc', methods=['GET', 'POST'])
+# def effectCalc():
+#     form = powerForm()
+#
+#     feature = 'Bar'
+#     # bar = create_plot(feature)
+#
+#     # Setting the default value of alpha as 0.05
+#     if request.method == 'GET':
+#         form.alpha.default = 0.05
+#         form.process()
+#
+#     if (request.method == 'POST'):
+#         effect = None
+#         nobs = request.form['nobs']
+#         alpha = request.form['alpha']
+#         power = request.form['power']
+#         test = request.form['test']
+#         alternative = request.form['alternative']
+#
+#         # output the user input on the shell
+#         # print("\nnobs: " + nobs  + "    Alpha: " +  alpha  + "     Power: " + power  + "   Test: " + test + "   Alternative: " + alternative + "\n")
+#
+#         powerFunc(effect, float(alpha), float(power), int(nobs), test, alternative)
+#
+#     return render_template('powerForms/effectCalc.html', form=form)
 
-    return render_template('power.html', form=form)
-
-
-@app.route('/effectCalc', methods=['GET', 'POST'])
-def effectCalc():
-    form = powerForm()
-
-    feature = 'Bar'
-    bar = create_plot(feature)
-
-    # Setting the default value of alpha as 0.05
-    if request.method == 'GET':
-        form.alpha.default = 0.05
-        form.process()
-
-    if (request.method == 'POST'):
-        effect = None
-        nobs = request.form['nobs']
-        alpha = request.form['alpha']
-        power = request.form['power']
-        test = request.form['test']
-        alternative = request.form['alternative']
-
-        # output the user input on the shell
-        # print("\nnobs: " + nobs  + "    Alpha: " +  alpha  + "     Power: " + power  + "   Test: " + test + "   Alternative: " + alternative + "\n")
-
-        powerFunc(effect, float(alpha), float(power), int(nobs), test, alternative)
-
-    return render_template('powerForms/effectCalc.html', form=form, plot=bar)
-
-
-@app.route('/nobsCalc', methods=['GET', 'POST'])
-def nobsCalc():
-    form = powerForm()
-
-    feature = 'Bar'
-    bar = create_plot(feature)
-
-    # Setting the default value of alpha as 0.05
-    if request.method == 'GET':
-        form.alpha.default = 0.05
-        form.process()
-
-    if (request.method == 'POST'):
-        effect = request.form['effect']
-        nobs = None
-        alpha = request.form['alpha']
-        power = request.form['power']
-        test = request.form['test']
-        alternative = request.form['alternative']
-
-        powerFunc(float(effect), float(alpha), float(power), nobs, test, alternative)
-
-
-    return render_template('powerForms/nobsCalc.html', form=form, plot=bar)
-
-
-@app.route('/powerCalc', methods=['GET', 'POST'])
-def powerCalc():
-    form = powerForm()
-
-    feature = 'Line'
-    plot = create_plot(feature)
-    table = createTable()
-
-    # Setting the default value of alpha as 0.05
-    if request.method == 'GET':
-        form.alpha.default = 0.05
-        form.process()
-
-    if (request.method == 'POST'):
-        effect = request.form['effect']
-        nobs = request.form['nobs']
-        alpha = request.form['alpha']
-        power = None
-        test = request.form['test']
-        alternative = request.form['alternative']
-
-        # output the user input on the shell
-        # print("\nEffect: " + effect  + "    nobs: " + nobs  + "    Alpha: " +  alpha  + "   Test: " + test +"\n")
-
-        powerFunc(float(effect), float(alpha), power, int(nobs), test, alternative)    
-        plot, table = createLineGraphAndTable(int(nobs), float(alpha), power, alternative, test)
-
-    return render_template('powerForms/powerCalc.html', form=form, plot=plot, plot2=table)
+#
+# @app.route('/nobsCalc', methods=['GET', 'POST'])
+# def nobsCalc():
+#     form = powerForm()
+#
+#     feature = 'Bar'
+#     # bar = create_plot(feature)
+#
+#     # Setting the default value of alpha as 0.05
+#     if request.method == 'GET':
+#         form.alpha.default = 0.05
+#         form.process()
+#
+#     if (request.method == 'POST'):
+#         effect = request.form['effect']
+#         nobs = None
+#         alpha = request.form['alpha']
+#         power = request.form['power']
+#         test = request.form['test']
+#         alternative = request.form['alternative']
+#
+#         powerFunc(float(effect), float(alpha), float(power), nobs, test, alternative)
+#
+#
+#     return render_template('powerForms/nobsCalc.html', form=form)
+#
+#
+# @app.route('/powerCalc', methods=['GET', 'POST'])
+# def powerCalc():
+#     form = powerForm()
+#
+#     feature = 'Line'
+#     # plot = create_plot(feature)
+#     # table = createTable()
+#
+#     # Setting the default value of alpha as 0.05
+#     if request.method == 'GET':
+#         form.alpha.default = 0.05
+#         form.process()
+#
+#     if (request.method == 'POST'):
+#         effect = request.form['effect']
+#         nobs = request.form['nobs']
+#         alpha = request.form['alpha']
+#         power = None
+#         test = request.form['test']
+#         alternative = request.form['alternative']
+#
+#         # output the user input on the shell
+#         # print("\nEffect: " + effect  + "    nobs: " + nobs  + "    Alpha: " +  alpha  + "   Test: " + test +"\n")
+#
+#         powerFunc(float(effect), float(alpha), power, int(nobs), test, alternative)
+#         # plot, table = createLineGraphAndTable(int(nobs), float(alpha), power, alternative, test)
+#
+#     return render_template('powerForms/powerCalc.html', form=form)
 
 # how to get dash plotly graph on flask: check this link below
 # https://medium.com/@olegkomarov_77860/how-to-embed-a-dash-app-into-an-existing-flask-app-ea05d7a2210b

@@ -1,3 +1,4 @@
+import plotly as plotly
 from flask import render_template, flash, redirect,url_for, redirect, request
 from statsmodels.stats.power import TTestPower, TTestIndPower
 import math as m
@@ -10,30 +11,15 @@ import json
 
 
 def powerFunc(effect,alpha,power,nobs,test, alternative):
-    
-    # print("test")
-
     if test == 'independent':
         analysis = TTestPower()
-        # print("test")
-        # this is where the program brakes, the parameters are right, I'm not sure why this is not working
-        result = analysis.solve_power(effect_size=effect,nobs=nobs,alpha=alpha,power=power, alternative=alternative) 
-        # print("test")
+        result = analysis.solve_power(effect_size=effect,nobs=nobs,alpha=alpha,power=power, alternative=alternative)
+        print(result)
     elif test == 'paired':
         analysis = TTestIndPower()
         result = analysis.solve_power(effect_size=effect,nobs1=nobs,alpha=alpha,power=power, alternative=alternative)
 
-    # result = str(result)
-
-    if effect is None:
-        print("\nThe Effect size should be %.2f\n" % result)
-        flash("The Effect size should be %.2f\n" % result)
-    elif nobs is None:
-        print('\nThe Sample Size is should be {}'.format(m.ceil(result)))
-        flash("The Sample Size is should be {}".format(m.ceil(result)))
-    elif power is None:
-        print("\nThe Power should be %.2f\n" % result)
-        flash("The Power should be %.2f\n" % result)
+    return result
 
 
 def create_plot(feature):
@@ -47,7 +33,7 @@ def create_plot(feature):
             x = [1, 2, 3],
             y = [2, 4, 5],
             name = 'Montreal'
-        ) 
+        )
 
         data = [trace1, trace2]
     elif (feature == 'Line'):
@@ -116,7 +102,7 @@ def createLineGraphAndTable(nobs, alpha, power, alternative, test):
             )
             data.append(trace)
 
-    # Adding title 
+    # Adding title
     layout = dict(title = 'Need Title',
                   xaxis = dict(title='Effect Size'),
                   yaxis = dict(title='Power'),
@@ -126,7 +112,7 @@ def createLineGraphAndTable(nobs, alpha, power, alternative, test):
 
     # lineGraph = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
     lineGraph = json.dumps(graph, cls=plotly.utils.PlotlyJSONEncoder)
-    
+
     ## create Table
     # round the value of effect size into 2 decimal place
     for a in range(len(es)):
@@ -157,5 +143,5 @@ def createLineGraphAndTable(nobs, alpha, power, alternative, test):
     tableData = [trace2]
 
     graphTable = json.dumps(tableData, cls=plotly.utils.PlotlyJSONEncoder)
-    
+
     return lineGraph, graphTable

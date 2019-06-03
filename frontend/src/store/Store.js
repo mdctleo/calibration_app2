@@ -6,7 +6,9 @@ Vue.use(Vuex);
 export default new Vuex.Store({
     state: {
         selectedCounter: null,
-        selectedIsotope: null
+        selectedIsotope: null,
+        files: [],
+        biodiCsvToDownload: null
     },
     mutations: {
         setSelectedCounter (state, payload) {
@@ -15,6 +17,14 @@ export default new Vuex.Store({
 
         setSelectedIsotope (state, payload) {
             return state.selectedIsotope = payload.selectedIsotope;
+        },
+
+        setFiles (state, payload) {
+            return state.files = payload.files;
+        },
+
+        setBiodiCsvToDownload (state, payload) {
+            return state.biodiCsvToDownload = payload.biodiCsvToDownload;
         }
     },
     actions: {
@@ -24,27 +34,15 @@ export default new Vuex.Store({
 
         setSelectedIsotope (context, payload) {
             context.commit('setSelectedIsotope', payload)
+        },
+
+        setFiles (context, payload){
+            context.commit('setFiles', payload)
+        },
+
+        setBiodiCsvToDownload (context, payload) {
+            context.commit('setBiodiCsvToDownload', payload)
         }
     }
 });
 
-// export var store = {
-//     state: {
-//         selectedCounter: "",
-//         selectedIsotope: ""
-//     },
-//     setSelectedCounter(counter) {
-//         this.state.selectedCounter = counter;
-//     },
-//     getSelectedCounter() {
-//         return this.state.selectedCounter
-//     },
-//
-//     setSelectedIsotope(isotope) {
-//         this.state.selectedIsotope = isotope
-//     },
-//
-//     getSelectedIsotope() {
-//         return this.state.selectedIsotope
-//     }
-// };
