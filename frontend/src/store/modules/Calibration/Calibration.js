@@ -8,7 +8,7 @@ const defaultState = {
     counters: [],
     isotopes: [],
     calibrationFactors: [],
-    traces: {},
+    calibrationGraph: {},
     loading: false,
     error: null
 };
@@ -79,19 +79,16 @@ const actions = {
         context.commit('SET_LOADING', {loading: true});
         getCalibrationFactorsGraph(payload.selectedCounter, payload.selectedIsotope)
             .then((response) => {
-                console.log(response);
-                let traces = {};
+                let graph = {};
                 if (response.status === 200) {
-                    traces = response.data;
-                    console.log(traces);
-                    // Object.values(traces).forEach((trace) => {
-                    //     trace[0].forEach((time, index) => {
-                    //         trace[0][index] = moment(time).format('DD-MM-YYYY, h:mm:ss');
-                    //     })
-                    // });
+                    graph = response.data;
+                    graph.data.forEach((trace) => {
+                        trace.x.forEach((date, index) => {
+                            trace.x[index] = moment(date).format('DD-MM-YYYY, h:mm:ss');
+                        })
+                    })
                 }
-                console.log(traces);
-                context.commit('SET_TRACES', {traces: traces})
+                context.commit('SET_CALIBRATION_GRAPH', {calibrationGraph: graph});
             })
             .catch((error) => {
                 context.commit('SET_ERROR', {error: error.response.data.message})
@@ -124,8 +121,8 @@ const mutations = {
         return state.calibrationFactors = payload.calibrationFactors
     },
 
-    SET_TRACES: (state, payload) => {
-        return state.traces = payload.traces
+    SET_CALIBRATION_GRAPH: (state, payload) => {
+        return state.calibrationGraph = payload.calibrationGraph
     },
 
     SET_LOADING: (state, payload) => {
@@ -144,7 +141,7 @@ const getters = {
     counters: state => state.counters,
     isotopes: state => state.isotopes,
     calibrationFactors: state => state.calibrationFactors,
-    traces: state => state.traces,
+    calibrationGraph: state => state.calibrationGraph,
     calibrationLoading: state => state.loading,
     calibrationError: state => state.error
 };

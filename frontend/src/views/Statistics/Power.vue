@@ -14,7 +14,7 @@
             <span class="result" v-show="this.result !== null">{{'Power is :' + this.result}}</span>
         </el-row>
         <el-row>
-            <PowerGraph :graph="powerGraph"></PowerGraph>
+            <LineGraph graph-id="PowerGraph" :graph="powerGraph"></LineGraph>
         </el-row>
         <el-row>
             <PowerTable :table="powerTable"></PowerTable>
@@ -26,12 +26,12 @@
     import StatisticsFormBase from "./components/StatisticsFormBase";
     import * as types from '../../store/modules/Statistics/types'
     import {mapActions, mapGetters} from 'vuex';
-    import PowerGraph from "./components/PowerGraph";
     import PowerTable from "./components/PowerTable";
+    import LineGraph from "../../components/LineGraph";
 
     export default {
         name: "Power",
-        components: {PowerTable, PowerGraph, StatisticsFormBase},
+        components: {LineGraph, PowerTable, StatisticsFormBase},
         computed: {
             ...mapGetters({
                 input0: 'input0',

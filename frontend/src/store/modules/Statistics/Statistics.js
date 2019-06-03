@@ -90,7 +90,6 @@ const actions = {
         context.commit('SET_LOADING', {loading: true});
         getPowerGraph(payload.statisticForm)
             .then((response) => {
-                console.log(response);
                 context.commit('SET_POWER_GRAPH', {powerGraph: response.data});
             })
             .catch((error) => {
@@ -105,7 +104,6 @@ const actions = {
         context.commit('SET_LOADING', {loading: true});
         getPowerTable(payload.statisticForm)
             .then((response) => {
-                console.log(response);
                 context.commit('SET_POWER_TABLE', {powerTable: response.data});
             })
             .catch((error) => {

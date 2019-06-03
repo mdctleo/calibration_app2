@@ -16,7 +16,7 @@
                 v-on:query="getCalibrationFactors(); getCalibrationFactorsGraph();"></IsotopeModelSelect>
         </el-row>
         <el-row>
-        <CalibrationGraph :traces="this.traces"></CalibrationGraph>
+         <LineGraph graph-id="CalibrationGraph" :graph="calibrationGraph"></LineGraph>
         </el-row>
         <el-row>
         <CalibrationTable :calibrationFactors="calibrationFactors"
@@ -30,15 +30,13 @@
     import * as types from '../../store/modules/Calibration/types'
     import CalibrationTable from './components/CalibrationTable'
     import IsotopeModelSelect from './components/IsotopeModelSelect.vue'
-    import {mapActions, mapState, mapGetters} from 'vuex';
-    import CalibrationGraph from './components/CalibrationGraph.vue'
-
-    const moment = require('moment');
+    import {mapActions, mapGetters} from 'vuex';
+    import LineGraph from "../../components/LineGraph";
 
     export default {
         name: 'Calibration',
         components: {
-            CalibrationGraph,
+            LineGraph,
             CalibrationTable,
             IsotopeModelSelect
         },
@@ -49,7 +47,7 @@
                 counters: 'counters',
                 isotopes: 'isotopes',
                 calibrationFactors: 'calibrationFactors',
-                traces: 'traces',
+                calibrationGraph: 'calibrationGraph',
                 loading: 'calibrationLoading',
                 error: 'calibrationError'
             })

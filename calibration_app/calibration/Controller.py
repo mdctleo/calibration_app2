@@ -5,7 +5,9 @@ from flask import jsonify
 from response.response import StandardResponse, StandardResponseSchema
 from exceptions.Exceptions import *
 from marshmallow import ValidationError
-from constants.CommonModel import PlotlyTrace, PlotlyGraph, PlotlyGraphSchema
+import plotly.graph_objs as go
+import plotly
+import json
 
 
 def createCalibrationFactor(calibrationFactorDict):
@@ -50,20 +52,28 @@ def getCalibrationFactorsGraph(model, isotopeName):
                 isotopeMap[calibrationFactor.isotopeName][0].append(calibrationFactor.createdOn)
                 isotopeMap[calibrationFactor.isotopeName][1].append(calibrationFactor.factor)
 
-        graph = []
+        data = []
         for isotope, values in isotopeMap.items():
-            graph.append(PlotlyTrace(mode='lines+markes', name=isotope, x=values[0], y=values[1]))
+            trace = go.Scatter(
+                x=values[0],
+                y=values[1],
+                mode='lines+markers',
+                name=isotope
+            )
+            data.append(trace)
 
-        graph = PlotlyGraph(graph)
-        print(graph)
+        layout = dict(title = 'Calibration Factors v.s. Time',
+                      xaxis = dict(title='Time'),
+                      yaxis = dict(title='Calibration Factors'),
+                      )
+        graph = dict(data=data, layout=layout)
 
     except BaseException as e:
         response = BaseExceptionSchema().dump(e)
         return jsonify(response), 500
 
-    response = PlotlyGraphSchema().dump(graph)
-    print(response)
-    return jsonify(response), 200
+    response = json.dumps(graph, cls=plotly.utils.PlotlyJSONEncoder)
+    return response, 200
 
 
 @bp.route('/calibration', methods=['POST'])

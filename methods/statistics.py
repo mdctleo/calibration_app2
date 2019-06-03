@@ -19,19 +19,7 @@ def powerFunc(effect,alpha,power,nobs,test, alternative):
         analysis = TTestIndPower()
         result = analysis.solve_power(effect_size=effect,nobs1=nobs,alpha=alpha,power=power, alternative=alternative)
 
-    # result = str(result)
-    # print(result)
     return result
-
-    # if effect is None:
-    #     print("\nThe Effect size should be %.2f\n" % result)
-    #     flash("The Effect size should be %.2f\n" % result)
-    # elif nobs is None:
-    #     print('\nThe Sample Size is should be {}'.format(m.ceil(result)))
-    #     flash("The Sample Size is should be {}".format(m.ceil(result)))
-    # elif power is None:
-    #     print("\nThe Power should be %.2f\n" % result)
-    #     flash("The Power should be %.2f\n" % result)
 
 
 def create_plot(feature):
