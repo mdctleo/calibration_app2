@@ -1,12 +1,12 @@
 import {calculateEffect, calculateNobs, calculatePower, getPowerGraph, getPowerTable} from "../../../api/api";
 
 const defaultState = {
-    input0: null,
-    input1: null,
-    alpha: null,
-    test: null,
-    alternative: null,
-    result: null,
+    input0: "",
+    input1: "",
+    alpha: "",
+    test: "",
+    alternative: "",
+    result: "",
     loading: false,
     error: null,
     powerGraph: {},

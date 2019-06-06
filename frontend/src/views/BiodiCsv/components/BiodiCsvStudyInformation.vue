@@ -32,14 +32,20 @@
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Radioisotope" prop="radioIsotope">
-                        <el-input v-model="form.radioIsotope"></el-input>
+                        <el-select v-model="form.radioIsotope" placeholder="Please select the radio isotope">
+                            <el-option label="Zone one" value="shanghai"></el-option>
+                            <el-option label="Zone two" value="beijing"></el-option>
+                        </el-select>
                     </el-form-item>
                 </el-col>
             </el-row>
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Radiotracer" prop="radioTracer">
-                        <el-input v-model="form.radioTracer"></el-input>
+                        <el-select v-model="form.radioTracer" placeholder="Please select the radio tracer">
+                            <el-option label="Zone one" value="shanghai"></el-option>
+                            <el-option label="Zone two" value="beijing"></el-option>
+                        </el-select>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -63,13 +69,13 @@
         data() {
             return {
                 form: {
-                    studyName: '',
-                    studyDate: null,
-                    researcherName: '',
-                    piName: '',
-                    radioIsotope: null,
-                    radioTracer: null,
-                    comments: '',
+                    studyName: "",
+                    studyDate: "",
+                    researcherName: "",
+                    piName: "",
+                    radioIsotope: "",
+                    radioTracer: "",
+                    comments: "",
                 },
                 rules: {
                     studyName: [
@@ -118,6 +124,10 @@
 <style scoped>
     .form {
         margin-top: 2%;
+    }
+
+    .form .el-select {
+        display: block;
     }
 
 </style>

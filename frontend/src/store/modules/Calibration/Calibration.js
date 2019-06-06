@@ -57,11 +57,7 @@ const actions = {
 
     getCalibrationFactors: (context, payload) => {
         context.commit('SET_LOADING', {loading: true});
-        console.log(typeof(payload.selectedIsotope));
-        console.log(typeof(payload.selectedCounter));
-        let selectedCounter = (payload.selectedCounter === "") ? null : payload.selectedIsotope;
-        let selectedIsotope = (payload.selectedIsotope === "") ? null : payload.selectedCounter;
-      getCalibrationFactors(selectedCounter, selectedIsotope)
+      getCalibrationFactors(payload.selectedCounter, payload.selectedIsotope)
           .then((response) => {
               let calibrationFactors = response.data;
               calibrationFactors.forEach((calibrationFactor) => {
@@ -81,9 +77,7 @@ const actions = {
 
     getCalibrationFactorsGraph: (context, payload) => {
         context.commit('SET_LOADING', {loading: true});
-        let selectedCounter = (payload.selectedCounter === "") ? null : payload.selectedIsotope;
-        let selectedIsotope = (payload.selectedIsotope === "") ? null : payload.selectedCounter;
-        getCalibrationFactorsGraph(selectedCounter, selectedIsotope)
+        getCalibrationFactorsGraph(payload.selectedCounter, payload.selectedIsotope)
             .then((response) => {
                 let graph = {};
                 if (response.status === 200) {

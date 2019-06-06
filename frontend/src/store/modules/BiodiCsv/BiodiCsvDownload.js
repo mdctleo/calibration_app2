@@ -3,7 +3,7 @@ const moment = require('moment');
 
 const defaultState = {
     metas: [],
-    biodiCsvToDownload : null,
+    biodiCsvToDownload : "",
     error: null,
     loading: false,
 };

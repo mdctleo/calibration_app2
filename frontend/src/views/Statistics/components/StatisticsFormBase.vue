@@ -64,11 +64,11 @@
         data() {
             return {
                 form: {
-                    input0: null,
-                    input1: null,
-                    alpha: null,
-                    test: null,
-                    alternative: null
+                    input0: "",
+                    input1: "",
+                    alpha: "",
+                    test: "",
+                    alternative: ""
                 },
                 rules: {
                     input0: [
