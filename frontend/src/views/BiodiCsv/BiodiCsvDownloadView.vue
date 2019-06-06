@@ -5,10 +5,10 @@
                 :title="error"
                 type="error"
                 show-icon
-                @close="error = null">
+                @close="setError({error: null})">
         </el-alert>
         <el-row>
-            <BiodiCsvDownload :metas="this.metas" @download="this.downloadBiodiCsv()"></BiodiCsvDownload>
+            <BiodiCsvDownload :metas="metas" @download="handleDownload"></BiodiCsvDownload>
         </el-row>
     </div>
 </template>
@@ -16,11 +16,14 @@
 <script>
     import {mapActions, mapGetters} from 'vuex';
     import * as types from '../../store/modules/BiodiCsv/types.js'
+    import BiodiCsvDownload from "./components/BiodiCsvDownload";
     export default {
-        name: "BiodiCsvDownload",
+        name: "BiodiCsvDownloadView",
+        components: {BiodiCsvDownload},
         computed: {
             ...mapGetters({
                 metas: 'metas',
+                biodiCsvToDownload: 'biodiCsvToDownload',
                 error: 'biodiCsvDownloadError',
                 loading: 'biodiCsvDownloadLoading'
             })
@@ -28,8 +31,13 @@
         methods: {
             ...mapActions([
                 types.DOWNLOAD_BIODI_CSV,
-                types.GET_BIODI_CSV_METAS
-            ])
+                types.GET_BIODI_CSV_METAS,
+                types.SET_ERROR
+            ]),
+
+            handleDownload() {
+                this.downloadBiodiCsv({biodiCsvToDownload: this.biodiCsvToDownload})
+            }
 
         },
 

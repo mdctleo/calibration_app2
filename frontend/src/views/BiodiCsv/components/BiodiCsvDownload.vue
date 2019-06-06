@@ -25,7 +25,7 @@
                     <el-button
                             size="mini"
                             type="primary"
-                            @click="handleDownload(scope.$index, scope.row); $emit('download')">Download</el-button>
+                            @click="handleDownload(scope.$index, scope.row)">Download</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -33,30 +33,21 @@
 </template>
 
 <script>
-    import store from '../../../store/Store.js'
-    import * as type from '../../../store/Types'
+    import {mapActions} from 'vuex';
+    import * as types from '../../../store/modules/BiodiCsv/types.js'
     export default {
         name: "BiodiCsvDownload",
         props: {
             metas: Array
         },
-        computed: {
-          biodiCsvToDownload: {
-              get () {
-                  return store.state.biodiCsvToDownload
-              },
-              set (id) {
-                  store.dispatch({
-                      type: type.setBiodiCsvToDownload,
-                      biodiCsvToDownload: id
-                  })
-              }
-          }
-        },
 
         methods: {
+            ...mapActions([
+                types.SET_BIODI_CSV_TO_DOWNLOAD
+            ]),
             handleDownload(index, row) {
-                this.biodiCsvToDownload = row.id
+                this.setBiodiCsvToDownload({biodiCsvToDownload: row.id});
+                this.$emit('download');
             }
         }
     }

@@ -10,9 +10,12 @@ const defaultState = {
 
 const actions = {
     setBiodiCsvToDownload: (context, payload) => {
-      context.commit('SET_BIODI_CSV_TO_DOWNLOAD', {biodiCsvToDownload: payload.biodiCsvToDownload})
+      context.commit('SET_BIODI_CSV_TO_DOWNLOAD', payload)
     },
 
+    setError: (context, payload) => {
+        context.commit('SET_ERROR', payload);
+    },
 
     downloadBiodiCsv: (context, payload) => {
         context.commit('SET_LOADING', {loading: true});
@@ -27,6 +30,7 @@ const actions = {
                 link.parentNode.removeChild(link);
             })
             .catch((error) => {
+                console.log(error);
                 context.commit('SET_ERROR', {error: error.response.data.message});
             })
             .finally(() => {
@@ -39,7 +43,7 @@ const actions = {
         getBiodiCsvMetas()
             .then((response) => {
                 let metas = response.data;
-                metas.data.forEach((meta) => {
+                metas.forEach((meta) => {
                     meta.createdOn = moment(meta.createdOn).format('DD-MM-YYYY, h:mm:ss');
                 });
                context.commit('SET_METAS', {metas: metas});

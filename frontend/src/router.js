@@ -21,7 +21,7 @@ export default new Router({
         },
         {
             path: '/calibration',
-            name: 'calibration',
+            name: 'Calibration',
             component: () => import(/* webpackChunkName: "about" */ './views/Calibration/Calibration.vue')
         },
         {
@@ -31,6 +31,17 @@ export default new Router({
             // this generates a separate chunk (about.[hash].js) for this route
             // which is lazy-loaded when the route is visited.
             component: () => import(/* webpackChunkName: "about" */ './views/BiodiCsv/BiodiCsv.vue')
+        },
+        {
+          path: '/biodicsv/download',
+          name: 'BiodiCsvDownload',
+            component: () => import(/* webpackChunkName: "about" */ './views/BiodiCsv/BiodiCsvDownloadView.vue')
+
+        },
+        {
+          path: '/biodicsv/upload',
+          name: 'BiodiCsvUpload',
+          component: () => import('./views/BiodiCsv/BiodiCsvUploadView.vue')
         },
         {
             path: '/effect',

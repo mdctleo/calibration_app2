@@ -12,9 +12,9 @@
         <el-row>
             <BiodiCsvUpload v-on:submit="handleSubmit" ref="upload"></BiodiCsvUpload>
         </el-row>
-        <el-row>
-            <BiodiCsvDownload :metas="this.metas" @download="downloadBiodiCsvs"></BiodiCsvDownload>
-        </el-row>
+<!--        <el-row>-->
+<!--            <BiodiCsvDownload :metas="this.metas" @download="downloadBiodiCsvs"></BiodiCsvDownload>-->
+<!--        </el-row>-->
     </div>
 </template>
 
@@ -137,49 +137,49 @@
                     fileReader.readAsText(file)
                 })
             },
-            getBiodiCsvMetas() {
-                this.loading = true;
-                api.getBiodiCsvMetas()
-                    .then((response) => {
-                        response.data.forEach((meta) => {
-                            meta.createdOn = moment(meta.createdOn).format('DD-MM-YYYY, h:mm:ss');
-                        });
-                        this.metas = response.data;
-                    })
-                    .catch((error) => {
-                        this.error = error.data.response.message
-
-                    })
-                    .finally(() => {
-                        this.loading = false;
-                    })
-            },
-
-            downloadBiodiCsvs() {
-                this.loading = true;
-                api.getBiodiCsvs(this.biodiCsvToDownload)
-                    .then((response) => {
-                        const url = window.URL.createObjectURL(new Blob([response.data]));
-                        const link = document.createElement('a');
-                        link.href = url;
-                        link.setAttribute('download', 'file.csv');
-                        document.body.appendChild(link);
-                        link.click();
-                        link.parentNode.removeChild(link);
-                    })
-                    .catch((error) => {
-                        this.error = error.response.data.message;
-                    })
-                    .finally(() => {
-                        this.loading = false;
-                    })
-
-            }
+            // getBiodiCsvMetas() {
+            //     this.loading = true;
+            //     api.getBiodiCsvMetas()
+            //         .then((response) => {
+            //             response.data.forEach((meta) => {
+            //                 meta.createdOn = moment(meta.createdOn).format('DD-MM-YYYY, h:mm:ss');
+            //             });
+            //             this.metas = response.data;
+            //         })
+            //         .catch((error) => {
+            //             this.error = error.data.response.message
+            //
+            //         })
+            //         .finally(() => {
+            //             this.loading = false;
+            //         })
+            // },
+            //
+            // downloadBiodiCsvs() {
+            //     this.loading = true;
+            //     api.getBiodiCsvs(this.biodiCsvToDownload)
+            //         .then((response) => {
+            //             const url = window.URL.createObjectURL(new Blob([response.data]));
+            //             const link = document.createElement('a');
+            //             link.href = url;
+            //             link.setAttribute('download', 'file.csv');
+            //             document.body.appendChild(link);
+            //             link.click();
+            //             link.parentNode.removeChild(link);
+            //         })
+            //         .catch((error) => {
+            //             this.error = error.response.data.message;
+            //         })
+            //         .finally(() => {
+            //             this.loading = false;
+            //         })
+            //
+            // }
         },
 
-        created() {
-            this.getBiodiCsvMetas();
-        }
+        // created() {
+        //     this.getBiodiCsvMetas();
+        // }
     }
 </script>
 

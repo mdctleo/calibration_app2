@@ -62,6 +62,8 @@ class DatabaseHelper:
     #
     @staticmethod
     def getCalibrationFactors(model, isotopeName):
+        print(model)
+        print(isotopeName)
         try:
             filters = []
 

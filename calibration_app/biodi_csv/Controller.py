@@ -101,6 +101,11 @@ def biodiCsv():
             result = StandardResponse(e.message)
             response = StandardResponseSchema().dump(result)
             return jsonify(response), 400
+        except Exception as e:
+            print(e.__str__())
+            result = StandardResponse(e.__str__())
+            response = StandardResponseSchema().dump(result)
+            return jsonify(response), 500
 
         response = make_response(result)
         response.headers["Content-Disposition"] = "attachment; filename=" + fileName
