@@ -1,8 +1,9 @@
 <template>
     <div>
         <el-button
-                size="small"
+                type="primary"
                 @click="addTab()"
+                class="controls"
         >
             add tab
         </el-button>
@@ -43,11 +44,15 @@
                 this.index++;
             },
             removeTab(targetName) {
-                let tabs = this.editableTabs;
-                let activeName = this.editableTabsValue;
+                let tabs = this.mouseForms;
+                let activeName = this.currTab;
                 if (activeName === targetName) {
+                    // if you close the current tab you are on right now
                     tabs.forEach((tab, index) => {
                         if (tab.name === targetName) {
+                            // find the closing active tab, set the active tab to
+                            // either the previous or next one
+                            // if it exists
                             let nextTab = tabs[index + 1] || tabs[index - 1];
                             if (nextTab) {
                                 activeName = nextTab.name;
@@ -55,16 +60,17 @@
                         }
                     });
                 }
-
-                this.editableTabsValue = activeName;
-                this.editableTabs = tabs.filter(tab => tab.name !== targetName);
+                // set new active tab
+                this.currTab = activeName;
+                // remove the closed tab
+                this.mouseForms = tabs.filter(tab => tab.name !== targetName);
             }
         }
     }
 </script>
 
 <style scoped>
-   .tabs {
-
-   }
+    .controls {
+        margin-top: 2%;
+    }
 </style>
