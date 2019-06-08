@@ -42,9 +42,9 @@
         },
 
         methods: {
-            ...mapActions([
-                types.SET_BIODI_CSV_TO_DOWNLOAD
-            ]),
+            ...mapActions({
+                'setBiodiCsvToDownload': types.SET_BIODI_CSV_TO_DOWNLOAD
+            }),
             handleDownload(index, row) {
                 this.setBiodiCsvToDownload({biodiCsvToDownload: row.id});
                 this.$emit('download');

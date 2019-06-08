@@ -61,7 +61,6 @@ const actions = {
         context.commit('SET_LOADING', {loading: true});
         calculateNobs(payload.statisticForm)
             .then((response) => {
-                console.log(response);
                 context.commit('SET_RESULT', {result: response.data.result})
             })
             .catch((error) => {
@@ -165,8 +164,8 @@ const getters = {
     test: state => state.test,
     alternative: state => state.alternative,
     result: state => state.result,
-    statisticsLoading: state => state.loading,
-    statisticsError: state => state.error,
+    loading: state => state.loading,
+    error: state => state.error,
     powerGraph: state => state.powerGraph,
     powerTable: state => state.powerTable
 };
@@ -176,4 +175,5 @@ export default {
     getters,
     actions,
     mutations,
+    namespaced: true
 };

@@ -77,8 +77,8 @@ const mutations = {
 };
 
 const getters = {
-    biodiCsvDownloadError: state => state.error,
-    biodiCsvDownloadLoading: state => state.loading,
+    error: state => state.error,
+    loading: state => state.loading,
     biodiCsvToDownload: state => state.biodiCsvToDownload,
     metas: state => state.metas
 };
@@ -88,4 +88,5 @@ export default {
     getters,
     actions,
     mutations,
+    namespaced: true
 };

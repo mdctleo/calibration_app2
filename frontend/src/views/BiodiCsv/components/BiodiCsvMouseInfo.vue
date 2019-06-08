@@ -5,7 +5,7 @@
                 @click="addTab()"
                 class="controls"
         >
-            add tab
+            Add Mouse
         </el-button>
         <el-tabs v-model="currTab" type="card" closable @tab-remove="removeTab">
             <el-tab-pane
@@ -37,7 +37,7 @@
             addTab() {
                 let newTabName = String("Mouse " + this.index);
                 this.mouseForms.push({
-                    title: newTabName,
+                    title: 'New Mouse',
                     name: newTabName
                 });
                 this.currTab = newTabName;
@@ -72,5 +72,6 @@
 <style scoped>
     .controls {
         margin-top: 2%;
+        margin-bottom: 2%;
     }
 </style>

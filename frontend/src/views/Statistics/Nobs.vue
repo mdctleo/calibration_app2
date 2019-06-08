@@ -26,21 +26,21 @@
         components: {StatisticsFormBase},
         computed: {
             ...mapGetters({
-                input0: 'input0',
-                input1: 'input1',
-                alpha: 'alpha',
-                test: 'test',
-                alternative: 'alternative',
-                loading: 'statisticsLoading',
-                error: 'statisticsError',
-                result: 'result'
+                input0: 'statistics/input0',
+                input1: 'statistics/input1',
+                alpha: 'statistics/alpha',
+                test: 'statistics/test',
+                alternative: 'statistics/alternative',
+                loading: 'statistics/loading',
+                error: 'statistics/error',
+                result: 'statistics/result'
             })
         },
         methods: {
-            ...mapActions([
-                types.CALCULATE_NOBS,
-                types.SET_ERROR
-            ]),
+            ...mapActions({
+                'calculateNobs': types.CALCULATE_NOBS,
+                'setError': types.SET_ERROR
+            }),
             handleSubmit() {
                 let statisticForm = {
                     effect: this.input0,

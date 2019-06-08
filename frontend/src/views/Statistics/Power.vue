@@ -34,25 +34,25 @@
         components: {LineGraph, PowerTable, StatisticsFormBase},
         computed: {
             ...mapGetters({
-                input0: 'input0',
-                input1: 'input1',
-                alpha: 'alpha',
-                test: 'test',
-                alternative: 'alternative',
-                loading: 'statisticsLoading',
-                error: 'statisticsError',
-                result: 'result',
-                powerGraph: 'powerGraph',
-                powerTable: 'powerTable'
+                input0: 'statistics/input0',
+                input1: 'statistics/input1',
+                alpha: 'statistics/alpha',
+                test: 'statistics/test',
+                alternative: 'statistics/alternative',
+                loading: 'statistics/loading',
+                error: 'statistics/error',
+                result: 'statistics/result',
+                powerGraph: 'statistics/powerGraph',
+                powerTable: 'statistics/powerTable'
             })
         },
         methods: {
-            ...mapActions([
-                types.CALCULATE_POWER,
-                types.SET_ERROR,
-                types.GET_POWER_GRAPH,
-                types.GET_POWER_TABLE
-            ]),
+            ...mapActions({
+                'calculatePower': types.CALCULATE_POWER,
+                'setError': types.SET_ERROR,
+                'getPowerGraph': types.GET_POWER_GRAPH,
+                'getPowerTable': types.GET_POWER_TABLE
+            }),
             handleSubmit() {
                 let statisticForm = {
                     effect: this.input0,

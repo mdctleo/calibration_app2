@@ -22,18 +22,18 @@
         components: {BiodiCsvDownload},
         computed: {
             ...mapGetters({
-                metas: 'metas',
-                biodiCsvToDownload: 'biodiCsvToDownload',
-                error: 'biodiCsvDownloadError',
-                loading: 'biodiCsvDownloadLoading'
+                metas: 'biodiCsvDownload/metas',
+                biodiCsvToDownload: 'biodiCsvDownload/biodiCsvToDownload',
+                error: 'biodiCsvdownload/error',
+                loading: 'biodiCsvDownload/loading'
             })
         },
         methods: {
-            ...mapActions([
-                types.DOWNLOAD_BIODI_CSV,
-                types.GET_BIODI_CSV_METAS,
-                types.SET_ERROR
-            ]),
+            ...mapActions({
+                'downloadBiodiCsv': types.DOWNLOAD_BIODI_CSV,
+                'getBiodiCsvMetas': types.GET_BIODI_CSV_METAS,
+                'setError': types.SET_ERROR
+            }),
 
             handleDownload() {
                 this.downloadBiodiCsv({biodiCsvToDownload: this.biodiCsvToDownload})

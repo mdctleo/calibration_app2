@@ -54,7 +54,7 @@
 
 <style scoped>
     .upload {
-        margin-top: 10px;
+        margin-top: 2%;
     }
     .upload-submit {
         margin-top: 10px;

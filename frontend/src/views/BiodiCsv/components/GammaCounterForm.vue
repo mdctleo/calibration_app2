@@ -4,7 +4,7 @@
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Gamma Counter ID" prop="gammaCounterId">
-                        <el-select v-model="form.gammaCounterId" placeholder="Please select the radio isotope">
+                        <el-select v-model="form.gammaCounterId" placeholder="Please select the gamma counter">
                             <el-option label="Zone one" value="shanghai"></el-option>
                             <el-option label="Zone two" value="beijing"></el-option>
                         </el-select>
@@ -50,9 +50,6 @@
 <script>
     export default {
         name: "GammaCounterForm",
-        props: {
-            key: Number
-        },
         data () {
             return {
                 form: {

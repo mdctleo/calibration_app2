@@ -100,14 +100,14 @@
             label1: null
         },
         methods: {
-            ...mapActions([
-                types.SET_INPUT_0,
-                types.SET_INPUT_1,
-                types.SET_ALPHA,
-                types.SET_TEST,
-                types.SET_ALTERNATIVE,
-                types.SET_RESULT
-            ]),
+            ...mapActions({
+                'setInput0': types.SET_INPUT_0,
+                'setInput1': types.SET_INPUT_1,
+                'setAlpha': types.SET_ALPHA,
+                'setTest': types.SET_TEST,
+                'setAlternative': types.SET_ALTERNATIVE,
+                'setResult': types.SET_RESULT
+            }),
 
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {

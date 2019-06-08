@@ -81,7 +81,6 @@
         height: 100%;
         min-height: 100vh;
         width: 15% !important;
-        background-color: #C2EFF4 !important;
     }
 
     .menu {
