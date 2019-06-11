@@ -66,6 +66,9 @@
 <script>
     export default {
         name: "BiodiCsvStudyInformation",
+        props: {
+          bus: Object
+        },
         data() {
             return {
                 form: {
@@ -82,7 +85,8 @@
                         {required: true, message: 'Please input study name', trigger: 'blur'},
                     ],
                     studyDate: [
-                        {type: 'date', required: true, message: 'Please pick a date', trigger: 'change'}
+                        {type: 'date', required: true, message: 'Please pick a date', trigger: 'change'},
+                        {type: 'date', message: 'format for this field must be a date', trigger: 'change'}
                     ],
                     researcherName: [
                         {required: true, message: 'Please input researcher name', trigger: 'blur'}
@@ -106,7 +110,7 @@
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        alert('submit!');
+                        this.$emit('validated');
                     } else {
                         console.log('error submit!!');
                         return false;
@@ -116,6 +120,12 @@
             resetForm(formName) {
                 this.$refs[formName].resetFields();
             }
+        },
+
+        created() {
+            this.bus.$on('startValidation', () => {
+                this.submitForm('form')
+            })
         }
 
     }

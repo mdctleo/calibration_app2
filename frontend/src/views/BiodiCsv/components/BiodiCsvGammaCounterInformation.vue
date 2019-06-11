@@ -1,18 +1,49 @@
 <template>
-    <div>
-        <component
-                v-for="gammaForm in gammaForms"
-                :key="gammaForm.key"
-                :is="gammaForm.type"
-                v-bind="gammaForm"
-        >
-        </component>
-        <el-row class="controls">
-            <el-col :span="12" :offset="6">
-                <el-button type="primary" @click="addCounter">New Counter</el-button>
-                <el-button type="danger" @click="removeCounter">Remove Counter</el-button>
-            </el-col>
-        </el-row>
+    <div class="form">
+        <el-form :model="form" :rules="rules" ref="form" label-width="120px" label-position="top" class="demo-ruleForm">
+            <el-row>
+                <el-col :span="12" :offset="6">
+                    <el-form-item label="Gamma Counter ID" prop="gammaCounterId">
+                        <el-select v-model="form.gammaCounterId" placeholder="Please select the gamma counter">
+                            <el-option label="Zone one" value="shanghai"></el-option>
+                            <el-option label="Zone two" value="beijing"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="12" :offset="6">
+                    <el-form-item label="Gamma Counter Run ID" prop="gammaCounterRunId">
+                        <el-input v-model.number="form.gammaCounterRunId"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="12" :offset="6">
+                    <el-form-item label="Gamma Counter Run Date & Time" prop="gammaCounterRunDateTime">
+                        <el-date-picker
+                                v-model="form.gammaCounterRunDateTime"
+                                type="datetime"
+                                placeholder="Select date and time">
+                        </el-date-picker>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="12" :offset="6">
+                    <el-form-item label="Gamma Counter Run Time Offset" prop="gammaCounterRunTimeOffset">
+                        <el-input v-model="form.gammaCounterRunTimeOffset"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="12" :offset="6">
+                    <el-form-item label="Gamma Counter Run Comments" prop="gammaCounterRunComments">
+                        <el-input type="textarea" v-model="form.gammaCounterRunComments"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+        </el-form>
     </div>
 </template>
 
@@ -22,34 +53,69 @@
     export default {
         name: "BiodiCsvGammaCounterInformation",
         components: {GammaCounterForm},
-        data() {
+        props: {
+            bus: Object
+        },
+        data () {
             return {
-                gammaForms: [],
-                index: 0
+                form: {
+                    gammaCounterId: "",
+                    gammaCounterRunId: "",
+                    gammaCounterRunDateTime: "",
+                    gammaCounterRunTimeOffset: "",
+                    gammaCounterRunComments: ""
+                },
+
+                rules: {
+                    gammaCounterId: [
+                        {required: true, message: 'Please select a gamma counter', trigger: 'change'},
+                    ],
+                    gammaCounterRunId: [
+                        {required: true, message: 'Please input a run id', trigger: 'blur'},
+                        {type: 'number', message: 'Format for this field must be a number', trigger: 'blur'}
+                    ],
+                    gammaCounterRunDateTime: [
+                        {required: true, type: 'date', message: 'Please pick a date & time', trigger: 'change'},
+                        {type: 'date', message: 'Format for this field must be a date', trigger:'change'}
+                    ],
+                    comments: [
+                        { min: 0, max: 5000, message: 'Length should be less than 5000', trigger: 'blur' }
+                    ]
+                }
             }
         },
 
         methods: {
-            addCounter() {
-                this.gammaForms.push({
-                    key: this.index,
-                    label: this.index,
-                    type: 'GammaCounterForm'
+            submitForm(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        this.$emit('validated');
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
                 });
-                this.index++;
-            },
-
-            removeCounter() {
-                this.gammaForms.pop();
-                this.index--;
             }
+        },
+        created () {
+            this.bus.$on('startValidation', () => {
+                this.submitForm('form')
+            })
         }
     }
 </script>
 
 <style scoped>
-    .controls {
+    .form {
         margin-top: 2%;
+    }
+
+    .form .el-select {
+        display: block;
+    }
+
+    .form .el-date-picker {
+        width: 100%;
     }
 
 

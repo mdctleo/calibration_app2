@@ -14,7 +14,7 @@
                     :name="item.name"
                     :label="item.title"
             >
-                <MouseForm></MouseForm>
+                <component :is="item.content"></component>
             </el-tab-pane>
         </el-tabs>
     </div>
@@ -25,6 +25,9 @@
     export default {
         name: "BiodiCsvMouseInfo",
         components: {MouseForm},
+        props: {
+            bus: Object
+        },
         data() {
             return {
                 mouseForms: [],
@@ -38,7 +41,8 @@
                 let newTabName = String("Mouse " + this.index);
                 this.mouseForms.push({
                     title: 'New Mouse',
-                    name: newTabName
+                    name: newTabName,
+                    content: "MouseForm"
                 });
                 this.currTab = newTabName;
                 this.index++;
@@ -64,7 +68,23 @@
                 this.currTab = activeName;
                 // remove the closed tab
                 this.mouseForms = tabs.filter(tab => tab.name !== targetName);
+            },
+
+            validateForms() {
+                console.log(this.$children);
+                // this.mouseForms.forEach((mouseForm) => {
+                //     console.log(this.currTab)
+                //     console.log(typeof this.currTab)
+                //
+                // })
+
             }
+        },
+
+        created() {
+            this.bus.$on('startValidation', () => {
+                this.validateForms()
+            })
         }
     }
 </script>

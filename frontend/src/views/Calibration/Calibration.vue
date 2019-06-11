@@ -59,7 +59,7 @@
                 'getCalibrationFactorsGraph': types.GET_CALIBRATION_FACTORS_GRAPH,
                 'getCounters': types.GET_COUNTERS,
                 'getIsotopes': types.GET_ISOTOPES,
-                'setError': types.SET_CALIBRATION_ERROR
+                'setError': types.SET_ERROR
             }),
             getCalibrationFactors() {
                 this.$store.dispatch({
