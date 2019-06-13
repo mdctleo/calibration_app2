@@ -13,13 +13,6 @@
             </el-row>
             <el-row>
                 <el-col :span="12" :offset="6">
-                    <el-form-item label="Gamma Counter Run ID" prop="gammaCounterRunId">
-                        <el-input v-model.number="form.gammaCounterRunId"></el-input>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-            <el-row>
-                <el-col :span="12" :offset="6">
                     <el-form-item label="Gamma Counter Run Date & Time" prop="gammaCounterRunDateTime">
                         <el-date-picker
                                 v-model="form.gammaCounterRunDateTime"
@@ -49,6 +42,7 @@
 
 <script>
     import GammaCounterForm from "./GammaCounterForm";
+    import {mapGetters} from "vuex";
 
     export default {
         name: "BiodiCsvGammaCounterInformation",
@@ -60,7 +54,6 @@
             return {
                 form: {
                     gammaCounterId: "",
-                    gammaCounterRunId: "",
                     gammaCounterRunDateTime: "",
                     gammaCounterRunTimeOffset: "",
                     gammaCounterRunComments: ""
@@ -69,10 +62,6 @@
                 rules: {
                     gammaCounterId: [
                         {required: true, message: 'Please select a gamma counter', trigger: 'change'},
-                    ],
-                    gammaCounterRunId: [
-                        {required: true, message: 'Please input a run id', trigger: 'blur'},
-                        {type: 'number', message: 'Format for this field must be a number', trigger: 'blur'}
                     ],
                     gammaCounterRunDateTime: [
                         {required: true, type: 'date', message: 'Please pick a date & time', trigger: 'change'},
@@ -85,22 +74,31 @@
             }
         },
 
+        computed: {
+            ...mapGetters({
+                startValidation: 'biodiCsvUpload/startValidation'
+            })
+        },
+
+        watch: {
+            startValidation: function (val) {
+                if (val === true) {
+                    this.submitForm('form')
+                }
+            }
+        },
+
         methods: {
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        this.$emit('validated');
+                        this.$emit('validated', true);
                     } else {
                         console.log('error submit!!');
-                        return false;
+                        this.$emit('validated', false);
                     }
                 });
             }
-        },
-        created () {
-            this.bus.$on('startValidation', () => {
-                this.submitForm('form')
-            })
         }
     }
 </script>

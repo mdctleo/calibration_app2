@@ -11,7 +11,8 @@
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Study Date" prop="studyDate">
-                        <el-date-picker type="date" placeholder="Pick a date" v-model="form.studyDate" style="width: 100%;"></el-date-picker>
+                        <el-date-picker type="date" placeholder="Pick a date" v-model="form.studyDate"
+                                        style="width: 100%;"></el-date-picker>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -41,11 +42,55 @@
             </el-row>
             <el-row>
                 <el-col :span="12" :offset="6">
-                    <el-form-item label="Radiotracer" prop="radioTracer">
-                        <el-select v-model="form.radioTracer" placeholder="Please select the radio tracer">
+                    <el-form-item label="Chelator" prop="chelator">
+                        <el-select v-model="form.chelator" placeholder="Please select the chelator">
                             <el-option label="Zone one" value="shanghai"></el-option>
                             <el-option label="Zone two" value="beijing"></el-option>
                         </el-select>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="12" :offset="6">
+                    <el-form-item label="Vector" prop="vector">
+                        <el-select v-model="form.vector" placeholder="Please select the vector">
+                            <el-option label="Zone one" value="shanghai"></el-option>
+                            <el-option label="Zone two" value="beijing"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="12" :offset="6">
+                    <el-form-item label="Target" prop="target">
+                        <el-input v-model="form.target" placeholder="Please input the target"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="12" :offset="6">
+                    <el-form-item label="Cell Line" prop="cellLine">
+                        <el-select v-model="form.cellLine" placeholder="Please select the cell line">
+                            <el-option label="Zone one" value="shanghai"></el-option>
+                            <el-option label="Zone two" value="beijing"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="12" :offset="6">
+                    <el-form-item label="Radio Activity" prop="radioActivity">
+                        <el-input v-model.number="form.radioActivity">
+                            <el-option label="Zone one" value="shanghai"></el-option>
+                            <el-option label="Zone two" value="beijing"></el-option>
+                        </el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="12" :offset="6">
+                    <el-form-item label="Radio Purity" prop="radioPurity">
+                        <el-input v-model.number="form.radioPurity"></el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -64,10 +109,13 @@
 </template>
 
 <script>
+    import {mapActions, mapGetters} from "vuex";
+    import * as types from '../../../store/modules/BiodiCsv/types.js'
+
     export default {
         name: "BiodiCsvStudyInformation",
         props: {
-          bus: Object
+            bus: Object
         },
         data() {
             return {
@@ -77,7 +125,12 @@
                     researcherName: "",
                     piName: "",
                     radioIsotope: "",
-                    radioTracer: "",
+                    chelator: "",
+                    vector: "",
+                    target: "",
+                    cellLine: "",
+                    radioActivity: "",
+                    radioPurity: "",
                     comments: "",
                 },
                 rules: {
@@ -85,7 +138,7 @@
                         {required: true, message: 'Please input study name', trigger: 'blur'},
                     ],
                     studyDate: [
-                        {type: 'date', required: true, message: 'Please pick a date', trigger: 'change'},
+                        {required: true, message: 'Please pick a date', trigger: 'change'},
                         {type: 'date', message: 'format for this field must be a date', trigger: 'change'}
                     ],
                     researcherName: [
@@ -97,35 +150,60 @@
                     radioIsotope: [
                         {required: true, message: 'Please select an isotope', trigger: 'change'}
                     ],
-                    radioTracer: [
-                        {required: true, message: 'Please select a radio tracer', trigger: 'change'}
+                    chelator: [
+                        {required: true, message: 'Please select a chelator', trigger: 'change'}
+                    ],
+                    vector: [
+                        {required: true, message: 'Please select a vector', trigger: 'change'},
+                    ],
+                    target: [
+                        {required: true, message: 'Please input a target', trigger: 'blur'}
+                    ],
+                    cellLine: [
+                        {required: true, message: 'Please input a cell line', trigger: 'change'}
+                    ],
+                    radioActivity: [
+                        {required: true, message: 'Please input radio activity', trigger: 'blur'},
+                        {type: 'number', message: 'Format of this field must be a number', trigger: 'blur'}
+                    ],
+                    radioPurity: [
+                        {required: true, message: 'Please input radio purity', trigger: 'blur'},
+                        {type: 'number', message: 'Format of this field must be a number'}
                     ],
                     comments: [
-                        { min: 0, max: 5000, message: 'Length should be less than 5000', trigger: 'blur' }
+                        {min: 0, max: 5000, message: 'Length should be less than 5000', trigger: 'blur'}
                     ]
                 }
             };
         },
+        computed: {
+            ...mapGetters({
+                startValidation: 'biodiCsvUpload/startValidation'
+            })
+        },
+
+        watch: {
+            startValidation: function (val) {
+                if (val === true) {
+                    this.submitForm('form')
+                }
+            }
+        },
+
         methods: {
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        this.$emit('validated');
+                        this.$emit('validated', true);
                     } else {
                         console.log('error submit!!');
-                        return false;
+                        this.$emit('validated', false);
                     }
                 });
             },
             resetForm(formName) {
                 this.$refs[formName].resetFields();
             }
-        },
-
-        created() {
-            this.bus.$on('startValidation', () => {
-                this.submitForm('form')
-            })
         }
 
     }

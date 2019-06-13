@@ -66,14 +66,14 @@
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Pre-inj MBq" prop="preInjMBq">
-                        <el-input v-model="form.preInjMBq"></el-input>
+                        <el-input v-model.number="form.preInjMBq"></el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Post-inj MBq" prop="postInjMBq">
-                        <el-input v-model="form.postInjMBq"></el-input>
+                        <el-input v-model.number="form.postInjMBq"></el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -89,8 +89,13 @@
 </template>
 
 <script>
+    import {mapGetters} from "vuex";
+
     export default {
         name: "MouseForm",
+        props: {
+            bus: Object
+        },
         data () {
             return {
                 form: {
@@ -117,22 +122,28 @@
                         {required: true, type:'date', message: 'Please select a time point', trigger: 'change'}
                     ],
                     weight: [
-                        {required: true, type:'number', message: 'Please input a weight', trigger: 'blur'}
+                        {required: true, message: 'Please input a weight', trigger: 'blur'},
+                        {type: 'number', message: 'Format of this field needs to be a number', trigger: 'blur'}
                     ],
                     injectionDate: [
-                        {required: true, type:'date', message: 'Please input an injection date', trigger: 'change'}
+                        {required: true, message: 'Please input an injection date', trigger: 'change'},
+                        {type: 'date', message: 'Format of this field needs to be a date', trigger: 'change'}
                     ],
                     preInjTime: [
-                        {required: true, type:'date', message: 'Please input a pre injection time', trigger: 'change'}
+                        {required: true, message: 'Please input a pre injection time', trigger: 'change'},
+                        {type: 'date', message: 'Format of this field needs to be a date', trigger: 'change'}
                     ],
                     postInjTime: [
-                        {required: true, type:'date', message: 'Please input a post injection time', trigger: 'change'}
+                        {required: true, message: 'Please input a post injection time', trigger: 'change'},
+                        {type: 'date', message: 'Format of this field needs to be a date', trigger: 'change'}
                     ],
                     preInjMBq: [
-                        {required: true, type: 'number', message: 'Please input a pre injection level', trigger: 'blur'}
+                        {required: true, message: 'Please input a pre injection level', trigger: 'blur'},
+                        {type: 'number', message: 'Format of this field needs to be a number'}
                     ],
                     postInjMBq: [
-                        {required: false, type:'number', message: 'Please input a number for this field', trigger: 'blur'}
+                        {required: false, message: 'Please input a number for this field', trigger: 'blur'},
+                        {type: 'number', message: 'Format of this field needs to be a number'}
                     ],
                     comments: [
                         { min: 0, max: 5000, message: 'Length should be less than 5000', trigger: 'blur' }
@@ -141,7 +152,34 @@
                 }
 
             }
-        }
+        },
+
+        computed: {
+            ...mapGetters({
+                startValidation: 'biodiCsvUpload/startValidation'
+            })
+        },
+
+        watch: {
+            startValidation: function (val) {
+                if (val === true) {
+                    this.submitForm('form')
+                }
+            }
+        },
+
+        methods: {
+            submitForm(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        this.$emit('validated-one-form');
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            }
+        },
     }
 </script>
 

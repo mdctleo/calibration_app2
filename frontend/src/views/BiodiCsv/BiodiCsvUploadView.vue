@@ -13,7 +13,7 @@
         <BiodiCsvMouseInfo @validated="moveNext" :bus="bus" v-if="step === 2"></BiodiCsvMouseInfo>
         <BiodiCsvTubeInformation v-if="step === 3"></BiodiCsvTubeInformation>
         <BiodiCsvUpload v-if="step === 4"></BiodiCsvUpload>
-        <el-button @click="handleNext" class="next">Next</el-button>
+        <el-button @click="moveNext" class="next">Next</el-button>
         <el-button @click="handlePrevious" class="previous">Previous</el-button>
     </div>
 </template>
@@ -26,6 +26,9 @@
     import BiodiCsvReviewInformation from "./components/BiodiCsvReviewInformation";
     import BiodiCsvTubeInformation from './components/BiodiCsvOrganOrder'
     import Vue from "vue";
+    import {mapActions} from "vuex";
+    import * as types from '../../store/modules/BiodiCsv/types.js'
+    import EventBus from './components/EventBus.js'
 
     export default {
         name: "BiodiCsvUploadView",
@@ -41,18 +44,25 @@
             }
         },
         methods: {
+            ...mapActions({
+                'setStartValidation': types.SET_START_VALIDATION
+            }),
             handleNext() {
-                this.bus.$emit('startValidation');
+                this.setStartValidation({startValidation: true})
             },
 
-            moveNext() {
+            moveNext(validated) {
+                this.setStartValidation({startValidation: false});
                 this.step++;
+
 
             },
 
             handlePrevious() {
                 this.step--;
             }
+        },
+        created() {
         }
     }
 </script>

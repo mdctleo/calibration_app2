@@ -16,16 +16,22 @@ const defaultState = {
     organs: [],
     file: null,
     loading: false,
-    error: null
+    error: null,
+    startValidation: false,
+    mouseCsvFormat: "Mouse ID, Group ID, Euthanasia Time, Weight (g), Injection Date, Pre-Injection Time, Injection Time, Post-Injection Time, Pre-Injection MBq, Post-Injection MBq, Comments"
 };
 
 const actions = {
+    setStartValidation: (context, payload) => {
+      context.commit('SET_START_VALIDATION', payload)
+    },
+
     setUploadFile: (context, payload) => {
-        context.commit('SET_UPLOAD_FILE', payload);
+        context.commit('SET_UPLOAD_FILE', payload)
     },
 
     setStudyName: (context, payload) => {
-        context.commit('SET_STUDY_NAME', payload);
+        context.commit('SET_STUDY_NAME', payload)
     },
 
     setStudyDate: (context, payload) => {
@@ -66,6 +72,16 @@ const actions = {
 
     setError: (context, payload) => {
         context.commit('SET_ERROR', payload)
+    },
+
+    downloadMouseCsvFormat: (context) => {
+        const url = window.URL.createObjectURL(new Blob([context.state.mouseCsvFormat]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'mouse_info.csv');
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
     },
 
     /**
@@ -139,6 +155,10 @@ const actions = {
 };
 
 const mutations = {
+    SET_START_VALIDATION: (state, payload) => {
+        return state.startValidation = payload.startValidation
+    },
+
     SET_LOADING: (state, payload) => {
         return state.loading = payload.loading;
     },
@@ -194,6 +214,7 @@ const mutations = {
 };
 
 const getters = {
+    startValidation: state => state.startValidation,
     studyName: state => state.studyName,
     studyDate: state => state.studyDate,
     researcherName: state => state.researcherName,
@@ -206,7 +227,8 @@ const getters = {
     organs: state => state.organs,
     file: state => state.file,
     loading: state => state.loading,
-    error: state => state.error
+    error: state => state.error,
+    mouseCsvFormat: state => state.mouseCsvFormat
 };
 
 export default {

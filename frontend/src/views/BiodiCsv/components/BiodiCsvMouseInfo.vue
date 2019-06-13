@@ -1,27 +1,30 @@
 <template>
     <div>
-        <el-button
-                type="primary"
-                @click="addTab()"
-                class="controls"
-        >
-            Add Mouse
-        </el-button>
-        <el-tabs v-model="currTab" type="card" closable @tab-remove="removeTab">
-            <el-tab-pane
-                    v-for="(item, index) in mouseForms"
-                    :key="item.name"
-                    :name="item.name"
-                    :label="item.title"
-            >
-                <component :is="item.content"></component>
-            </el-tab-pane>
-        </el-tabs>
+<!--        <el-button-->
+<!--                type="primary"-->
+<!--                @click="addTab()"-->
+<!--                class="controls"-->
+<!--        >-->
+<!--            Add Mouse-->
+<!--        </el-button>-->
+<!--        <el-tabs v-model="currTab" type="card" closable @tab-remove="removeTab">-->
+<!--            <el-tab-pane-->
+<!--                    v-for="(item, index) in mouseForms"-->
+<!--                    :key="item.name"-->
+<!--                    :name="item.name"-->
+<!--                    :label="item.title"-->
+<!--            >-->
+<!--               <MouseForm :bus="bus" @validated-one-form="handleValidated"></MouseForm>-->
+<!--            </el-tab-pane>-->
+<!--        </el-tabs>-->
+        <el-button type="success" @click="downloadMouseCsvFormat">Download Csv Format</el-button>
     </div>
 </template>
 
 <script>
     import MouseForm from "./MouseForm";
+    import {mapActions, mapGetters} from "vuex";
+    import * as types from '../../../store/modules/BiodiCsv/types'
     export default {
         name: "BiodiCsvMouseInfo",
         components: {MouseForm},
@@ -32,12 +35,16 @@
             return {
                 mouseForms: [],
                 index: 0,
-                currTab: ""
+                currTab: "",
+                numValidatedForms: 0
             }
         },
 
         methods: {
-            addTab() {
+            ...mapActions({
+                'downloadMouseCsvFormat': types.DOWNLOAD_MOUSE_CSV_FORMAT
+            }),
+            addTab () {
                 let newTabName = String("Mouse " + this.index);
                 this.mouseForms.push({
                     title: 'New Mouse',
@@ -47,7 +54,7 @@
                 this.currTab = newTabName;
                 this.index++;
             },
-            removeTab(targetName) {
+            removeTab (targetName) {
                 let tabs = this.mouseForms;
                 let activeName = this.currTab;
                 if (activeName === targetName) {
@@ -70,22 +77,18 @@
                 this.mouseForms = tabs.filter(tab => tab.name !== targetName);
             },
 
-            validateForms() {
-                console.log(this.$children);
-                // this.mouseForms.forEach((mouseForm) => {
-                //     console.log(this.currTab)
-                //     console.log(typeof this.currTab)
-                //
-                // })
+            handleValidated () {
+                this.numValidatedForms++;
 
+                if (this.numValidatedForms === this.mouseForms.length) {
+                    console.log("mouse forms validated");
+                    this.$emit('validated', true)
+                } else {
+                    console.log("mouse forms not validated")
+                    this.$emit('validated', false)
+                }
             }
         },
-
-        created() {
-            this.bus.$on('startValidation', () => {
-                this.validateForms()
-            })
-        }
     }
 </script>
 
