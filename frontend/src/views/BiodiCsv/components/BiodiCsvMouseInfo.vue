@@ -9,7 +9,7 @@
 <script>
     import MouseForm from "./MouseForm";
     import {mapActions, mapGetters} from "vuex";
-    import * as types from '../../../store/modules/BiodiCsv/types'
+    import * as types from '../../../store/modules/BiodiCsv/BiodiCsvUploadTypes'
     import BiodiCsvUpload from "./BiodiCsvUpload";
 
     export default {
@@ -22,7 +22,7 @@
         computed: {
             ...mapGetters({
                 startValidation: 'biodiCsvUpload/startValidation',
-                mouseCsv: 'biodiCsvUpload/mouseCsv'
+                mouseCsv: 'biodiCsvUpload/mouseCsv',
             })
         },
 

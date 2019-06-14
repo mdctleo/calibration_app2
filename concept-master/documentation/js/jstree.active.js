@@ -7,7 +7,7 @@ $('#jstree1').jstree({
             'core' : {
                 'check_callback' : true
             },
-            'plugins' : [ 'types', 'dnd' ],
+            'plugins' : [ 'BiodiCsvUploadTypes.js', 'dnd' ],
             'types' : {
                 'default' : {
                     'icon' : 'fa fa-folder'

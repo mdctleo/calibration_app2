@@ -8,6 +8,13 @@
             <el-step title="Step 5" description="Upload Csv"></el-step>
             <el-step title="Step 6" description="Review Info"></el-step>
         </el-steps>
+        <el-alert
+                v-show="error"
+                :title="error"
+                type="error"
+                show-icon
+                @close="setError({error: null})">
+        </el-alert>
         <BiodiCsvStudyInformation @validated="moveNext" :bus="bus" v-if="step === 0"></BiodiCsvStudyInformation>
         <BiodiCsvGammaCounterInformation @validated="moveNext" :bus="bus" v-if="step === 1"></BiodiCsvGammaCounterInformation>
         <BiodiCsvMouseInfo @validated="moveNext" :bus="bus" v-if="step === 2"></BiodiCsvMouseInfo>
@@ -26,9 +33,8 @@
     import BiodiCsvReviewInformation from "./components/BiodiCsvReviewInformation";
     import BiodiCsvTubeInformation from './components/BiodiCsvOrganOrder'
     import Vue from "vue";
-    import {mapActions} from "vuex";
-    import * as types from '../../store/modules/BiodiCsv/types.js'
-    import EventBus from './components/EventBus.js'
+    import {mapActions, mapGetters} from "vuex";
+    import * as types from '../../store/modules/BiodiCsv/BiodiCsvUploadTypes.js'
 
     export default {
         name: "BiodiCsvUploadView",
@@ -43,9 +49,15 @@
                 bus: new Vue()
             }
         },
+        computed: {
+            ...mapGetters({
+                error: 'biodiCsvUpload/error'
+            })
+        },
         methods: {
             ...mapActions({
-                'setStartValidation': types.SET_START_VALIDATION
+                'setStartValidation': types.SET_START_VALIDATION,
+                'setError': types.SET_ERROR
             }),
             handleNext() {
                 this.setStartValidation({startValidation: true})

@@ -13,13 +13,17 @@ const defaultState = {
     comments: "",
     gammaCounters: [],
     mice: [],
-    organs: [],
+    availableOrgans: [],
     file: null,
     loading: false,
     error: null,
     startValidation: false,
     mouseCsvFormat: "Mouse ID, Group ID, Euthanasia Time, Weight (g), Injection Date, Pre-Injection Time, Injection Time, Post-Injection Time, Pre-Injection MBq, Post-Injection MBq, Comments",
-    mouseCsv: null
+    mouseCsv: null,
+    mouseCsvJson: null,
+    organCsvFormat: "Organ Order",
+    organCsv: null,
+    selectedOrgans: [],
 };
 
 const actions = {
@@ -67,12 +71,12 @@ const actions = {
         context.commit('SET_MICE', payload)
     },
 
-    setOrgans: (context, payload) => {
-        context.commit('SET_ORGANS', payload)
-    },
-
     setMouseCsv: (context, payload) => {
         context.commit('SET_MOUSE_CSV', payload)
+    },
+
+    setOrganCsv: (context, payload) => {
+        context.commit('SET_ORGAN_CSV', payload)
     },
 
     setError: (context, payload) => {
@@ -84,6 +88,16 @@ const actions = {
         const link = document.createElement('a');
         link.href = url;
         link.setAttribute('download', 'mouse_info.csv');
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+    },
+
+    downloadOrganCsvFormat: (context) => {
+        const url = window.URL.createObjectURL(new Blob([context.state.organCsvFormat]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'organ_order.csv');
         document.body.appendChild(link);
         link.click();
         link.parentNode.removeChild(link);
@@ -107,23 +121,23 @@ const actions = {
     },
 
     validateMouse: (context, row) => {
-        if (row['Euthanasia Time'] === undefined || row ['Euthanasia Time'] === null) {
+        if (row['Euthanasia Time'] === "") {
             return false;
-        } else if (row['Group ID'] === undefined || row['Group ID'] === null) {
+        } else if (row['Group ID'] === "") {
             return false;
-        } else if (row['Injection Date'] === undefined || row['Injection Date'] === null) {
+        } else if (row['Injection Date'] === "") {
             return false;
-        } else if (row['Injection Time'] === undefined || row['Injection Time'] === null) {
+        } else if (row['Injection Time'] === "") {
             return false;
-        } else if (row['Mouse ID'] === undefined || row['Mouse ID'] === null) {
+        } else if (row['Mouse ID'] === "") {
             return false;
-        } else if (row['Post-Injection MBq'] === undefined || row['Post-Injection MBq'] === null) {
+        } else if (row['Post-Injection MBq'] === "") {
             return false;
-        } else if (row['Pre-Injection MBq'] === undefined || row['Pre-Injectin MBq'] === null) {
+        } else if (row['Pre-Injection MBq'] === "") {
             return false;
-        } else if (row['Pre-Injection Time'] === undefined || row ['Pre-Injection Time'] === null) {
+        } else if (row['Pre-Injection Time'] === "") {
             return false;
-        } else if (row['Weight (g)'] === undefined || row['Weight (g)'] === null) {
+        } else if (row['Weight (g)'] === "") {
             return false;
         } else {
             return true;
@@ -134,16 +148,31 @@ const actions = {
     handleMouseCsv: async (context, payload) => {
         try {
             context.commit('SET_LOADING', {loading: true});
-            let csvFile = await context.dispatch('readFile', payload.mouseCsv[0].raw);
-            if (csvFile.substring(0, context.state.mouseCsvFormat.length) === context.state.mouseCsvFormat) {
+            // did not upload file
+            if (payload.mouseCsv === null) {
+                return false;
+            }
+            let mouseCsv = payload.mouseCsv[0].raw;
+
+            let csvFile = await context.dispatch('readFile', mouseCsv);
+            // validate headers
+            if (csvFile.substring(0, context.state.mouseCsvFormat.length) !== mouseCsv) {
                 return false;
             }
             let csvFileJson = await csv().fromString(csvFile);
             let indexHolder = 0;
-            let rowValidation = csvFileJson.every((row, index) => {
-                indexHolder = index;
-               return context.dispatch('validateMouse', row);
-            });
+            let rowValidation = true;
+
+            // validate each existing rows for required cells
+            for (let i = 0; i < csvFileJson.length; i++) {
+                let row = csvFileJson[i];
+                indexHolder = i;
+                rowValidation = await context.dispatch('validateMouse', row);
+
+                if (!rowValidation) {
+                    break;
+                }
+            }
 
             if (rowValidation) {
                 return true;
@@ -151,6 +180,39 @@ const actions = {
                 context.commit('SET_ERROR', {error: "There is an error on row " + indexHolder});
                 return false;
             }
+        } catch (err) {
+            context.commit('SET_ERROR', {error: err.message});
+            return false;
+        } finally {
+            context.commit('SET_LOADING', {loading: false});
+        }
+    },
+
+    // validateOrgan: (context, row, availableOrgans) => {
+    //     return availableOrgans.includes(row['Organ Order']);
+    // },
+
+    handleOrganCsv: async (context, payload) => {
+        try {
+            context.commit('SET_LOADING', {loading: true});
+            let organCsv = payload.organCsv[0].raw;
+
+            let csvFile = await context.dispatch('readFile', organCsv);
+            // validate headers
+
+            let csvFileJson = await csv().fromString(csvFile);
+
+            let selectedOrgans = [];
+            for (let i = 0; i < csvFileJson.length; i++) {
+                selectedOrgans.push({
+                    key: i,
+                    label: i,
+                    type: 'OrganForm',
+                    value: csvFileJson[i]['Organ Order']
+                })
+            }
+
+            return context.commit('SET_SELECTED_ORGANS', {selectedOrgans: selectedOrgans})
         } catch (err) {
             context.commit('SET_ERROR', {error: err.message});
             return false;
@@ -265,12 +327,20 @@ const mutations = {
         return state.mice = payload.mice
     },
 
-    SET_ORGANS: (state, payload) => {
-        return state.organs = payload.organs
+    SET_AVAILABLE_ORGANS: (state, payload) => {
+        return state.availableOrgans = payload.availableOrgans
+    },
+
+    SET_SELECTED_ORGANS: (state, payload) => {
+        return state.selectedOrgans = payload.selectedOrgans
     },
 
     SET_MOUSE_CSV: (state, payload) => {
         return state.mouseCsv = payload.mouseCsv
+    },
+
+    SET_ORGAN_CSV: (state, payload) => {
+        return state.organCsv = payload.organCsv
     }
 
 };
@@ -286,11 +356,13 @@ const getters = {
     comments: state => state.comments,
     gammaCounters: state => state.gammaCounters,
     mice: state => state.mice,
-    organs: state => state.organs,
+    availableOrgans: state => state.availableOrgans,
     file: state => state.file,
     loading: state => state.loading,
     error: state => state.error,
-    mouseCsv: state => state.mouseCsv
+    mouseCsv: state => state.mouseCsv,
+    organCsv: state => state.organCsv,
+    selectedOrgans: state => state.selectedOrgans
 };
 
 export default {

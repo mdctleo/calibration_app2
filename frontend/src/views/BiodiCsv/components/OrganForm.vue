@@ -3,10 +3,11 @@
         <el-form :model="form" :rules="rules" ref="form" label-width="120px" label-position="top" class="demo-ruleForm">
             <el-row>
                 <el-col :span="12" :offset="6">
-                    <el-form-item :label="'Tube ' +  $attrs.label + ' Organ'" prop="organ">
+                    <el-form-item id="test" :label="'Tube ' +  $attrs.label + ' Organ'" prop="organ">
                         <el-select v-model="form.organ" placeholder="Please select an organ">
-                            <el-option label="Zone one" value="shanghai"></el-option>
-                            <el-option label="Zone two" value="beijing"></el-option>
+                            <el-option label="Lungs" value="Lungs"></el-option>
+                            <el-option label="Brain" value="Brain"></el-option>
+                            <el-option label="Liver" value="Liver"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
@@ -19,6 +20,9 @@
 <script>
     export default {
         name: "OrganForm",
+        props: {
+          selectedValue: String
+        },
         data () {
             return {
                 form: {
@@ -27,10 +31,17 @@
 
                 rules: {
                     organ: [
-                        {required: true, message: 'Please select a organ', trigger: 'change'},
+                        {required: true, message: 'Please select a valid organ in the database', trigger: 'change'},
                     ]
                 }
             }
+        },
+        computed: {
+
+        },
+
+        created () {
+            this.form.organ = this.selectedValue;
         }
     }
 </script>

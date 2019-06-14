@@ -110,7 +110,7 @@
 
 <script>
     import {mapActions, mapGetters} from "vuex";
-    import * as types from '../../../store/modules/BiodiCsv/types.js'
+    import * as types from '../../../store/modules/BiodiCsv/BiodiCsvUploadTypes.js'
 
     export default {
         name: "BiodiCsvStudyInformation",
