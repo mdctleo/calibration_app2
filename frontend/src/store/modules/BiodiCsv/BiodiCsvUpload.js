@@ -18,12 +18,13 @@ const defaultState = {
     loading: false,
     error: null,
     startValidation: false,
-    mouseCsvFormat: "Mouse ID, Group ID, Euthanasia Time, Weight (g), Injection Date, Pre-Injection Time, Injection Time, Post-Injection Time, Pre-Injection MBq, Post-Injection MBq, Comments"
+    mouseCsvFormat: "Mouse ID, Group ID, Euthanasia Time, Weight (g), Injection Date, Pre-Injection Time, Injection Time, Post-Injection Time, Pre-Injection MBq, Post-Injection MBq, Comments",
+    mouseCsv: null
 };
 
 const actions = {
     setStartValidation: (context, payload) => {
-      context.commit('SET_START_VALIDATION', payload)
+        context.commit('SET_START_VALIDATION', payload)
     },
 
     setUploadFile: (context, payload) => {
@@ -70,6 +71,10 @@ const actions = {
         context.commit('SET_ORGANS', payload)
     },
 
+    setMouseCsv: (context, payload) => {
+        context.commit('SET_MOUSE_CSV', payload)
+    },
+
     setError: (context, payload) => {
         context.commit('SET_ERROR', payload)
     },
@@ -84,37 +89,7 @@ const actions = {
         link.parentNode.removeChild(link);
     },
 
-    /**
-     * File upload start
-    **/
-    handleRawFile: (context, payload) => {
-        context.commit('SET_LOADING', {loading: true});
-        this.readFile(payload.file)
-            .then((csvFile) => {
-                return csv().fromString(csvFile)
-            })
-            .then((csvFileJson) => {
-                let fileFormat = {
-                    fileName: payload.file.name,
-                    file: csvFileJson
-                };
-
-                return postBiodiCsvFile(fileFormat)
-            })
-            .then((rsponse) => {
-
-            })
-            .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.message})
-            })
-            .finally(() => {
-                context.commit('SET_LOADING', {loading: false});
-                context.commit('SET_UPLOAD_FILE', {file: null})
-
-            })
-    },
-
-    readFile(file) {
+    readFile: (context, file) => {
         return new Promise((resolve, reject) => {
             let fileReader = new FileReader();
 
@@ -129,6 +104,89 @@ const actions = {
 
             fileReader.readAsText(file)
         })
+    },
+
+    validateMouse: (context, row) => {
+        if (row['Euthanasia Time'] === undefined || row ['Euthanasia Time'] === null) {
+            return false;
+        } else if (row['Group ID'] === undefined || row['Group ID'] === null) {
+            return false;
+        } else if (row['Injection Date'] === undefined || row['Injection Date'] === null) {
+            return false;
+        } else if (row['Injection Time'] === undefined || row['Injection Time'] === null) {
+            return false;
+        } else if (row['Mouse ID'] === undefined || row['Mouse ID'] === null) {
+            return false;
+        } else if (row['Post-Injection MBq'] === undefined || row['Post-Injection MBq'] === null) {
+            return false;
+        } else if (row['Pre-Injection MBq'] === undefined || row['Pre-Injectin MBq'] === null) {
+            return false;
+        } else if (row['Pre-Injection Time'] === undefined || row ['Pre-Injection Time'] === null) {
+            return false;
+        } else if (row['Weight (g)'] === undefined || row['Weight (g)'] === null) {
+            return false;
+        } else {
+            return true;
+        }
+    },
+
+
+    handleMouseCsv: async (context, payload) => {
+        try {
+            context.commit('SET_LOADING', {loading: true});
+            let csvFile = await context.dispatch('readFile', payload.mouseCsv[0].raw);
+            if (csvFile.substring(0, context.state.mouseCsvFormat.length) === context.state.mouseCsvFormat) {
+                return false;
+            }
+            let csvFileJson = await csv().fromString(csvFile);
+            let indexHolder = 0;
+            let rowValidation = csvFileJson.every((row, index) => {
+                indexHolder = index;
+               return context.dispatch('validateMouse', row);
+            });
+
+            if (rowValidation) {
+                return true;
+            } else {
+                context.commit('SET_ERROR', {error: "There is an error on row " + indexHolder});
+                return false;
+            }
+        } catch (err) {
+            context.commit('SET_ERROR', {error: err.message});
+            return false;
+        } finally {
+            context.commit('SET_LOADING', {loading: false});
+        }
+    },
+
+    /**
+     * File upload start
+     **/
+    handleRawFile: (context, payload) => {
+        context.commit('SET_LOADING', {loading: true});
+        context.dispatch('readFile', payload.files[0].raw)
+            .then((csvFile) => {
+                return csv().fromString(csvFile)
+            })
+            .then((csvFileJson) => {
+                let fileFormat = {
+                    fileName: payload.file.name,
+                    file: csvFileJson
+                };
+
+                return postBiodiCsvFile(fileFormat)
+            })
+            .then((response) => {
+
+            })
+            .catch((error) => {
+                context.commit('SET_ERROR', {error: error.response.data.message})
+            })
+            .finally(() => {
+                context.commit('SET_LOADING', {loading: false});
+                context.commit('SET_UPLOAD_FILE', {file: null})
+
+            })
     },
 
     replaceProtocolKey(csvRow) {
@@ -211,6 +269,10 @@ const mutations = {
         return state.organs = payload.organs
     },
 
+    SET_MOUSE_CSV: (state, payload) => {
+        return state.mouseCsv = payload.mouseCsv
+    }
+
 };
 
 const getters = {
@@ -228,7 +290,7 @@ const getters = {
     file: state => state.file,
     loading: state => state.loading,
     error: state => state.error,
-    mouseCsvFormat: state => state.mouseCsvFormat
+    mouseCsv: state => state.mouseCsv
 };
 
 export default {

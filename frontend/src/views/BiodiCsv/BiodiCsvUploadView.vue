@@ -13,7 +13,7 @@
         <BiodiCsvMouseInfo @validated="moveNext" :bus="bus" v-if="step === 2"></BiodiCsvMouseInfo>
         <BiodiCsvTubeInformation v-if="step === 3"></BiodiCsvTubeInformation>
         <BiodiCsvUpload v-if="step === 4"></BiodiCsvUpload>
-        <el-button @click="moveNext" class="next">Next</el-button>
+        <el-button @click="handleNext" class="next">Next</el-button>
         <el-button @click="handlePrevious" class="previous">Previous</el-button>
     </div>
 </template>
@@ -54,15 +54,11 @@
             moveNext(validated) {
                 this.setStartValidation({startValidation: false});
                 this.step++;
-
-
             },
 
             handlePrevious() {
                 this.step--;
             }
-        },
-        created() {
         }
     }
 </script>

@@ -20,3 +20,5 @@ export const SET_GAMMA_COUNTERS = "biodiCsvUpload/setGammaCounters";
 export const SET_MICE = "biodiCsvUpload/setMice";
 export const SET_ORGANS = "biodiCsvUpload/setOrgans";
 export const DOWNLOAD_MOUSE_CSV_FORMAT = "biodiCsvUpload/downloadMouseCsvFormat";
+export const HANDLE_MOUSE_CSV = "biodiCsvUpload/handleMouseCsv";
+export const SET_MOUSE_CSV = "biodiCsvUpload/setMouseCsv";
