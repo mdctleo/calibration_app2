@@ -19,14 +19,17 @@
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Researcher Name" prop="researcherName">
-                        <el-input v-model="form.researcherName"></el-input>
+                        <el-input  v-model="form.researcherName"></el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Principal Investigator Name" prop="piName">
-                        <el-input v-model="form.piName"></el-input>
+                        <el-select v-model="form.piName" placeholder="Please select the radio isotope">
+                            <el-option label="Francois Bernard" value="shanghai"></el-option>
+                            <el-option label="Francois Bernard" value="beijing"></el-option>
+                        </el-select>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -70,7 +73,7 @@
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Cell Line" prop="cellLine">
-                        <el-select v-model="form.cellLine" placeholder="Please select the cell line">
+                        <el-select v-model="form.cellLine"  @input="setCellLine" placeholder="Please select the cell line">
                             <el-option label="Zone one" value="shanghai"></el-option>
                             <el-option label="Zone two" value="beijing"></el-option>
                         </el-select>
@@ -80,7 +83,7 @@
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Radio Activity" prop="radioActivity">
-                        <el-input v-model.number="form.radioActivity">
+                        <el-input v-model.number="form.radioActivity" type="number">
                             <el-option label="Zone one" value="shanghai"></el-option>
                             <el-option label="Zone two" value="beijing"></el-option>
                         </el-input>
@@ -90,7 +93,7 @@
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Radio Purity" prop="radioPurity">
-                        <el-input v-model.number="form.radioPurity"></el-input>
+                        <el-input v-model.number="form.radioPurity" type="number"></el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -145,7 +148,7 @@
                         {required: true, message: 'Please input researcher name', trigger: 'blur'}
                     ],
                     piName: [
-                        {required: true, message: 'Please input a principal investigator name', trigger: 'blur'}
+                        {required: true, message: 'Please input a principal investigator name', trigger: 'change'}
                     ],
                     radioIsotope: [
                         {required: true, message: 'Please select an isotope', trigger: 'change'}
@@ -178,7 +181,18 @@
         },
         computed: {
             ...mapGetters({
-                startValidation: 'biodiCsvUpload/startValidation'
+                startValidation: 'biodiCsvUpload/startValidation',
+                getStudyName: 'biodiCsvUpload/studyName',
+                studyDate: 'biodiCsvUpload/studyDate',
+                piName: 'biodiCsvUpload/piName',
+                radioIsotope: 'biodiCsvUpload/radioIsotope',
+                chelator: 'biodiCsvUpload/chelator',
+                vector: 'biodiCsvUpload/vector',
+                target: 'biodiCsvUpload/target',
+                cellLine: 'biodiCsvUpload/cellLine',
+                radioActivity: 'biodiCsvUpload/radioActivity',
+                radioPurity: 'biodiCsvUpload/radioPurity',
+                comments: 'biodiCsvUpload/comments'
             })
         },
 
@@ -191,6 +205,20 @@
         },
 
         methods: {
+            ...mapActions({
+                'setStudyName': types.SET_STUDY_NAME,
+                'setStudyDate': types.SET_STUDY_DATE,
+                'setResearcherName': types.SET_RESEARCHER_NAME,
+                'setPiName': types.SET_PI_NAME,
+                'setRadioIsotope': types.SET_RADIO_ISOTOPE,
+                'setChelator': types.SET_CHELATOR,
+                'setVector': types.SET_VECTOR,
+                'setTarget': types.SET_TARGET,
+                'setCellLine': types.SET_CELL_LINE,
+                'setRadioActivity': types.SET_RADIO_ACTIVITY,
+                'setRadioPurity': types.SET_RADIO_PURITY,
+                'SET_COMMENTS': types.SET_COMMENTS
+            }),
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {

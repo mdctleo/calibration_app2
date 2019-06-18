@@ -4,17 +4,23 @@ const moment = require('moment');
 const csv = require('csvtojson');
 
 const defaultState = {
-    studyName: "",
+    studyName: "test",
     studyDate: "",
     researcherName: "",
     piName: "",
     radioIsotope: "",
-    radioTracer: "",
+    chelator: "",
+    vector: "",
+    target: "",
+    radioActivity: "",
+    radioPurity: "",
     comments: "",
+
     gammaCounters: [],
     mice: [],
     availableOrgans: [],
-    file: null,
+    biodiCsvs: null,
+    biodiCsvJson: null,
     loading: false,
     error: null,
     startValidation: false,
@@ -29,10 +35,6 @@ const defaultState = {
 const actions = {
     setStartValidation: (context, payload) => {
         context.commit('SET_START_VALIDATION', payload)
-    },
-
-    setUploadFile: (context, payload) => {
-        context.commit('SET_UPLOAD_FILE', payload)
     },
 
     setStudyName: (context, payload) => {
@@ -55,8 +57,28 @@ const actions = {
         context.commit('SET_RADIO_ISOTOPE', payload)
     },
 
-    setRadioTracer: (context, payload) => {
-        context.commit('SET_RADIO_TRACER', payload)
+    setChelator: (context, payload) => {
+        context.commit('SET_CHELATOR', payload)
+    },
+
+    setVector: (context, payload) => {
+        context.commit('SET_VECTOR', payload)
+    },
+
+    setTarget: (context, payload) => {
+        context.commit('SET_TARGET', payload)
+    },
+
+    setCellLine: (context, payload) => {
+        context.commit('SET_CELL_LINE', payload)
+    },
+
+    setRadioActivity: (context, payload) => {
+        context.commit('SET_RADIO_ACTIVITY', payload)
+    },
+
+    setRadioPurity: (context, payload) => {
+        context.commit('SET_RADIO_PURITY', payload)
     },
 
     setComments: (context, payload) => {
@@ -77,6 +99,10 @@ const actions = {
 
     setOrganCsv: (context, payload) => {
         context.commit('SET_ORGAN_CSV', payload)
+    },
+
+    setBiodiCsvs: (context, payload) => {
+        context.commit('SET_BIODI_CSVS', payload)
     },
 
     setError: (context, payload) => {
@@ -150,13 +176,15 @@ const actions = {
             context.commit('SET_LOADING', {loading: true});
             // did not upload file
             if (payload.mouseCsv === null) {
+                context.commit('SET_ERROR', {error: "Form not uploaded"});
                 return false;
             }
             let mouseCsv = payload.mouseCsv[0].raw;
 
             let csvFile = await context.dispatch('readFile', mouseCsv);
             // validate headers
-            if (csvFile.substring(0, context.state.mouseCsvFormat.length) !== mouseCsv) {
+            if (csvFile.substring(0, context.state.mouseCsvFormat.length) !== context.state.mouseCsvFormat) {
+                context.commit('SET_ERROR', {error: "Do not mess with the headers"});
                 return false;
             }
             let csvFileJson = await csv().fromString(csvFile);
@@ -177,7 +205,7 @@ const actions = {
             if (rowValidation) {
                 return true;
             } else {
-                context.commit('SET_ERROR', {error: "There is an error on row " + indexHolder});
+                context.commit('SET_ERROR', {error: "There is an error on row " + (indexHolder + 2)});
                 return false;
             }
         } catch (err) {
@@ -195,10 +223,19 @@ const actions = {
     handleOrganCsv: async (context, payload) => {
         try {
             context.commit('SET_LOADING', {loading: true});
+            if (payload.organCsv === null) {
+                context.commit('SET_ERROR', {error: "Form not uploaded"});
+                return context.commit('SET_SELECTED_ORGANS', {selectedOrgans: []})
+            }
+
             let organCsv = payload.organCsv[0].raw;
 
             let csvFile = await context.dispatch('readFile', organCsv);
             // validate headers
+            if (csvFile.substring(0, context.state.organCsvFormat.length) !== context.state.organCsvFormat) {
+                context.commit('SET_ERROR', {error: "Do not mess with the headers"});
+                return false;
+            }
 
             let csvFileJson = await csv().fromString(csvFile);
 
@@ -224,15 +261,16 @@ const actions = {
     /**
      * File upload start
      **/
-    handleRawFile: (context, payload) => {
+    handleBiodiCsv: (context, payload) => {
         context.commit('SET_LOADING', {loading: true});
-        context.dispatch('readFile', payload.files[0].raw)
+        let biodiCsvFile = payload.biodiCsvs[0]
+        context.dispatch('readFile', biodiCsvFile.raw)
             .then((csvFile) => {
                 return csv().fromString(csvFile)
             })
             .then((csvFileJson) => {
                 let fileFormat = {
-                    fileName: payload.file.name,
+                    fileName: biodiCsvFile.name,
                     file: csvFileJson
                 };
 
@@ -246,8 +284,6 @@ const actions = {
             })
             .finally(() => {
                 context.commit('SET_LOADING', {loading: false});
-                context.commit('SET_UPLOAD_FILE', {file: null})
-
             })
     },
 
@@ -287,10 +323,6 @@ const mutations = {
         return state.error = payload.error;
     },
 
-    SET_UPLOAD_FILE: (state, payload) => {
-        return state.file = payload.file
-    },
-
     SET_STUDY_NAME: (state, payload) => {
         return state.studyName = payload.studyName
     },
@@ -311,8 +343,28 @@ const mutations = {
         return state.radioIsotope = payload.radioIsotope
     },
 
-    SET_RADIO_TRACER: (state, payload) => {
-        return state.radioTracer = payload.radioTracer
+    SET_CHELATOR: (state, payload) => {
+        return state.chelator = payload.chelator
+    },
+
+    SET_VECTOR: (state, payload) => {
+        return state.vector = payload.vector
+    },
+
+    SET_TARGET: (state, payload) => {
+        return state.target = payload.target
+    },
+
+    SET_CELL_LINE: (state, payload) => {
+        return state.cellLine = payload.cellLine
+    },
+
+    SET_RADIO_ACTIVITY: (state, payload) => {
+        return state.radioActivity = payload.radioActivity
+    },
+
+    SET_RADIO_PURITY: (state, payload) => {
+        return state.radioPurity = payload.radioPurity
     },
 
     SET_COMMENTS: (state, payload) => {
@@ -341,8 +393,15 @@ const mutations = {
 
     SET_ORGAN_CSV: (state, payload) => {
         return state.organCsv = payload.organCsv
-    }
+    },
 
+    SET_BIODI_CSVS: (state, payload) => {
+        return state.biodiCsvs = payload.biodiCsvs
+    },
+
+    SET_BIODI_CSV_JSON: (state, payload) => {
+        return state.biodiCsvJson = payload.biodiCsvJson
+    }
 };
 
 const getters = {
@@ -353,16 +412,20 @@ const getters = {
     piName: state => state.piName,
     radioIsotope: state => state.radioIsotope,
     radioTracer: state => state.radioTracer,
+    chelator: state => state.chelator,
+    vector: state => state.vector,
+    target: state => state.target,
+    cellLine: state => state.cellLine,
     comments: state => state.comments,
     gammaCounters: state => state.gammaCounters,
     mice: state => state.mice,
     availableOrgans: state => state.availableOrgans,
-    file: state => state.file,
     loading: state => state.loading,
     error: state => state.error,
     mouseCsv: state => state.mouseCsv,
     organCsv: state => state.organCsv,
-    selectedOrgans: state => state.selectedOrgans
+    selectedOrgans: state => state.selectedOrgans,
+    biodiCsvs: state => state.biodiCsvs
 };
 
 export default {

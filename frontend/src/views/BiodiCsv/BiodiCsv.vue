@@ -10,7 +10,7 @@
             </el-alert>
         </el-row>
         <el-row>
-            <BiodiCsvUpload v-on:submit="handleSubmit" ref="upload"></BiodiCsvUpload>
+            <BiodiCsvUploadForm v-on:submit="handleSubmit" ref="upload"></BiodiCsvUploadForm>
         </el-row>
 <!--        <el-row>-->
 <!--            <BiodiCsvDownload :metas="this.metas" @download="downloadBiodiCsvs"></BiodiCsvDownload>-->
@@ -20,7 +20,7 @@
 
 <script>
     import * as api from '../../api/api'
-    import BiodiCsvUpload from "./components/BiodiCsvUpload";
+    import BiodiCsvUploadForm from "./components/BiodiCsvUploadForm";
     import store from '../../store/Store.js'
     import BiodiCsvDownload from "./components/BiodiCsvDownload";
     import {getBiodiCsvMetas} from "../../api/api";
@@ -29,7 +29,7 @@
     const csv = require('csvtojson');
     export default {
         name: "BiodiCsv.vue",
-        components: {BiodiCsvDownload, BiodiCsvUpload},
+        components: {BiodiCsvDownload, BiodiCsvUploadForm},
         data() {
             return {
                 filesJson: [],

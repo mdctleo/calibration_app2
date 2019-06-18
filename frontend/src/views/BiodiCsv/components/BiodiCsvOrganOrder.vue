@@ -1,7 +1,9 @@
 <template>
     <div>
-        <el-button type="primary" @click="downloadOrganCsvFormat">Download Csv Format</el-button>
-        <BiodiCsvUpload tips="Upload your organ list" @upload-file="handleUploadfile"  @remove-file="handleRemovefile"></BiodiCsvUpload>
+        <el-button type="primary" class="controls" @click="downloadOrganCsvFormat">Download Csv Format</el-button>
+        <BiodiCsvUploadForm tips="Upload your organ list"
+                        @upload-file="handleUploadfile"
+                        @remove-file="handleRemovefile"></BiodiCsvUploadForm>
         <component
                 v-for="organForm in selectedOrgans"
                 :key="organForm.key"
@@ -9,6 +11,8 @@
                 v-bind="organForm"
                 :index="index"
                 :selectedValue="organForm.value"
+                @validated-one-organ-form="handleValidation"
+                :availableOrgans="availableOrgans"
         >
         </component>
 <!--        <el-row class="controls">-->
@@ -22,16 +26,18 @@
 
 <script>
     import OrganForm from "./OrganForm";
-    import BiodiCsvUpload from "./BiodiCsvUpload";
+    import BiodiCsvUploadForm from "./BiodiCsvUploadForm";
     import {mapActions, mapGetters} from "vuex";
     import * as types from "../../../store/modules/BiodiCsv/BiodiCsvUploadTypes"
     export default {
         name: "BiodiCsvOrganOrder",
-        components: {BiodiCsvUpload, OrganForm},
+        components: {BiodiCsvUploadForm, OrganForm},
         data() {
             return {
                 organForms: [],
-                index: 0
+                index: 0,
+                validatedOrganForms: 0,
+                availableOrgans: ["Lungs", "Brain", "Liver"]
             }
         },
 
@@ -43,6 +49,14 @@
           })
         },
 
+        watch: {
+          startValidation: function (val) {
+              if (val === true && this.selectedOrgans.length === 0) {
+                  this.$emit('validated', false)
+              }
+          }
+        },
+
         methods: {
             ...mapActions({
                 'downloadOrganCsvFormat': types.DOWNLOAD_ORGAN_CSV_FORMAT,
@@ -51,32 +65,26 @@
             }),
 
             handleUploadfile(fileList) {
-                this.setOrganCsv({organCsv: fileList});
+                this.setOrganCsv({organCsv: fileList})
                 this.handleOrganCsv({organCsv: this.organCsv})
-                    .then(() =>  {
-                        console.log(this.selectedOrgans)
-                    })
             },
 
             handleRemovefile() {
-                this.setOrganCsv({organCsv: null})
+                this.handleOrganCsv({organCsv: null})
             },
 
-            handleStartValidation() {
-                this.handleOrganCsv({organCsv: this.organCsv})
-                    .then((validated) => {
-                        if (validated) {
-                            console.log("organ forms validated");
-                            this.$emit('validated', true)
-                        } else {
-                            console.log("organ forms not validated");
-                            this.$emit('validated', false);
-                        }
-                    })
-                    .catch((err) => {
-                        this.$emit('validated', false)
-                    });
-            },
+            handleValidation(validated) {
+                if (validated === true) {
+                    this.validatedOrganForms++
+                    if (this.validatedOrganForms === this.selectedOrgans.length) {
+                        this.$emit('validated', true)
+                    }
+                } else {
+                    this.validatedOrganForms = 0
+                    this.$emit('validated', false)
+                }
+            }
+
         }
     }
 </script>

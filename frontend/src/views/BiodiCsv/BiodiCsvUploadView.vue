@@ -18,8 +18,8 @@
         <BiodiCsvStudyInformation @validated="moveNext" :bus="bus" v-if="step === 0"></BiodiCsvStudyInformation>
         <BiodiCsvGammaCounterInformation @validated="moveNext" :bus="bus" v-if="step === 1"></BiodiCsvGammaCounterInformation>
         <BiodiCsvMouseInfo @validated="moveNext" :bus="bus" v-if="step === 2"></BiodiCsvMouseInfo>
-        <BiodiCsvTubeInformation v-if="step === 3"></BiodiCsvTubeInformation>
-        <BiodiCsvUpload v-if="step === 4"></BiodiCsvUpload>
+        <BiodiCsvTubeInformation @validated="moveNext" v-if="step === 3"></BiodiCsvTubeInformation>
+        <BiodiCsvUpload @validated="moveNext" tips="Upload your raw Biodi Csv file" v-if="step === 4"></BiodiCsvUpload>
         <el-button @click="handleNext" class="next">Next</el-button>
         <el-button @click="handlePrevious" class="previous">Previous</el-button>
     </div>
@@ -29,7 +29,7 @@
     import BiodiCsvStudyInformation from "./components/BiodiCsvStudyInformation";
     import BiodiCsvMouseInfo from "./components/BiodiCsvMouseInfo";
     import BiodiCsvGammaCounterInformation from "./components/BiodiCsvGammaCounterInformation";
-    import BiodiCsvUpload from "./components/BiodiCsvUpload";
+    import BiodiCsvUpload from "./components/BiodiCsvUploadForm";
     import BiodiCsvReviewInformation from "./components/BiodiCsvReviewInformation";
     import BiodiCsvTubeInformation from './components/BiodiCsvOrganOrder'
     import Vue from "vue";
@@ -65,10 +65,13 @@
 
             moveNext(validated) {
                 this.setStartValidation({startValidation: false});
-                this.step++;
+                if (validated) {
+                    this.step++;
+                }
             },
 
             handlePrevious() {
+                this.setStartValidation({startValidation: false});
                 this.step--;
             }
         }

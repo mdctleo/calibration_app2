@@ -1,8 +1,8 @@
 <template>
     <div>
-        <el-button type="primary" @click="downloadMouseCsvFormat">Download Csv Format</el-button>
-        <BiodiCsvUpload tips="Upload your completed mouse info file" @upload-file="handleUploadfile"
-                        @remove-file="handleRemovefile"></BiodiCsvUpload>
+        <el-button type="primary" class="controls" @click="downloadMouseCsvFormat">Download Csv Format</el-button>
+        <BiodiCsvUploadForm tips="Upload your completed mouse info file" @upload-file="handleUploadfile"
+                        @remove-file="handleRemovefile"></BiodiCsvUploadForm>
     </div>
 </template>
 
@@ -10,11 +10,11 @@
     import MouseForm from "./MouseForm";
     import {mapActions, mapGetters} from "vuex";
     import * as types from '../../../store/modules/BiodiCsv/BiodiCsvUploadTypes'
-    import BiodiCsvUpload from "./BiodiCsvUpload";
+    import BiodiCsvUploadForm from "./BiodiCsvUploadForm";
 
     export default {
         name: "BiodiCsvMouseInfo",
-        components: {BiodiCsvUpload, MouseForm},
+        components: {BiodiCsvUploadForm, MouseForm},
         props: {
             bus: Object
         },
@@ -71,6 +71,5 @@
 <style scoped>
     .controls {
         margin-top: 2%;
-        margin-bottom: 2%;
     }
 </style>

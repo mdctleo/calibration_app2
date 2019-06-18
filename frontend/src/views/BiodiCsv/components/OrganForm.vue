@@ -18,10 +18,13 @@
 </template>
 
 <script>
+    import {mapGetters} from "vuex";
+
     export default {
         name: "OrganForm",
         props: {
-          selectedValue: String
+          selectedValue: String,
+          availableOrgans: Array
         },
         data () {
             return {
@@ -31,13 +34,46 @@
 
                 rules: {
                     organ: [
-                        {required: true, message: 'Please select a valid organ in the database', trigger: 'change'},
+                        {validator: this.organValidation, trigger: 'change'},
                     ]
                 }
             }
         },
         computed: {
+            ...mapGetters({
+                startValidation: 'biodiCsvUpload/startValidation',
+            })
+        },
 
+        methods: {
+            submitForm(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        this.$emit('validated-one-organ-form', true)
+                    } else {
+                        console.log('error submit!!');
+                        this.$emit('validated-one-organ-form', false)
+                    }
+                });
+            },
+
+            organValidation (rule, value, callback) {
+                if (value === "") {
+                    callback(new Error('Please select an organ'))
+                } else if (!this.availableOrgans.includes(value)) {
+                    callback(new Error('The organ you have entered is not in the database, please select one'))
+                } else {
+                    callback();
+                }
+            }
+        },
+
+        watch: {
+          startValidation: function (val) {
+              if (val === true) {
+                  this.submitForm('form')
+              }
+          }
         },
 
         created () {
