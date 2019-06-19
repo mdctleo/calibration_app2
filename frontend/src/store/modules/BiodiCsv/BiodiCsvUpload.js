@@ -4,17 +4,20 @@ const moment = require('moment');
 const csv = require('csvtojson');
 
 const defaultState = {
-    studyName: "test",
-    studyDate: "",
-    researcherName: "",
-    piName: "",
-    radioIsotope: "",
-    chelator: "",
-    vector: "",
-    target: "",
-    radioActivity: "",
-    radioPurity: "",
-    comments: "",
+    form: {
+        studyName: "asdfasdf",
+        studyDate: "",
+        researcherName: "",
+        piName: "",
+        radioIsotope: "",
+        chelator: "",
+        vector: "",
+        target: "",
+        cellLine: "",
+        radioActivity: "",
+        radioPurity: "",
+        comments: "",
+    },
 
     gammaCounters: [],
     mice: [],
@@ -38,6 +41,7 @@ const actions = {
     },
 
     setStudyName: (context, payload) => {
+        console.log(payload);
         context.commit('SET_STUDY_NAME', payload)
     },
 
@@ -324,51 +328,52 @@ const mutations = {
     },
 
     SET_STUDY_NAME: (state, payload) => {
-        return state.studyName = payload.studyName
+        console.log("setting study name")
+        return state.form.studyName = payload.studyName
     },
 
     SET_STUDY_DATE: (state, payload) => {
-        return state.studyDate = payload.studyDate
+        return state.form.studyDate = payload.studyDate
     },
 
     SET_RESEARCHER_NAME: (state, payload) => {
-        return state.researcherName = payload.researcherName
+        return state.form.researcherName = payload.researcherName
     },
 
     SET_PI_NAME: (state, payload) => {
-        return state.piName = payload.piName
+        return state.form.piName = payload.piName
     },
 
     SET_RADIO_ISOTOPE: (state, payload) => {
-        return state.radioIsotope = payload.radioIsotope
+        return state.form.radioIsotope = payload.radioIsotope
     },
 
     SET_CHELATOR: (state, payload) => {
-        return state.chelator = payload.chelator
+        return state.form.chelator = payload.chelator
     },
 
     SET_VECTOR: (state, payload) => {
-        return state.vector = payload.vector
+        return state.form.vector = payload.vector
     },
 
     SET_TARGET: (state, payload) => {
-        return state.target = payload.target
+        return state.form.target = payload.target
     },
 
     SET_CELL_LINE: (state, payload) => {
-        return state.cellLine = payload.cellLine
+        return state.form.cellLine = payload.cellLine
     },
 
     SET_RADIO_ACTIVITY: (state, payload) => {
-        return state.radioActivity = payload.radioActivity
+        return state.form.radioActivity = payload.radioActivity
     },
 
     SET_RADIO_PURITY: (state, payload) => {
-        return state.radioPurity = payload.radioPurity
+        return state.form.radioPurity = payload.radioPurity
     },
 
     SET_COMMENTS: (state, payload) => {
-        return state.comments = payload.comments
+        return state.form.comments = payload.comments
     },
 
     SET_GAMMA_COUNTERS: (state, payload) => {
@@ -406,17 +411,17 @@ const mutations = {
 
 const getters = {
     startValidation: state => state.startValidation,
-    studyName: state => state.studyName,
-    studyDate: state => state.studyDate,
-    researcherName: state => state.researcherName,
-    piName: state => state.piName,
-    radioIsotope: state => state.radioIsotope,
-    radioTracer: state => state.radioTracer,
-    chelator: state => state.chelator,
-    vector: state => state.vector,
-    target: state => state.target,
-    cellLine: state => state.cellLine,
-    comments: state => state.comments,
+    form: state => state.form,
+    studyName: state => state.form.studyName,
+    studyDate: state => state.form.studyDate,
+    researcherName: state => state.form.researcherName,
+    piName: state => state.form.piName,
+    radioIsotope: state => state.form.radioIsotope,
+    chelator: state => state.form.chelator,
+    vector: state => state.form.vector,
+    target: state => state.form.target,
+    cellLine: state => state.form.cellLine,
+    comments: state => state.form.comments,
     gammaCounters: state => state.gammaCounters,
     mice: state => state.mice,
     availableOrgans: state => state.availableOrgans,

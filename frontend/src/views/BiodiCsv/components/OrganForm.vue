@@ -1,9 +1,9 @@
 <template>
     <div class="form">
-        <el-form :model="form" :rules="rules" ref="form" label-width="120px" label-position="top" class="demo-ruleForm">
+        <el-form :model="form" :rules="rules" ref="form" label-width="120px" label-position="top">
             <el-row>
                 <el-col :span="12" :offset="6">
-                    <el-form-item id="test" :label="'Tube ' +  $attrs.label + ' Organ'" prop="organ">
+                    <el-form-item id="test" :label="'Tube ' +  ($attrs.label + 1) + ' Organ'" prop="organ">
                         <el-select v-model="form.organ" placeholder="Please select an organ">
                             <el-option label="Lungs" value="Lungs"></el-option>
                             <el-option label="Brain" value="Brain"></el-option>
@@ -23,10 +23,10 @@
     export default {
         name: "OrganForm",
         props: {
-          selectedValue: String,
-          availableOrgans: Array
+            selectedValue: String,
+            availableOrgans: Array
         },
-        data () {
+        data() {
             return {
                 form: {
                     organ: ""
@@ -57,7 +57,7 @@
                 });
             },
 
-            organValidation (rule, value, callback) {
+            organValidation(rule, value, callback) {
                 if (value === "") {
                     callback(new Error('Please select an organ'))
                 } else if (!this.availableOrgans.includes(value)) {
@@ -69,19 +69,23 @@
         },
 
         watch: {
-          startValidation: function (val) {
-              if (val === true) {
-                  this.submitForm('form')
-              }
-          }
+            startValidation: function (val) {
+                if (val === true) {
+                    this.submitForm('form')
+                }
+            }
         },
 
-        created () {
+        created() {
             this.form.organ = this.selectedValue;
         }
     }
 </script>
 
 <style scoped>
+
+    .form .el-select {
+        display: block;
+    }
 
 </style>

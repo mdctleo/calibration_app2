@@ -19,7 +19,7 @@
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Researcher Name" prop="researcherName">
-                        <el-input  v-model="form.researcherName"></el-input>
+                        <el-input v-model="form.researcherName"></el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -73,7 +73,8 @@
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Cell Line" prop="cellLine">
-                        <el-select v-model="form.cellLine"  @input="setCellLine" placeholder="Please select the cell line">
+                        <el-select v-model="form.cellLine"
+                                   placeholder="Please select the cell line">
                             <el-option label="Zone one" value="shanghai"></el-option>
                             <el-option label="Zone two" value="beijing"></el-option>
                         </el-select>
@@ -122,20 +123,6 @@
         },
         data() {
             return {
-                form: {
-                    studyName: "",
-                    studyDate: "",
-                    researcherName: "",
-                    piName: "",
-                    radioIsotope: "",
-                    chelator: "",
-                    vector: "",
-                    target: "",
-                    cellLine: "",
-                    radioActivity: "",
-                    radioPurity: "",
-                    comments: "",
-                },
                 rules: {
                     studyName: [
                         {required: true, message: 'Please input study name', trigger: 'blur'},
@@ -182,18 +169,129 @@
         computed: {
             ...mapGetters({
                 startValidation: 'biodiCsvUpload/startValidation',
+                getForm: 'biodiCsvUpload/form',
                 getStudyName: 'biodiCsvUpload/studyName',
-                studyDate: 'biodiCsvUpload/studyDate',
-                piName: 'biodiCsvUpload/piName',
-                radioIsotope: 'biodiCsvUpload/radioIsotope',
-                chelator: 'biodiCsvUpload/chelator',
-                vector: 'biodiCsvUpload/vector',
-                target: 'biodiCsvUpload/target',
-                cellLine: 'biodiCsvUpload/cellLine',
-                radioActivity: 'biodiCsvUpload/radioActivity',
-                radioPurity: 'biodiCsvUpload/radioPurity',
-                comments: 'biodiCsvUpload/comments'
-            })
+                getStudyDate: 'biodiCsvUpload/studyDate',
+                getResearcherName: 'biodiCsvUpload/researcherName',
+                getPiName: 'biodiCsvUpload/piName',
+                getRadioIsotope: 'biodiCsvUpload/radioIsotope',
+                getChelator: 'biodiCsvUpload/chelator',
+                getVector: 'biodiCsvUpload/vector',
+                getTarget: 'biodiCsvUpload/target',
+                getCellLine: 'biodiCsvUpload/cellLine',
+                getRadioActivity: 'biodiCsvUpload/radioActivity',
+                getRadioPurity: 'biodiCsvUpload/radioPurity',
+                getComments: 'biodiCsvUpload/comments'
+            }),
+
+            form: {
+                get() {
+                    return this.getForm
+                },
+
+                set(value) {
+                },
+            },
+
+            studyName: {
+                get() {
+                    return this.getStudyName;
+                },
+
+                set(value) {
+                    this.setStudyName({studyName: value})
+                }
+            },
+
+            studyDate: {
+                get() {
+                    return this.getStudyDate
+                },
+
+                set(value) {
+                    this.setStudyDate({studyDate: value})
+                }
+            },
+
+            researcherName: {
+                get() {
+                    return this.getResearcherName
+                },
+
+                set(value) {
+                    this.setResearcherName({researcherName: value})
+                }
+            },
+
+            piName: {
+                get() {
+                    return this.getPiName
+                },
+
+                set(value) {
+                    this.setPiName({piName: value})
+                }
+            },
+
+            radioIsotope: {
+                get() {
+                    return this.getRadioIsotope
+                },
+
+                set(value) {
+                    this.setRadioIsotope({radioIsotope: value})
+                }
+            },
+
+            chelator: {
+                get() {
+                    return this.getChelator
+                },
+
+                set(value) {
+                    this.setChelator({chelator: value})
+                }
+            },
+
+            vector: {
+                get() {
+                    return this.getVector
+                },
+
+                set(value) {
+                    this.setVector({vector: value})
+                }
+            },
+
+            target: {
+                get() {
+                    return this.getTarget
+                },
+
+                set(value) {
+                    this.setTarget({target: value})
+                }
+            },
+
+            cellLine: {
+                get() {
+                    return this.getCellLine
+                },
+
+                set(value) {
+                    this.setCellLine({cellLine: value})
+                }
+            },
+
+            comments: {
+                get() {
+                    return this.getComments
+                },
+
+                set(value) {
+                    this.setComments({comments: value})
+                }
+            }
         },
 
         watch: {
@@ -217,7 +315,7 @@
                 'setCellLine': types.SET_CELL_LINE,
                 'setRadioActivity': types.SET_RADIO_ACTIVITY,
                 'setRadioPurity': types.SET_RADIO_PURITY,
-                'SET_COMMENTS': types.SET_COMMENTS
+                'setComments': types.SET_COMMENTS
             }),
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {

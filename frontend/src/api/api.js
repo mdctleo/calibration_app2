@@ -1,5 +1,5 @@
 const axios = require('axios');
-const BASE_URL = " http://localhost:5000";
+const BASE_URL = " http://378e9d44.ngrok.io";
 
 
 // Calibration
