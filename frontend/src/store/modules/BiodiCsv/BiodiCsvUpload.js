@@ -4,7 +4,7 @@ const moment = require('moment');
 const csv = require('csvtojson');
 
 const defaultState = {
-    form: {
+    studyForm: {
         studyName: "asdfasdf",
         studyDate: "",
         researcherName: "",
@@ -19,9 +19,19 @@ const defaultState = {
         comments: "",
     },
 
-    gammaCounters: [],
+    gammaForm: {
+        gammaCounter: "",
+        gammaCounterRunDateTime: "",
+        gammaCounterRunTimeOffset: "",
+        gammaCounterRunComments: "",
+    },
+
+    organForm: {
+        selectedOrgans: []
+    },
+
     mice: [],
-    availableOrgans: [],
+    availableOrgans: ["Lungs", "Liver", "Heart"],
     biodiCsvs: null,
     biodiCsvJson: null,
     loading: false,
@@ -32,7 +42,6 @@ const defaultState = {
     mouseCsvJson: null,
     organCsvFormat: "Organ Order",
     organCsv: null,
-    selectedOrgans: [],
 };
 
 const actions = {
@@ -89,8 +98,20 @@ const actions = {
         context.commit('SET_COMMENTS', payload)
     },
 
-    setGammaCounters: (context, payload) => {
-        context.commit('SET_GAMMA_COUNTERS', payload)
+    setGammaCounter: (context, payload) => {
+        context.commit('SET_GAMMA_COUNTER', payload)
+    },
+
+    setGammaCounterRunDateTime: (context, payload) => {
+        context.commit('SET_GAMMA_COUNTER_RUN_DATE_TIME', payload)
+    },
+
+    setGammaCounterRunTimeOffset: (context, payload) => {
+        context.commit('SET_GAMMA_COUNTER_RUN_TIME_OFFSET', payload)
+    },
+
+    setGammaCounterRunComments: (context, payload) => {
+        context.commit('SET_GAMMA_COUNTER_RUN_COMMENTS', payload)
     },
 
     setMice: (context, payload) => {
@@ -103,6 +124,10 @@ const actions = {
 
     setOrganCsv: (context, payload) => {
         context.commit('SET_ORGAN_CSV', payload)
+    },
+
+    setSelectedOrgan: (context, payload) => {
+        context.commit('SET_SELECTED_ORGAN', payload)
     },
 
     setBiodiCsvs: (context, payload) => {
@@ -177,58 +202,55 @@ const actions = {
 
     handleMouseCsv: async (context, payload) => {
         try {
-            context.commit('SET_LOADING', {loading: true});
+            context.commit('SET_LOADING', {loading: true})
             // did not upload file
             if (payload.mouseCsv === null) {
-                context.commit('SET_ERROR', {error: "Form not uploaded"});
-                return false;
+                context.commit('SET_ERROR', {error: "mouse csv not uploaded"})
+                return false
             }
-            let mouseCsv = payload.mouseCsv[0].raw;
+            let mouseCsv = payload.mouseCsv[0].raw
 
-            let csvFile = await context.dispatch('readFile', mouseCsv);
+            let csvFile = await context.dispatch('readFile', mouseCsv)
             // validate headers
             if (csvFile.substring(0, context.state.mouseCsvFormat.length) !== context.state.mouseCsvFormat) {
-                context.commit('SET_ERROR', {error: "Do not mess with the headers"});
-                return false;
+                context.commit('SET_ERROR', {error: "Do not mess with the headers"})
+                return false
             }
-            let csvFileJson = await csv().fromString(csvFile);
-            let indexHolder = 0;
-            let rowValidation = true;
+            let csvFileJson = await csv().fromString(csvFile)
+            let indexHolder = 0
+            let rowValidated = true
 
             // validate each existing rows for required cells
             for (let i = 0; i < csvFileJson.length; i++) {
-                let row = csvFileJson[i];
-                indexHolder = i;
-                rowValidation = await context.dispatch('validateMouse', row);
+                let row = csvFileJson[i]
+                indexHolder = i
+                rowValidated = await context.dispatch('validateMouse', row)
 
-                if (!rowValidation) {
-                    break;
+                if (!rowValidated) {
+                    break
                 }
             }
 
-            if (rowValidation) {
-                return true;
+            if (rowValidated) {
+                context.commit('SET_MOUSE_CSV_JSON', {mouseCsvJson: csvFileJson})
+                return true
             } else {
-                context.commit('SET_ERROR', {error: "There is an error on row " + (indexHolder + 2)});
-                return false;
+                context.commit('SET_ERROR', {error: "There is an error on row " + (indexHolder + 2)})
+                return false
             }
         } catch (err) {
-            context.commit('SET_ERROR', {error: err.message});
-            return false;
+            context.commit('SET_ERROR', {error: err.message})
+            return false
         } finally {
-            context.commit('SET_LOADING', {loading: false});
+            context.commit('SET_LOADING', {loading: false})
         }
     },
-
-    // validateOrgan: (context, row, availableOrgans) => {
-    //     return availableOrgans.includes(row['Organ Order']);
-    // },
 
     handleOrganCsv: async (context, payload) => {
         try {
             context.commit('SET_LOADING', {loading: true});
             if (payload.organCsv === null) {
-                context.commit('SET_ERROR', {error: "Form not uploaded"});
+                context.commit('SET_ERROR', {error: "organ csv not uploaded"});
                 return context.commit('SET_SELECTED_ORGANS', {selectedOrgans: []})
             }
 
@@ -328,56 +350,68 @@ const mutations = {
     },
 
     SET_STUDY_NAME: (state, payload) => {
-        console.log("setting study name")
-        return state.form.studyName = payload.studyName
+        return state.studyForm.studyName = payload.studyName
     },
 
     SET_STUDY_DATE: (state, payload) => {
-        return state.form.studyDate = payload.studyDate
+        return state.studyForm.studyDate = payload.studyDate
     },
 
     SET_RESEARCHER_NAME: (state, payload) => {
-        return state.form.researcherName = payload.researcherName
+        console.log(payload.researcherName)
+        return state.studyForm.researcherName = payload.researcherName
     },
 
     SET_PI_NAME: (state, payload) => {
-        return state.form.piName = payload.piName
+        return state.studyForm.piName = payload.piName
     },
 
     SET_RADIO_ISOTOPE: (state, payload) => {
-        return state.form.radioIsotope = payload.radioIsotope
+        return state.studyForm.radioIsotope = payload.radioIsotope
     },
 
     SET_CHELATOR: (state, payload) => {
-        return state.form.chelator = payload.chelator
+        return state.studyForm.chelator = payload.chelator
     },
 
     SET_VECTOR: (state, payload) => {
-        return state.form.vector = payload.vector
+        return state.studyForm.vector = payload.vector
     },
 
     SET_TARGET: (state, payload) => {
-        return state.form.target = payload.target
+        return state.studyForm.target = payload.target
     },
 
     SET_CELL_LINE: (state, payload) => {
-        return state.form.cellLine = payload.cellLine
+        return state.studyForm.cellLine = payload.cellLine
     },
 
     SET_RADIO_ACTIVITY: (state, payload) => {
-        return state.form.radioActivity = payload.radioActivity
+        return state.studyForm.radioActivity = payload.radioActivity
     },
 
     SET_RADIO_PURITY: (state, payload) => {
-        return state.form.radioPurity = payload.radioPurity
+        return state.studyForm.radioPurity = payload.radioPurity
     },
 
     SET_COMMENTS: (state, payload) => {
-        return state.form.comments = payload.comments
+        return state.studyForm.comments = payload.comments
     },
 
-    SET_GAMMA_COUNTERS: (state, payload) => {
-        return state.gammaCounters = payload.gammaCounters
+    SET_GAMMA_COUNTER: (state, payload) => {
+        return state.gammaForm.gammaCounter = payload.gammaCounter
+    },
+
+    SET_GAMMA_COUNTER_RUN_DATE_TIME: (state, payload) => {
+        return state.gammaForm.gammaCounterRunDateTime = payload.gammaCounterRunDateTime
+    },
+
+    SET_GAMMA_COUNTER_RUN_TIME_OFFSET: (state, payload) => {
+        return state.gammaForm.gammaCounterRunTimeOffset = payload.gammaCounterRunTimeOffset
+    },
+
+    SET_GAMMA_COUNTER_RUN_COMMENTS: (state, payload) => {
+        return state.gammaForm.gammaCounterRunComments = payload.gammaCounterRunComments
     },
 
     SET_MICE: (state, payload) => {
@@ -389,15 +423,29 @@ const mutations = {
     },
 
     SET_SELECTED_ORGANS: (state, payload) => {
-        return state.selectedOrgans = payload.selectedOrgans
+        return state.organForm.selectedOrgans = payload.selectedOrgans
+    },
+
+    SET_SELECTED_ORGAN: (state, payload) => {
+        console.log(payload.index)
+        console.log(payload.organ)
+        return state.organForm.selectedOrgans[payload.index].value = payload.organ
     },
 
     SET_MOUSE_CSV: (state, payload) => {
         return state.mouseCsv = payload.mouseCsv
     },
 
+    SET_MOUSE_CSV_JSON: (state, payload) => {
+        return state.mouseCsvJson = payload.mouseCsvJson
+    },
+
     SET_ORGAN_CSV: (state, payload) => {
         return state.organCsv = payload.organCsv
+    },
+
+    SET_ORAGN_CSV_JSON: (state, payload) => {
+        return state.organCsvJson = payload.organCsvJson
     },
 
     SET_BIODI_CSVS: (state, payload) => {
@@ -411,25 +459,39 @@ const mutations = {
 
 const getters = {
     startValidation: state => state.startValidation,
-    form: state => state.form,
-    studyName: state => state.form.studyName,
-    studyDate: state => state.form.studyDate,
-    researcherName: state => state.form.researcherName,
-    piName: state => state.form.piName,
-    radioIsotope: state => state.form.radioIsotope,
-    chelator: state => state.form.chelator,
-    vector: state => state.form.vector,
-    target: state => state.form.target,
-    cellLine: state => state.form.cellLine,
-    comments: state => state.form.comments,
-    gammaCounters: state => state.gammaCounters,
+
+    studyForm: state => state.studyForm,
+    studyName: state => state.studyForm.studyName,
+    studyDate: state => state.studyForm.studyDate,
+    researcherName: state => state.studyForm.researcherName,
+    piName: state => state.studyForm.piName,
+    radioIsotope: state => state.studyForm.radioIsotope,
+    chelator: state => state.studyForm.chelator,
+    vector: state => state.studyForm.vector,
+    target: state => state.studyForm.target,
+    cellLine: state => state.studyForm.cellLine,
+    radioActivity: state => state.studyForm.radioActivity,
+    radioPurity: state => state.studyForm.radioPurity,
+    comments: state => state.studyForm.comments,
+
+    gammaForm: state => state.gammaForm,
+    gammaCounter: state => state.gammaForm.gammaCounter,
+    gammaCounterRunDateTime: state => state.gammaForm.gammaCounterRunDateTime,
+    gammaCounterRunTimeOffset: state => state.gammaForm.gammaCounterRunTimeOffset,
+    gammaCounterRunComments: state => state.gammaForm.gammaCounterRunComments,
+
     mice: state => state.mice,
+
     availableOrgans: state => state.availableOrgans,
+    organCsv: state => state.organCsv,
+    organForm: state => state.organForm,
+    selectedOrgans: state => index => {
+        return (index === -1)? state.organForm.selectedOrgans : state.organForm.selectedOrgans[index]
+    },
+
     loading: state => state.loading,
     error: state => state.error,
     mouseCsv: state => state.mouseCsv,
-    organCsv: state => state.organCsv,
-    selectedOrgans: state => state.selectedOrgans,
     biodiCsvs: state => state.biodiCsvs
 };
 

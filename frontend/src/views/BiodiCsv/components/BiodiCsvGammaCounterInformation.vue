@@ -1,10 +1,10 @@
 <template>
     <div class="form">
-        <el-form :model="form" :rules="rules" ref="form" label-width="120px" label-position="top" class="demo-ruleForm">
+        <el-form :model="gammaForm" :rules="rules" ref="form" label-width="120px" label-position="top" class="demo-ruleForm">
             <el-row>
                 <el-col :span="12" :offset="6">
-                    <el-form-item label="Gamma Counter ID" prop="gammaCounterId">
-                        <el-select v-model="form.gammaCounterId" placeholder="Please select the gamma counter">
+                    <el-form-item label="Gamma Counter ID" prop="gammaCounter">
+                        <el-select v-model="gammaCounter" placeholder="Please select the gamma counter">
                             <el-option label="Zone one" value="shanghai"></el-option>
                             <el-option label="Zone two" value="beijing"></el-option>
                         </el-select>
@@ -15,7 +15,7 @@
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Gamma Counter Run Date & Time" prop="gammaCounterRunDateTime">
                         <el-date-picker
-                                v-model="form.gammaCounterRunDateTime"
+                                v-model="gammaCounterRunDateTime"
                                 type="datetime"
                                 placeholder="Select date and time">
                         </el-date-picker>
@@ -25,14 +25,14 @@
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Gamma Counter Run Time Offset" prop="gammaCounterRunTimeOffset">
-                        <el-input v-model="form.gammaCounterRunTimeOffset"></el-input>
+                        <el-input v-model="gammaCounterRunTimeOffset"></el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Gamma Counter Run Comments" prop="gammaCounterRunComments">
-                        <el-input type="textarea" v-model="form.gammaCounterRunComments"></el-input>
+                        <el-input type="textarea" v-model="gammaCounterRunComments"></el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -42,7 +42,9 @@
 
 <script>
     import GammaCounterForm from "./GammaCounterForm";
-    import {mapGetters} from "vuex";
+    import {mapActions, mapGetters} from "vuex";
+    import * as types from '../../../store/modules/BiodiCsv/BiodiCsvUploadTypes.js'
+
 
     export default {
         name: "BiodiCsvGammaCounterInformation",
@@ -52,15 +54,8 @@
         },
         data () {
             return {
-                form: {
-                    gammaCounterId: "",
-                    gammaCounterRunDateTime: "",
-                    gammaCounterRunTimeOffset: "",
-                    gammaCounterRunComments: ""
-                },
-
                 rules: {
-                    gammaCounterId: [
+                    gammaCounter: [
                         {required: true, message: 'Please select a gamma counter', trigger: 'change'},
                     ],
                     gammaCounterRunDateTime: [
@@ -76,8 +71,62 @@
 
         computed: {
             ...mapGetters({
-                startValidation: 'biodiCsvUpload/startValidation'
-            })
+                startValidation: 'biodiCsvUpload/startValidation',
+                getGammaForm: 'biodiCsvUpload/gammaForm',
+                getGammaCounter: 'biodiCsvUpload/gammaCounter',
+                getGammaCounterRunDateTime: 'biodiCsvUpload/gammaCounterRunDateTime',
+                getGammaCounterRunTimeOffset: 'biodiCsvUpload/gammaCounterRunTimeOffset',
+                getGammaCounterRunComments: 'biodiCsvUpload/gammaCounterRunComments'
+            }),
+
+            gammaForm: {
+                get () {
+                    return this.getGammaForm
+                },
+
+                set (value) {
+                }
+            },
+
+            gammaCounter: {
+                get () {
+                    return this.getGammaCounter
+                },
+
+                set (value) {
+                    this.setGammaCounter({gammaCounter: value})
+                }
+            },
+
+            gammaCounterRunDateTime: {
+                get () {
+                    return this.getGammaCounterRunDateTime
+                },
+
+                set (value) {
+                    this.setGammaCounterRunDateTime({gammaCounterRunDateTime: value})
+                }
+            },
+
+            gammaCounterRunTimeOffset: {
+                get () {
+                    return this.getGammaCounterRunTimeOffset
+                },
+
+                set (value) {
+                    this.setGammaCounterRunTimeOffset({gammaCounterRunTimeOffset: value})
+                }
+            },
+
+            gammaCounterRunComments: {
+                get() {
+                    return this.getGammaCounterRunComments
+                },
+
+                set(value) {
+                    this.setGammaCounterRunComments({gammaCounterRunComments: value})
+                }
+            }
         },
 
         watch: {
@@ -89,6 +138,12 @@
         },
 
         methods: {
+            ...mapActions({
+                'setGammaCounter': types.SET_GAMMA_COUNTER,
+                'setGammaCounterRunDateTime': types.SET_GAMMA_COUNTER_RUN_DATE_TIME,
+                'setGammaCounterRunTimeOffset': types.SET_GAMMA_COUNTER_RUN_TIME_OFFSET,
+                'setGammaCounterRunComments': types.SET_GAMMA_COUNTER_RUN_COMMENTS
+            }),
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {

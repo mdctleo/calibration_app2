@@ -4,10 +4,13 @@
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item id="test" :label="'Tube ' +  ($attrs.label + 1) + ' Organ'" prop="organ">
-                        <el-select v-model="form.organ" placeholder="Please select an organ">
-                            <el-option label="Lungs" value="Lungs"></el-option>
-                            <el-option label="Brain" value="Brain"></el-option>
-                            <el-option label="Liver" value="Liver"></el-option>
+                        <el-select v-model="organ" placeholder="Please select an organ">
+                            <el-option
+                                    v-for="organ in availableOrgans"
+                                    :key="organ"
+                                    :label="organ"
+                                    :value="organ"
+                            ></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
@@ -18,20 +21,16 @@
 </template>
 
 <script>
-    import {mapGetters} from "vuex";
+    import {mapActions, mapGetters} from "vuex";
+    import * as types from "../../../store/modules/BiodiCsv/BiodiCsvUploadTypes"
 
     export default {
         name: "OrganForm",
         props: {
-            selectedValue: String,
             availableOrgans: Array
         },
         data() {
             return {
-                form: {
-                    organ: ""
-                },
-
                 rules: {
                     organ: [
                         {validator: this.organValidation, trigger: 'change'},
@@ -42,10 +41,35 @@
         computed: {
             ...mapGetters({
                 startValidation: 'biodiCsvUpload/startValidation',
-            })
+                getSelectedOrgans: 'biodiCsvUpload/selectedOrgans',
+                getOrganForm: 'biodiCsvUpload/organForm'
+            }),
+
+            organForm: {
+                get() {
+                    return this.getOrganForm
+                },
+
+                set(value) {
+
+                }
+            },
+
+            organ: {
+                get() {
+                    return this.getSelectedOrgans({index: this.$attrs.label})
+                },
+
+                set(value) {
+                    this.setSelectedOrgan({index: this.$attrs.label, organ: value})
+                }
+            }
         },
 
         methods: {
+            ...mapActions({
+                'setSelectedOrgan': types.SET_SELECTED_ORGAN
+            }),
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
@@ -74,10 +98,6 @@
                     this.submitForm('form')
                 }
             }
-        },
-
-        created() {
-            this.form.organ = this.selectedValue;
         }
     }
 </script>

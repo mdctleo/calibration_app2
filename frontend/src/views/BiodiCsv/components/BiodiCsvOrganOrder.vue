@@ -5,12 +5,11 @@
                         @upload-file="handleUploadfile"
                         @remove-file="handleRemovefile"></BiodiCsvUploadForm>
         <component
-                v-for="organForm in selectedOrgans"
+                v-for="organForm in selectedOrgans(-1)"
                 :key="organForm.key"
                 :is="organForm.type"
                 v-bind="organForm"
                 :index="index"
-                :selectedValue="organForm.value"
                 @validated-one-organ-form="handleValidation"
                 :availableOrgans="availableOrgans"
         >
@@ -37,7 +36,7 @@
                 organForms: [],
                 index: 0,
                 validatedOrganForms: 0,
-                availableOrgans: ["Lungs", "Brain", "Liver"]
+                // availableOrgans: ["Lungs", "Brain", "Liver"]
             }
         },
 
@@ -45,7 +44,8 @@
           ...mapGetters({
               startValidation: 'biodiCsvUpload/startValidation',
               organCsv: 'biodiCsvUpload/organCsv',
-              selectedOrgans: 'biodiCsvUpload/selectedOrgans'
+              selectedOrgans: 'biodiCsvUpload/selectedOrgans',
+              availableOrgans: 'biodiCsvUpload/availableOrgans'
           })
         },
 

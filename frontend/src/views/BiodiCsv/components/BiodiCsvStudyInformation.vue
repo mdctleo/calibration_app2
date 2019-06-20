@@ -1,17 +1,17 @@
 <template>
     <div class="form">
-        <el-form :model="form" :rules="rules" ref="form" label-width="120px" label-position="top" class="demo-ruleForm">
+        <el-form :model="studyForm" :rules="rules" ref="form" label-width="120px" label-position="top" class="demo-ruleForm">
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Study Name" prop="studyName">
-                        <el-input v-model="form.studyName"></el-input>
+                        <el-input v-model="studyName"></el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Study Date" prop="studyDate">
-                        <el-date-picker type="date" placeholder="Pick a date" v-model="form.studyDate"
+                        <el-date-picker type="date" placeholder="Pick a date" v-model="studyDate"
                                         style="width: 100%;"></el-date-picker>
                     </el-form-item>
                 </el-col>
@@ -19,14 +19,14 @@
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Researcher Name" prop="researcherName">
-                        <el-input v-model="form.researcherName"></el-input>
+                        <el-input v-model="researcherName"></el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Principal Investigator Name" prop="piName">
-                        <el-select v-model="form.piName" placeholder="Please select the radio isotope">
+                        <el-select v-model="piName" placeholder="Please select the radio isotope">
                             <el-option label="Francois Bernard" value="shanghai"></el-option>
                             <el-option label="Francois Bernard" value="beijing"></el-option>
                         </el-select>
@@ -36,7 +36,7 @@
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Radioisotope" prop="radioIsotope">
-                        <el-select v-model="form.radioIsotope" placeholder="Please select the radio isotope">
+                        <el-select v-model="radioIsotope" placeholder="Please select the radio isotope">
                             <el-option label="Zone one" value="shanghai"></el-option>
                             <el-option label="Zone two" value="beijing"></el-option>
                         </el-select>
@@ -46,7 +46,7 @@
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Chelator" prop="chelator">
-                        <el-select v-model="form.chelator" placeholder="Please select the chelator">
+                        <el-select v-model="chelator" placeholder="Please select the chelator">
                             <el-option label="Zone one" value="shanghai"></el-option>
                             <el-option label="Zone two" value="beijing"></el-option>
                         </el-select>
@@ -56,7 +56,7 @@
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Vector" prop="vector">
-                        <el-select v-model="form.vector" placeholder="Please select the vector">
+                        <el-select v-model="vector" placeholder="Please select the vector">
                             <el-option label="Zone one" value="shanghai"></el-option>
                             <el-option label="Zone two" value="beijing"></el-option>
                         </el-select>
@@ -66,14 +66,14 @@
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Target" prop="target">
-                        <el-input v-model="form.target" placeholder="Please input the target"></el-input>
+                        <el-input v-model="target" placeholder="Please input the target"></el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Cell Line" prop="cellLine">
-                        <el-select v-model="form.cellLine"
+                        <el-select v-model="cellLine"
                                    placeholder="Please select the cell line">
                             <el-option label="Zone one" value="shanghai"></el-option>
                             <el-option label="Zone two" value="beijing"></el-option>
@@ -84,7 +84,7 @@
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Radio Activity" prop="radioActivity">
-                        <el-input v-model.number="form.radioActivity" type="number">
+                        <el-input v-model.number="radioActivity" type="number">
                             <el-option label="Zone one" value="shanghai"></el-option>
                             <el-option label="Zone two" value="beijing"></el-option>
                         </el-input>
@@ -94,14 +94,14 @@
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Radio Purity" prop="radioPurity">
-                        <el-input v-model.number="form.radioPurity" type="number"></el-input>
+                        <el-input v-model.number="radioPurity" type="number"></el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Comments">
-                        <el-input type="textarea" v-model="form.comments"></el-input>
+                        <el-input type="textarea" v-model="comments"></el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -169,7 +169,7 @@
         computed: {
             ...mapGetters({
                 startValidation: 'biodiCsvUpload/startValidation',
-                getForm: 'biodiCsvUpload/form',
+                getStudyForm: 'biodiCsvUpload/studyForm',
                 getStudyName: 'biodiCsvUpload/studyName',
                 getStudyDate: 'biodiCsvUpload/studyDate',
                 getResearcherName: 'biodiCsvUpload/researcherName',
@@ -184,9 +184,9 @@
                 getComments: 'biodiCsvUpload/comments'
             }),
 
-            form: {
+            studyForm: {
                 get() {
-                    return this.getForm
+                    return this.getStudyForm
                 },
 
                 set(value) {
@@ -195,7 +195,7 @@
 
             studyName: {
                 get() {
-                    return this.getStudyName;
+                    return this.getStudyName
                 },
 
                 set(value) {
@@ -280,6 +280,26 @@
 
                 set(value) {
                     this.setCellLine({cellLine: value})
+                }
+            },
+
+            radioActivity: {
+                get() {
+                    return this.getRadioActivity
+                },
+
+                set(value) {
+                    this.setRadioActivity({radioActivity: value})
+                },
+            },
+
+            radioPurity: {
+                get() {
+                    return this.getRadioPurity
+                },
+
+                set(value) {
+                    this.setRadioPurity({radioPurity: value})
                 }
             },
 
