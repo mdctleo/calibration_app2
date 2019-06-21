@@ -1,5 +1,5 @@
 <template>
-    
+    <el-button type="success">Submit</el-button>
 </template>
 
 <script>

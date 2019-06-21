@@ -33,5 +33,5 @@ export const HANDLE_ORGAN_CSV = "biodiCsvUpload/handleOrganCsv";
 export const SET_ORGAN_CSV = "biodiCsvUpload/setOrganCsv";
 export const SET_SELECTED_ORGAN = "biodiCsvUpload/setSelectedOrgan";
 
-export const SET_BIODI_CSV = "biodiCsvUpload/setBiodiCsv";
-export const HANDLE_BIODI_CSV = "biodiCsvUpload/handleBiodiCsv";
+export const SET_BIODI_CSV = "biodiCsvUpload/setBiodiCsvs";
+export const HANDLE_BIODI_CSV = "biodiCsvUpload/handleBiodiCsvs";

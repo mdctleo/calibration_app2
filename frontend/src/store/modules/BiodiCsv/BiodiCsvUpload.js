@@ -5,7 +5,7 @@ const csv = require('csvtojson');
 
 const defaultState = {
     studyForm: {
-        studyName: "asdfasdf",
+        studyName: "",
         studyDate: "",
         researcherName: "",
         piName: "",
@@ -37,7 +37,7 @@ const defaultState = {
     loading: false,
     error: null,
     startValidation: false,
-    mouseCsvFormat: "Mouse ID, Group ID, Euthanasia Time, Weight (g), Injection Date, Pre-Injection Time, Injection Time, Post-Injection Time, Pre-Injection MBq, Post-Injection MBq, Comments",
+    mouseCsvFormat: "Mouse ID, Gender, Group ID, Euthanasia Time, Weight (g), Injection Date, Pre-Injection Time, Injection Time, Post-Injection Time, Pre-Injection MBq, Post-Injection MBq, Comments",
     mouseCsv: null,
     mouseCsvJson: null,
     organCsvFormat: "Organ Order",
@@ -50,7 +50,6 @@ const actions = {
     },
 
     setStudyName: (context, payload) => {
-        console.log(payload);
         context.commit('SET_STUDY_NAME', payload)
     },
 
@@ -186,6 +185,8 @@ const actions = {
             return false;
         } else if (row['Mouse ID'] === "") {
             return false;
+        } else if (row['Gender'] === "") {
+            return false;
         } else if (row['Post-Injection MBq'] === "") {
             return false;
         } else if (row['Pre-Injection MBq'] === "") {
@@ -287,8 +288,9 @@ const actions = {
     /**
      * File upload start
      **/
-    handleBiodiCsv: (context, payload) => {
+    handleBiodiCsvs: (context, payload) => {
         context.commit('SET_LOADING', {loading: true});
+        console.log(payload.biodiCsvs)
         let biodiCsvFile = payload.biodiCsvs[0]
         context.dispatch('readFile', biodiCsvFile.raw)
             .then((csvFile) => {
@@ -300,12 +302,17 @@ const actions = {
                     file: csvFileJson
                 };
 
-                return postBiodiCsvFile(fileFormat)
+                context.commit('SET_BIODI_CSV_JSON', {biodiCsvJson: fileFormat})
+
+                // TODO: call API
+                // return postBiodiCsvFile(fileFormat)
             })
             .then((response) => {
 
             })
             .catch((error) => {
+                console.log(error)
+                console.log("error happened")
                 context.commit('SET_ERROR', {error: error.response.data.message})
             })
             .finally(() => {
@@ -358,7 +365,6 @@ const mutations = {
     },
 
     SET_RESEARCHER_NAME: (state, payload) => {
-        console.log(payload.researcherName)
         return state.studyForm.researcherName = payload.researcherName
     },
 
@@ -427,8 +433,6 @@ const mutations = {
     },
 
     SET_SELECTED_ORGAN: (state, payload) => {
-        console.log(payload.index)
-        console.log(payload.organ)
         return state.organForm.selectedOrgans[payload.index].value = payload.organ
     },
 
@@ -442,10 +446,6 @@ const mutations = {
 
     SET_ORGAN_CSV: (state, payload) => {
         return state.organCsv = payload.organCsv
-    },
-
-    SET_ORAGN_CSV_JSON: (state, payload) => {
-        return state.organCsvJson = payload.organCsvJson
     },
 
     SET_BIODI_CSVS: (state, payload) => {

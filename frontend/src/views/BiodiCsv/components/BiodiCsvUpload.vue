@@ -19,7 +19,12 @@
             })
         },
         watch: {
-
+            startValidation: function (val) {
+                console.log('saw starValidation change')
+                if (val === true) {
+                    this.handleStartValidation()
+                }
+            }
         },
         methods: {
             ...mapActions({
@@ -39,6 +44,8 @@
             handleStartValidation() {
                 // TODO: Add in front end validationa and refactor the other two csvs validate -> handle logic
                 this.handleBiodiCsv({biodiCsvs: this.biodiCsvs})
+                this.$emit('validated', true)
+                console.log("got here")
             }
         }
 

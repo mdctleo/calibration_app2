@@ -36,7 +36,6 @@
                 organForms: [],
                 index: 0,
                 validatedOrganForms: 0,
-                // availableOrgans: ["Lungs", "Brain", "Liver"]
             }
         },
 

@@ -1,6 +1,6 @@
 <template>
     <div class="form">
-        <el-form :model="form" :rules="rules" ref="form" label-width="120px" label-position="top">
+        <el-form :model="organForm" :rules="rules" ref="form" label-width="120px" label-position="top">
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item id="test" :label="'Tube ' +  ($attrs.label + 1) + ' Organ'" prop="organ">
@@ -57,7 +57,7 @@
 
             organ: {
                 get() {
-                    return this.getSelectedOrgans({index: this.$attrs.label})
+                    return this.getSelectedOrgans(this.$attrs.label).value
                 },
 
                 set(value) {
@@ -81,10 +81,12 @@
                 });
             },
 
-            organValidation(rule, value, callback) {
-                if (value === "") {
+            organValidation(rule, organ, callback) {
+                if (organ === "") {
                     callback(new Error('Please select an organ'))
-                } else if (!this.availableOrgans.includes(value)) {
+                } else if (!this.availableOrgans.includes(this.organ)) {
+                    console.log(this.availableOrgans)
+                    console.log(this.organ)
                     callback(new Error('The organ you have entered is not in the database, please select one'))
                 } else {
                     callback();
