@@ -3,7 +3,8 @@ from flask import request
 import csv
 import json
 from io import StringIO
-from calibration_app.biodi_csv.Model import BiodiCsv, BiodiCsvSchema, BiodiCsvRow, BiodiCsvRowSchema, BiodiCsvRequestSchema, DatabaseHelper as db
+from calibration_app.biodi_csv.BiodiCsvModel import BiodiCsv,  BiodiCsvRow, DatabaseHelper as db
+from calibration_app.biodi_csv.Schema import BiodiCsvSchema, BiodiCsvRowSchema, BiodiCsvRequestSchema
 from werkzeug.utils import secure_filename
 from flask import jsonify
 from response.response import StandardResponse, StandardResponseSchema

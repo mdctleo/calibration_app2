@@ -47,7 +47,7 @@ from user import Model as userModel
 from calibration_app.isotope import bp as isotope_bp, Model as isotopeModel
 from calibration_app.calibration import bp as calibration_bp, Model as calibrationModel
 from calibration_app.counter import bp as counter_bp, Model as gammaCounterModel
-from calibration_app.biodi_csv import bp as csv_bp, Model as biodiCsvModel
+from calibration_app.biodi_csv import bp as csv_bp, BiodiCsvModel as biodiCsvModel
 from statistics_app import bp as statistics_bp
 
 app.register_blueprint(isotope_bp)

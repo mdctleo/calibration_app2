@@ -37,7 +37,7 @@ const defaultState = {
     loading: false,
     error: null,
     startValidation: false,
-    mouseCsvFormat: "Mouse ID, Gender, Group ID, Euthanasia Time, Weight (g), Injection Date, Pre-Injection Time, Injection Time, Post-Injection Time, Pre-Injection MBq, Post-Injection MBq, Comments",
+    mouseCsvFormat: "Mouse ID, Gender, Strain, Age, Group ID, Euthanasia Date, Euthanasia Time, Weight (g), Injection Date, Pre-Injection Time, Injection Time, Post-Injection Time, Pre-Injection MBq, Post-Injection MBq, Comments",
     mouseCsv: null,
     mouseCsvJson: null,
     organCsvFormat: "Organ Order",
@@ -186,6 +186,10 @@ const actions = {
         } else if (row['Mouse ID'] === "") {
             return false;
         } else if (row['Gender'] === "") {
+            return false;
+        } else if (row['Strain'] === "") {
+            return false;
+        } else if (row['Age'] === "") {
             return false;
         } else if (row['Post-Injection MBq'] === "") {
             return false;

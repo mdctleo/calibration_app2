@@ -83,48 +83,6 @@ class BiodiCsvRow(db.Model):
                (self.rowNum)
 
 
-class ProtocolSchema(Schema):
-    name = fields.Str(required=True, max_length=8)
-
-class BiodiCsvSchema(Schema):
-    id = fields.Integer()
-    fileName = fields.Str()
-    protocolId = fields.Integer()
-    createdOn = fields.DateTime()
-    createdBy = fields.Str()
-
-
-
-class BiodiCsvRowSchema(Schema):
-    rowNum = fields.Int(dump_only=True)
-    protocolId = fields.Integer(data_key="Protocol ID")
-    protocolName = fields.Str(dump_only=True)
-    measurementTime = fields.DateTime(data_key='Measurement date & time')
-    completionStatus = fields.Int(data_key='Completion status')
-    runId = fields.Int(data_key='Run ID')
-    rack = fields.Int(data_key='Rack')
-    det = fields.Int(data_key='Det')
-    pos = fields.Int(data_key='Pos')
-    time = fields.Float(data_key='Time')
-    sampleCode = fields.Str(data_key='Sample code', max_length=45)
-    counts = fields.Float(data_key='Counts')
-    cpm = fields.Float(data_key='CPM')
-    error = fields.Float(data_key='Error %')
-    info = fields.Str(data_key='Info', max_length=1)
-
-
-class BiodiCsvFileSchema(Schema):
-    fileName = fields.Str(required=True)
-    file = fields.Nested(BiodiCsvRowSchema, many=True)
-
-
-class BiodiCsvRequestSchema(Schema):
-    files = fields.Nested(BiodiCsvFileSchema, many=True)
-
-
-
-
-
 class DatabaseHelper:
 
     @staticmethod
