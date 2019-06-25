@@ -1,4 +1,4 @@
-import {postBiodiCsvFile} from "../../../api/api";
+import {postBiodiCsv} from "../../../api/api";
 
 const moment = require('moment');
 const csv = require('csvtojson');
@@ -294,13 +294,44 @@ const actions = {
      **/
     handleBiodiCsvs: (context, payload) => {
         context.commit('SET_LOADING', {loading: true});
-        console.log(payload.biodiCsvs)
+        if (payload.biodiCsvs === null) {
+            context.commit('SET_ERROR', {error: "biodi csv not uploaded"})
+            return false
+        }
         let biodiCsvFile = payload.biodiCsvs[0]
         context.dispatch('readFile', biodiCsvFile.raw)
             .then((csvFile) => {
                 return csv().fromString(csvFile)
             })
             .then((csvFileJson) => {
+                for (let i = 0; i < csvFileJson.length; i++) {
+                    let csvRow = csvFileJson[i]
+                    let protocolName = csvRow['Protocol name'];
+                    let oldCountKey = protocolName + ' Counts';
+                    let oldCPMKey = protocolName + ' CPM';
+                    let oldErrorKey = protocolName + ' Error %';
+                    let oldInfoKey = protocolName + ' Info';
+
+                    csvRow['Counts'] = csvRow[oldCountKey];
+                    csvRow['CPM'] = csvRow[oldCPMKey];
+                    csvRow['Error %'] = csvRow[oldErrorKey];
+                    csvRow['Info'] = csvRow[oldInfoKey];
+
+                    // newRow['Counts'] = csvRow[oldCountKey];
+                    // newRow['CPM'] = csvRow[oldCPMKey];
+                    // newRow['Error %'] = csvRow[oldErrorKey];
+                    // newRow['Info'] = csvRow[oldInfoKey];
+
+                    delete csvRow[oldCountKey];
+                    delete csvRow[oldCPMKey];
+                    delete csvRow[oldErrorKey];
+                    delete csvRow[oldInfoKey];
+                    delete csvRow['Protocol name'];
+                }
+
+                console.log(csvFileJson)
+
+
                 let fileFormat = {
                     fileName: biodiCsvFile.name,
                     file: csvFileJson
@@ -308,15 +339,8 @@ const actions = {
 
                 context.commit('SET_BIODI_CSV_JSON', {biodiCsvJson: fileFormat})
 
-                // TODO: call API
-                // return postBiodiCsvFile(fileFormat)
-            })
-            .then((response) => {
-
             })
             .catch((error) => {
-                console.log(error)
-                console.log("error happened")
                 context.commit('SET_ERROR', {error: error.response.data.message})
             })
             .finally(() => {
@@ -324,27 +348,61 @@ const actions = {
             })
     },
 
-    replaceProtocolKey(csvRow) {
-        let protocolName = csvRow['Protocol name'];
-        let oldCountKey = protocolName + ' Counts';
-        let oldCPMKey = protocolName + ' CPM';
-        let oldErrorKey = protocolName + ' Error %';
-        let oldInfoKey = protocolName + ' Info';
-
-        csvRow['Counts'] = csvRow[oldCountKey];
-        csvRow['CPM'] = csvRow[oldCPMKey];
-        csvRow['Error %'] = csvRow[oldErrorKey];
-        csvRow['Info'] = csvRow[oldInfoKey];
-
-        delete csvRow[oldCountKey];
-        delete csvRow[oldCPMKey];
-        delete csvRow[oldErrorKey];
-        delete csvRow[oldInfoKey];
-        delete csvRow['Protocol name'];
-    }
-    /**
+    // replaceProtocolKey(csvRow) {
+    //     // let newRow = {}
+    //     // newRow['Protocol ID'] = csvRow['Protocol ID']
+    //     // newRow['Measurement date & time'] = csvRow['Measurement date & time']
+    //     // newRow['Completion status'] = csvRow['Completion status']
+    //     // newRow['Run ID'] = csvRow['Run ID']
+    //     // newRow['Rack'] = csvRow['Rack']
+    //     // newRow['Det'] = csvRow['Det']
+    //     // newRow['Pos'] = csvRow['Pos']
+    //     // newRow['Time'] = csvRow['Time']
+    //     // newRow['Sample code'] = csvRow['Sample code']
+    //
+    //     let protocolName = csvRow['Protocol name'];
+    //     let oldCountKey = protocolName + ' Counts';
+    //     let oldCPMKey = protocolName + ' CPM';
+    //     let oldErrorKey = protocolName + ' Error %';
+    //     let oldInfoKey = protocolName + ' Info';
+    //
+    //     csvRow['Counts'] = csvRow[oldCountKey];
+    //     csvRow['CPM'] = csvRow[oldCPMKey];
+    //     csvRow['Error %'] = csvRow[oldErrorKey];
+    //     csvRow['Info'] = csvRow[oldInfoKey];
+    //
+    //     // newRow['Counts'] = csvRow[oldCountKey];
+    //     // newRow['CPM'] = csvRow[oldCPMKey];
+    //     // newRow['Error %'] = csvRow[oldErrorKey];
+    //     // newRow['Info'] = csvRow[oldInfoKey];
+    //
+    //     delete csvRow[oldCountKey];
+    //     delete csvRow[oldCPMKey];
+    //     delete csvRow[oldErrorKey];
+    //     delete csvRow[oldInfoKey];
+    //     delete csvRow['Protocol name'];
+    //     // console.log(newRow)
+    //     // return newRow
+    // },
+     /**
      * File upload ends
      */
+    postBiodiCsv(context, payload) {
+        console.log(payload)
+        context.commit('SET_LOADING', {loading: true})
+        postBiodiCsv(payload)
+            .then((response) => {
+                console.log(response)
+            })
+            .catch((error) => {
+                context.commit('SET_ERROR', {error: error.response.data.message})
+            })
+            .finally(() => {
+                context.commit('SET_LOADING', {loading: false})
+            })
+    }
+
+
 };
 
 const mutations = {
@@ -490,13 +548,15 @@ const getters = {
     organCsv: state => state.organCsv,
     organForm: state => state.organForm,
     selectedOrgans: state => index => {
-        return (index === -1)? state.organForm.selectedOrgans : state.organForm.selectedOrgans[index]
+        return (index === -1) ? state.organForm.selectedOrgans : state.organForm.selectedOrgans[index]
     },
 
     loading: state => state.loading,
     error: state => state.error,
     mouseCsv: state => state.mouseCsv,
-    biodiCsvs: state => state.biodiCsvs
+    mouseCsvJson: state => state.mouseCsvJson,
+    biodiCsvs: state => state.biodiCsvs,
+    biodiCsvJson: state => state.biodiCsvJson
 };
 
 export default {

@@ -53,10 +53,8 @@
                 this.handleMouseCsv({mouseCsv: this.mouseCsv})
                     .then((validated) => {
                         if (validated) {
-                            console.log("mouse forms validated");
                             this.$emit('validated', true)
                         } else {
-                            console.log("mouse forms not validated");
                             this.$emit('validated', false);
                         }
                     })

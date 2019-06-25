@@ -79,12 +79,16 @@ def getCsv(csvId):
 def biodiCsv():
     if request.method == 'POST':
         try:
+            print(request.get_json())
             biodiCsvRequestDict = BiodiCsvRequestSchema().load(request.get_json())
-            createCsvs(biodiCsvRequestDict['files'])
+            print(biodiCsvRequestDict)
+            # TODO: delegate responsibilities
+            # createCsvs(biodiCsvRequestDict['files'])
         except ValidationError as e:
-            result = StandardResponse("Failed to validate the CSV, please use only csv with headers:"
-                                            "Protocol name, Measurement date & time, Completion status, Run ID, Rack, "
-                                            "Det, Pos, Time, Sample code, * Counts, * CPM, * Error %, * Info")
+            result = StandardResponse(e.__str__())
+            # result = StandardResponse("Failed to validate the CSV, please use only csv with headers:"
+            #                                 "Protocol name, Measurement date & time, Completion status, Run ID, Rack, "
+            #                                 "Det, Pos, Time, Sample code, * Counts, * CPM, * Error %, * Info")
             response = StandardResponseSchema().dump(result)
             return jsonify(response), 400
         except BaseException as e:

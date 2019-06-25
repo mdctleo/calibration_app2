@@ -1,5 +1,5 @@
 const axios = require('axios');
-const BASE_URL = " http://378e9d44.ngrok.io";
+const BASE_URL = " http://localhost:5000";
 
 
 // Calibration
@@ -36,10 +36,14 @@ export const getCalibrationFactorsGraph = async (model, isotope) => {
 
 // BiodiCsv
 
-export const postBiodiCsvFile = async (fileJson) => {
+export const postBiodiCsv = async (payload) => {
     let endpoint = BASE_URL + "/biodicsv";
     return await axios.post(endpoint, {
-        files: filesJson
+        biodiCsv: payload.biodiCsv,
+        studyInfo: payload.studyInfo,
+        gammaInfo: payload.gammaInfo,
+        mouseInfo: payload.mouseInfo,
+        organInfo: payload.organInfo
     })
 };
 

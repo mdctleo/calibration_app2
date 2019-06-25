@@ -342,7 +342,6 @@
                     if (valid) {
                         this.$emit('validated', true);
                     } else {
-                        console.log('error submit!!');
                         this.$emit('validated', false);
                     }
                 });

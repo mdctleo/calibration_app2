@@ -75,7 +75,6 @@
                     if (valid) {
                         this.$emit('validated-one-organ-form', true)
                     } else {
-                        console.log('error submit!!');
                         this.$emit('validated-one-organ-form', false)
                     }
                 });
@@ -85,8 +84,6 @@
                 if (organ === "") {
                     callback(new Error('Please select an organ'))
                 } else if (!this.availableOrgans.includes(this.organ)) {
-                    console.log(this.availableOrgans)
-                    console.log(this.organ)
                     callback(new Error('The organ you have entered is not in the database, please select one'))
                 } else {
                     callback();

@@ -174,7 +174,6 @@
                     if (valid) {
                         this.$emit('validated-one-form');
                     } else {
-                        console.log('error submit!!');
                         return false;
                     }
                 });

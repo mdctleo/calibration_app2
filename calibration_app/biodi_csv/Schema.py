@@ -59,16 +59,18 @@ class GammaInfoSchema(Schema):
 
 
 class MouseCsvRowSchema(Schema):
-    mouseId = fields.Str(required=True)
-    gender = fields.Str(required=True)
-    groupId = fields.Str(required=True)
-    weight = fields.Float(required=True)
-    injectionDate = fields.Date(required=True)
-    preInjectionTime = fields.Time(require=True)
-    injectionTime = fields.Time(require=True)
-    postInjectionTime = fields.Time(require=True)
-    preInjectionActivity = fields.Float(reuqire=True)
-    postInjectionActivity = fields.Float(require=True)
+    mouseId = fields.Str(data_key="Mouse ID", required=True)
+    gender = fields.Str(data_key="Gender", required=True)
+    groupId = fields.Str(data_key="Group ID", required=True)
+    euthanasiaDate = fields.Date(data_key="Euthanasia Date", required=True)
+    euthanasiaTime = fields.Time(data_key="Euthanasia Time", required=True)
+    weight = fields.Float(data_key="Weight (g)", required=True)
+    injectionDate = fields.Date(data_key="Injection Date", required=True)
+    preInjectionTime = fields.Time(data_key="Pre-Injection Time", require=True)
+    injectionTime = fields.Time(data_key="Injection Time", require=True)
+    postInjectionTime = fields.Time(data_key="Post-Injection Time", require=True)
+    preInjectionActivity = fields.Float(data_key="Pre-Injection MBq", reuqire=True)
+    postInjectionActivity = fields.Float(data_key="Post-Injection MBq", require=True)
     comments = fields.Str()
 
 
