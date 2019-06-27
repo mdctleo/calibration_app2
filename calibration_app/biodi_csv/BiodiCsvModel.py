@@ -36,6 +36,10 @@ class BiodiCsv(db.Model):
     def __repr__(self):
         return '<BiodiCsv %r %r %r>' % (self.id, self.fileName, self.protocolId)
 
+    @property
+    def fileName(self):
+        return self.fileName
+
 
 class BiodiCsvRow(db.Model):
     __tablename__ = BIODI_CSV_VALUES_T_NAME
@@ -81,72 +85,3 @@ class BiodiCsvRow(db.Model):
     def __repr__(self):
         return '<BiodiCsvRow %r>' % \
                (self.rowNum)
-
-
-class DatabaseHelper:
-
-    @staticmethod
-    def createCsvs(biodiCsvRows):
-        for row in biodiCsvRows:
-            db.session.add(row)
-        try:
-            db.session.commit()
-        except SQLAlchemyError as e:
-            db.session.rollback()
-            db.session.remove()
-            raise BaseException(e.__str__())
-
-        return True
-
-    @staticmethod
-    def getCsv(csvId):
-        try:
-            fileName = db.session.query(BiodiCsv).with_entities(BiodiCsv.fileName).filter(BiodiCsv.id == csvId).first()
-            csvRows = db.session.query(BiodiCsv, BiodiCsvRow, Protocol)\
-                .with_entities(
-                               Protocol.id,
-                               Protocol.protocolName,
-                               BiodiCsvRow.measurementTime,
-                               BiodiCsvRow.completionStatus,
-                               BiodiCsvRow.runId,
-                               BiodiCsvRow.rack,
-                               BiodiCsvRow.det,
-                               BiodiCsvRow.pos,
-                               BiodiCsvRow.time,
-                               BiodiCsvRow.sampleCode,
-                               BiodiCsvRow.counts,
-                               BiodiCsvRow.cpm,
-                               BiodiCsvRow.error,
-                               BiodiCsvRow.info)\
-                .filter(BiodiCsv.id == csvId)\
-                .filter(BiodiCsvRow.csvId == BiodiCsv.id)\
-                .filter(Protocol.id == BiodiCsv.protocolId)\
-                .order_by(BiodiCsvRow.rowNum).all()
-        except SQLAlchemyError as e:
-            raise BaseException(e.__str__())
-        return fileName, csvRows
-
-    @staticmethod
-    def createMetas(metas):
-        for meta in metas:
-            db.session.add(meta)
-        try:
-            csvIds = []
-            db.session.commit()
-            for meta in metas:
-                csvIds.append(meta.id)
-        except SQLAlchemyError as e:
-            db.session.rollback()
-            db.session.remove()
-            raise BaseException(e.__str__())
-
-        return csvIds
-
-    @staticmethod
-    def getMetas():
-        try:
-            result = BiodiCsv.query.with_entities(BiodiCsv.id, BiodiCsv.fileName, BiodiCsv.createdBy, BiodiCsv.createdOn).all()
-        except SQLAlchemyError as e:
-            raise BaseException(e.__str__())
-
-        return result

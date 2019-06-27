@@ -34,6 +34,7 @@ class Organ(db.Model):
 class BiodiCsvComplete(db.Model):
     __tablename__ = BIODI_CSV_COMPLETE_T_NAME
     id = db.Column(BIODI_CSV_COMPLETE_VALUES_C_ID, db.Integer, primary_key=True, autoincrement=True)
+    studyName = db.Column(BIODICSV_COMPLETE_VALUES_C_STUD)
     fileName = db.Column(BIODI_CSV_COMPLETE_C_FILE_NAME, db.String(45), nullable=False)
     isotope = db.Column(BIODI_CSV_COMPLETE_C_ISOTOPE, db.String(8), nullable=False)
     chelator = db.Column(BIODI_CSV_COMPLETE_C_CHELATOR, db.String(8), nullable=False)
@@ -41,8 +42,16 @@ class BiodiCsvComplete(db.Model):
     tumorModel = db.Column(BIODI_CSV_COMPLETE_C_TUMOR_MODEL, db.String(45), nullable=False)
     mouseStrain = db.Column(BIODI_CSV_COMPLETE_C_MOUSE_STRAIN, db.String(8), nullable=False)
 
+    def __init__(self, fileName, isotope, chelator, vector, tumorModel, mouseStrain):
+        self.fileName = fileName
+        self.isotope = isotope
+        self.chelator = chelator
+        self.vector = vector
+        self.tumorModel = tumorModel
+        self.mouseStrain = mouseStrain
 
-class BiodiCsvCompleteValues(db.Model):
+
+class BiodiCsvCompleteRows(db.Model):
     __tablename__ = BIODI_CSV_COMPLETE_VALUES_T_NAME
     id = db.Column(BIODI_CSV_COMPLETE_VALUES_C_ID, db.Integer, primary_key=True, autoincrement=True)
     rowNumber = db.Column(BIODI_CSV_COMPLETE_VALUES_C_ROW_NUMBER, db.Integer, nullable=False)

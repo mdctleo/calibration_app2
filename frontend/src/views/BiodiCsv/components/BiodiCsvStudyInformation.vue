@@ -83,6 +83,28 @@
             </el-row>
             <el-row>
                 <el-col :span="12" :offset="6">
+                    <el-form-item label="Mouse Strain" prop="mouseStrain">
+                        <el-select v-model="mouseStrain"
+                                   placeholder="Please select a mouseStrain">
+                            <el-option label="Zone one" value="shanghai"></el-option>
+                            <el-option label="Zone two" value="beijing"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="12" :offset="6">
+                    <el-form-item label="Tumor Model" prop="tumorModel">
+                        <el-select v-model="tumorModel"
+                                   placeholder="Please select a tumor model">
+                            <el-option label="Zone one" value="shanghai"></el-option>
+                            <el-option label="Zone two" value="beijing"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="12" :offset="6">
                     <el-form-item label="Radio Activity" prop="radioActivity">
                         <el-input v-model.number="radioActivity" type="number">
                             <el-option label="Zone one" value="shanghai"></el-option>
@@ -152,6 +174,12 @@
                     cellLine: [
                         {required: true, message: 'Please input a cell line', trigger: 'change'}
                     ],
+                    mouseStrain: [
+                        {required: true, message: 'Please select a mouse strain', trigger: 'change'}
+                    ],
+                    tumorModel: [
+                        {required: true, message: 'Please select a tumor model', trigger: 'change'}
+                    ],
                     radioActivity: [
                         {required: true, message: 'Please input radio activity', trigger: 'blur'},
                         {type: 'number', message: 'Format of this field must be a number', trigger: 'blur'}
@@ -179,6 +207,8 @@
                 getVector: 'biodiCsvUpload/vector',
                 getTarget: 'biodiCsvUpload/target',
                 getCellLine: 'biodiCsvUpload/cellLine',
+                getMouseStrain: 'biodiCsvUpload/mouseStrain',
+                getTumorModel: 'biodiCsvUpload/tumorModel',
                 getRadioActivity: 'biodiCsvUpload/radioActivity',
                 getRadioPurity: 'biodiCsvUpload/radioPurity',
                 getComments: 'biodiCsvUpload/comments'
@@ -283,6 +313,27 @@
                 }
             },
 
+            mouseStrain: {
+                get() {
+                    return this.getMouseStrain
+                },
+
+                set(value) {
+                    this.setMouseStrain({mouseStrain: value})
+                }
+            },
+
+            tumorModel: {
+                get() {
+                    return this.getTumorModel
+                },
+
+                set(value) {
+                    this.setTumorModel({tumorModel: value})
+                }
+
+            },
+
             radioActivity: {
                 get() {
                     return this.getRadioActivity
@@ -333,6 +384,8 @@
                 'setVector': types.SET_VECTOR,
                 'setTarget': types.SET_TARGET,
                 'setCellLine': types.SET_CELL_LINE,
+                'setMouseStrain': types.SET_MOUSE_STRAIN,
+                'setTumorModel': types.SET_TUMOR_MODEL,
                 'setRadioActivity': types.SET_RADIO_ACTIVITY,
                 'setRadioPurity': types.SET_RADIO_PURITY,
                 'setComments': types.SET_COMMENTS

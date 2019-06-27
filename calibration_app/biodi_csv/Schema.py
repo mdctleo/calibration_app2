@@ -38,7 +38,7 @@ class BiodiCsvFileSchema(Schema):
 
 class StudyInfoSchema(Schema):
     studyName = fields.Str(required=True)
-    studyDate = fields.Date(required=True)
+    studyDate = fields.DateTime(required=True)
     researcherName = fields.Str(required=True)
     piName = fields.Str(required=True)
     radioIsotope = fields.Str(required=True)
@@ -46,6 +46,8 @@ class StudyInfoSchema(Schema):
     vector = fields.Str(required=True)
     target = fields.Str(required=True)
     cellLine = fields.Str(required=True)
+    mouseStrain = fields.Str(required=True)
+    tumorModel = fields.Str(required=True)
     radioActivity = fields.Float(required=True)
     radioPurity = fields.Float(required=True)
     comments = fields.Str()
@@ -61,6 +63,7 @@ class GammaInfoSchema(Schema):
 class MouseCsvRowSchema(Schema):
     mouseId = fields.Str(data_key="Mouse ID", required=True)
     gender = fields.Str(data_key="Gender", required=True)
+    age = fields.Number(data_key="Age", required=True)
     groupId = fields.Str(data_key="Group ID", required=True)
     euthanasiaDate = fields.Date(data_key="Euthanasia Date", required=True)
     euthanasiaTime = fields.Time(data_key="Euthanasia Time", required=True)
@@ -71,7 +74,7 @@ class MouseCsvRowSchema(Schema):
     postInjectionTime = fields.Time(data_key="Post-Injection Time", require=True)
     preInjectionActivity = fields.Float(data_key="Pre-Injection MBq", reuqire=True)
     postInjectionActivity = fields.Float(data_key="Post-Injection MBq", require=True)
-    comments = fields.Str()
+    comments = fields.Str(data_key="Comments")
 
 
 class OrganSchema(Schema):
@@ -83,4 +86,4 @@ class BiodiCsvRequestSchema(Schema):
     studyInfo = fields.Nested(StudyInfoSchema)
     gammaInfo = fields.Nested(GammaInfoSchema)
     mouseInfo = fields.Nested(MouseCsvRowSchema, many=True)
-    organInfo = fields.Nested(OrganSchema, many=True)
+    organInfo = fields.List(fields.Str(), required=True)

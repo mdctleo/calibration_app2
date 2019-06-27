@@ -14,6 +14,8 @@ const defaultState = {
         vector: "",
         target: "",
         cellLine: "",
+        mouseStrain: "",
+        tumorModel: "",
         radioActivity: "",
         radioPurity: "",
         comments: "",
@@ -37,7 +39,7 @@ const defaultState = {
     loading: false,
     error: null,
     startValidation: false,
-    mouseCsvFormat: "Mouse ID, Gender, Strain, Age, Group ID, Euthanasia Date, Euthanasia Time, Weight (g), Injection Date, Pre-Injection Time, Injection Time, Post-Injection Time, Pre-Injection MBq, Post-Injection MBq, Comments",
+    mouseCsvFormat: "Mouse ID, Gender, Age, Group ID, Euthanasia Date, Euthanasia Time, Weight (g), Injection Date, Pre-Injection Time, Injection Time, Post-Injection Time, Pre-Injection MBq, Post-Injection MBq, Comments",
     mouseCsv: null,
     mouseCsvJson: null,
     organCsvFormat: "Organ Order",
@@ -83,6 +85,14 @@ const actions = {
 
     setCellLine: (context, payload) => {
         context.commit('SET_CELL_LINE', payload)
+    },
+
+    setMouseStrain: (context, payload) => {
+        context.commit('SET_MOUSE_STRAIN', payload)
+    },
+
+    setTumorModel: (context, payload) => {
+        context.commit('SET_TUMOR_MODEL', payload)
     },
 
     setRadioActivity: (context, payload) => {
@@ -175,30 +185,32 @@ const actions = {
     },
 
     validateMouse: (context, row) => {
-        if (row['Euthanasia Time'] === "") {
-            return false;
-        } else if (row['Group ID'] === "") {
-            return false;
-        } else if (row['Injection Date'] === "") {
-            return false;
-        } else if (row['Injection Time'] === "") {
-            return false;
-        } else if (row['Mouse ID'] === "") {
-            return false;
+        if (row['Mouse ID'] === "") {
+            return false
         } else if (row['Gender'] === "") {
-            return false;
-        } else if (row['Strain'] === "") {
-            return false;
+            return false
         } else if (row['Age'] === "") {
-            return false;
-        } else if (row['Post-Injection MBq'] === "") {
-            return false;
-        } else if (row['Pre-Injection MBq'] === "") {
-            return false;
-        } else if (row['Pre-Injection Time'] === "") {
-            return false;
+            return false
+        } else if (row['Group ID'] === "") {
+            return false
+        } else if (row['Euthanasia Date'] === "" || !moment(row['Euthanasia Date'], "YYYY-MM-DD", true).isValid()) {
+            return false
+        } else if (row['Euthanasia Time'] === "" || !moment(row['Euthanasia Time'], "HH:mm", true).isValid()) {
+            return false
         } else if (row['Weight (g)'] === "") {
-            return false;
+            return false
+        } else if (row['Injection Date'] === "" || !moment(row['Injection Date'], "YYYY-MM-DD", true).isValid()) {
+            return false
+        } else if (row['Pre-Injection Time'] === "" || !moment(row['Pre-Injection Time'], "HH:mm", true).isValid()) {
+            return false
+        } else if (row['Injection Time'] === "" || !moment(row['Injection Time'], "HH:mm", true).isValid()) {
+            return false
+        } else if (row['Post-Injection Time'] === "" || !moment(row['Post-Injection Time'], "HH:mm", true).isValid()) {
+            return false
+        } else if (row['Pre-Injection MBq'] === "") {
+            return false
+        } else if (row['Post-Injection MBq'] === "") {
+            return false
         } else {
             return true;
         }
@@ -289,102 +301,102 @@ const actions = {
         }
     },
 
+    validateBiodiCsvs: (context, row) => {
+        if (row['Protocol ID'] === "") {
+            return false
+        } else if (row['Measurement date & time'] === "" || !moment(row['Measurement date & time'], "YYYY-MM-DD HH:mm", true).isValid()) {
+            console.log("measurement date & time validation failed")
+            return false
+        } else if (row['Completion status'] === "") {
+            return false
+        } else if (row['Run ID'] === "") {
+            return false
+        } else if (row['Rack'] === "") {
+            return false
+        } else if (row['Det'] === "") {
+            return false
+        } else if (row['Pos'] === "") {
+            return false
+        } else if (row['Time'] === "") {
+            return false
+        } else if (row['Counts'] === "") {
+            return false
+        } else if (row['CPM'] === "") {
+            return false
+        } else if (row['Error %'] === "") {
+            return false
+        } else {
+            return true
+        }
+    },
+
     /**
      * File upload start
      **/
-    handleBiodiCsvs: (context, payload) => {
-        context.commit('SET_LOADING', {loading: true});
-        if (payload.biodiCsvs === null) {
-            context.commit('SET_ERROR', {error: "biodi csv not uploaded"})
-            return false
-        }
-        let biodiCsvFile = payload.biodiCsvs[0]
-        context.dispatch('readFile', biodiCsvFile.raw)
-            .then((csvFile) => {
-                return csv().fromString(csvFile)
-            })
-            .then((csvFileJson) => {
-                for (let i = 0; i < csvFileJson.length; i++) {
-                    let csvRow = csvFileJson[i]
-                    let protocolName = csvRow['Protocol name'];
-                    let oldCountKey = protocolName + ' Counts';
-                    let oldCPMKey = protocolName + ' CPM';
-                    let oldErrorKey = protocolName + ' Error %';
-                    let oldInfoKey = protocolName + ' Info';
+    handleBiodiCsvs: async (context, payload) => {
+        try {
+            context.commit('SET_LOADING', {loading: true});
+            if (payload.biodiCsvs === null) {
+                context.commit('SET_ERROR', {error: "biodi csv not uploaded"})
+                return false
+            }
+            let biodiCsvFile = payload.biodiCsvs[0]
+            let csvFile = await context.dispatch('readFile', biodiCsvFile.raw)
+            let csvFileJson = await csv().fromString(csvFile)
+            let rowValidated = true
+            let indexHolder = 0
 
-                    csvRow['Counts'] = csvRow[oldCountKey];
-                    csvRow['CPM'] = csvRow[oldCPMKey];
-                    csvRow['Error %'] = csvRow[oldErrorKey];
-                    csvRow['Info'] = csvRow[oldInfoKey];
 
-                    // newRow['Counts'] = csvRow[oldCountKey];
-                    // newRow['CPM'] = csvRow[oldCPMKey];
-                    // newRow['Error %'] = csvRow[oldErrorKey];
-                    // newRow['Info'] = csvRow[oldInfoKey];
+            for (let i = 0; i < csvFileJson.length; i++) {
+                indexHolder = i
+                let csvRow = csvFileJson[i]
+                let protocolName = csvRow['Protocol name'];
+                let oldCountKey = protocolName + ' Counts';
+                let oldCPMKey = protocolName + ' CPM';
+                let oldErrorKey = protocolName + ' Error %';
+                let oldInfoKey = protocolName + ' Info';
 
-                    delete csvRow[oldCountKey];
-                    delete csvRow[oldCPMKey];
-                    delete csvRow[oldErrorKey];
-                    delete csvRow[oldInfoKey];
-                    delete csvRow['Protocol name'];
+                csvRow['Counts'] = csvRow[oldCountKey];
+                csvRow['CPM'] = csvRow[oldCPMKey];
+                csvRow['Error %'] = csvRow[oldErrorKey];
+                csvRow['Info'] = csvRow[oldInfoKey];
+
+                delete csvRow[oldCountKey];
+                delete csvRow[oldCPMKey];
+                delete csvRow[oldErrorKey];
+                delete csvRow[oldInfoKey];
+                delete csvRow['Protocol name'];
+
+                rowValidated = await context.dispatch('validateBiodiCsvs', csvRow)
+                if (!rowValidated) {
+                    break
                 }
+            }
 
-                console.log(csvFileJson)
-
-
+            if (rowValidated) {
                 let fileFormat = {
                     fileName: biodiCsvFile.name,
                     file: csvFileJson
                 };
 
                 context.commit('SET_BIODI_CSV_JSON', {biodiCsvJson: fileFormat})
+                return true
+            } else {
+                context.commit('SET_ERROR', {error: "There is an error on row " + (indexHolder + 2)})
+                return false
 
-            })
-            .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.message})
-            })
-            .finally(() => {
-                context.commit('SET_LOADING', {loading: false});
-            })
+            }
+
+        } catch (error) {
+            context.commit('SET_ERROR', {error: error.response.data.message})
+            return false
+        } finally {
+            context.commit('SET_LOADING', {loading: false});
+        }
     },
 
-    // replaceProtocolKey(csvRow) {
-    //     // let newRow = {}
-    //     // newRow['Protocol ID'] = csvRow['Protocol ID']
-    //     // newRow['Measurement date & time'] = csvRow['Measurement date & time']
-    //     // newRow['Completion status'] = csvRow['Completion status']
-    //     // newRow['Run ID'] = csvRow['Run ID']
-    //     // newRow['Rack'] = csvRow['Rack']
-    //     // newRow['Det'] = csvRow['Det']
-    //     // newRow['Pos'] = csvRow['Pos']
-    //     // newRow['Time'] = csvRow['Time']
-    //     // newRow['Sample code'] = csvRow['Sample code']
-    //
-    //     let protocolName = csvRow['Protocol name'];
-    //     let oldCountKey = protocolName + ' Counts';
-    //     let oldCPMKey = protocolName + ' CPM';
-    //     let oldErrorKey = protocolName + ' Error %';
-    //     let oldInfoKey = protocolName + ' Info';
-    //
-    //     csvRow['Counts'] = csvRow[oldCountKey];
-    //     csvRow['CPM'] = csvRow[oldCPMKey];
-    //     csvRow['Error %'] = csvRow[oldErrorKey];
-    //     csvRow['Info'] = csvRow[oldInfoKey];
-    //
-    //     // newRow['Counts'] = csvRow[oldCountKey];
-    //     // newRow['CPM'] = csvRow[oldCPMKey];
-    //     // newRow['Error %'] = csvRow[oldErrorKey];
-    //     // newRow['Info'] = csvRow[oldInfoKey];
-    //
-    //     delete csvRow[oldCountKey];
-    //     delete csvRow[oldCPMKey];
-    //     delete csvRow[oldErrorKey];
-    //     delete csvRow[oldInfoKey];
-    //     delete csvRow['Protocol name'];
-    //     // console.log(newRow)
-    //     // return newRow
-    // },
-     /**
+
+    /**
      * File upload ends
      */
     postBiodiCsv(context, payload) {
@@ -452,6 +464,14 @@ const mutations = {
 
     SET_CELL_LINE: (state, payload) => {
         return state.studyForm.cellLine = payload.cellLine
+    },
+
+    SET_MOUSE_STRAIN: (state, payload) => {
+        return state.studyForm.mouseStrain = payload.mouseStrain
+    },
+
+    SET_TUMOR_MODEL: (state, payload) => {
+        return state.studyForm.tumorModel = payload.tumorModel
     },
 
     SET_RADIO_ACTIVITY: (state, payload) => {
@@ -532,6 +552,8 @@ const getters = {
     vector: state => state.studyForm.vector,
     target: state => state.studyForm.target,
     cellLine: state => state.studyForm.cellLine,
+    mouseStrain: state => state.studyForm.mouseStrain,
+    tumorModel: state => state.studyForm.tumorModel,
     radioActivity: state => state.studyForm.radioActivity,
     radioPurity: state => state.studyForm.radioPurity,
     comments: state => state.studyForm.comments,

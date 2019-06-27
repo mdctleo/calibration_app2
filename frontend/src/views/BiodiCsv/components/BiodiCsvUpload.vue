@@ -43,7 +43,16 @@
             handleStartValidation() {
                 // TODO: Add in front end validationa and refactor the other two csvs validate -> handle logic
                 this.handleBiodiCsv({biodiCsvs: this.biodiCsvs})
-                this.$emit('validated', true)
+                    .then((validated) => {
+                        if (validated) {
+                            this.$emit('validated', true)
+                        } else {
+                            this.$emit('validated', false);
+                        }
+                    })
+                    .catch((error) => {
+                        this.$emit('validated', false)
+                    })
             }
         }
 

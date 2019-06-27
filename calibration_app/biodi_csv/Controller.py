@@ -3,8 +3,10 @@ from flask import request
 import csv
 import json
 from io import StringIO
-from calibration_app.biodi_csv.BiodiCsvModel import BiodiCsv,  BiodiCsvRow, DatabaseHelper as db
-from calibration_app.biodi_csv.Schema import BiodiCsvSchema, BiodiCsvRowSchema, BiodiCsvRequestSchema
+from calibration_app.biodi_csv.BiodiCsvModel import BiodiCsv,  BiodiCsvRow
+from calibration_app.biodi_csv.BiodiCsvCompleteModel import BiodiCsvComplete, BiodiCsvCompleteRows
+from calibration_app.biodi_csv.DatabaseHelper import DatabaseHelper as db
+from calibration_app.biodi_csv.Schema import BiodiCsvSchema, BiodiCsvRequestSchema
 from werkzeug.utils import secure_filename
 from flask import jsonify
 from response.response import StandardResponse, StandardResponseSchema
@@ -14,41 +16,58 @@ from flask import make_response
 from flask import Response
 
 
+def prepareBiodiCsvMeta(biodiCsv):
+    return BiodiCsv(biodiCsv["fileName"], biodiCsv["file"][0]["protocolId"], 'Carlos')
 
 
-def prepareMetas(files):
-    metas = []
-    for file in files:
-        metas.append(BiodiCsv(file["fileName"], file["file"][0]["protocolId"], 'Carlos'))
-
-    return metas
-
-def prepareCsvs(files, csvIds):
+def prepareBiodiCsv(biodiCsv, biodiCsvId):
     biodiCsvRows = []
-    for i, file in enumerate(files):
-        csvData = file["file"]
-        csvId = csvIds[i]
-        for i, row in enumerate(csvData):
-            rowNum = i + 1
-            biodiCsvRows.append(BiodiCsvRow(csvId, rowNum, row["measurementTime"], row["completionStatus"],
-                                        row["runId"], row["rack"], row["det"], row["pos"], row["time"], row["sampleCode"],
+    csvData = biodiCsv["file"][0]
+    for i, row in enumerate(csvData):
+        rowNum = i + 1
+        biodiCsvRows.append(BiodiCsvRow(biodiCsvId, rowNum, row["measurementTime"], row["completionStatus"],
+                                        row["runId"], row["rack"], row["det"], row["pos"], row["time"],
+                                        row["sampleCode"],
                                         row["counts"], row["cpm"], row["error"], row["info"]))
+
+
     return biodiCsvRows
 
 
 
-def createCsvs(files):
+def createBiodiCsv(biodiCsv):
     try:
-        metas = prepareMetas(files)
-        csvIds = db.createMetas(metas)
-        biodiCsvRows = prepareCsvs(files, csvIds)
-        db.createCsvs(biodiCsvRows)
+        meta = prepareBiodiCsvMeta(biodiCsv)
+        biodiCsvId = db.createBiodiCsv(meta)
+        biodiCsvRows = prepareBiodiCsv(biodiCsv, biodiCsvId)
+        db.createBiodiCsvRows(biodiCsvRows)
+        return biodiCsvRows, biodiCsvId, meta.fileName
     except BaseException as e:
         raise e
 
+def prepareBiodiCsvCompleteMeta(studyInfo, gammaInfo, biodiCsvId, biodiCsvFilename):
+    BiodiCsvComplete(
+        fileName=biodiCsvFilename + "_complete",
+        isotope=studyInfo['radioIsotope'],
+
+    )
+
+    return None
+
+def prepareBiodiCsvComplete(biodiCsvRows, biodiCsvCompleteId, mouseInfo):
+
+    return None
+
+def createBiodiCsvComplete(biodiCsvRows, biodiCsvId, biodiCsvFileName, studyInfo, gammaInfo, mouseInfo):
+    biodiCsvCompleteMeta = prepareBiodiCsvCompleteMeta(studyInfo, gammaInfo, biodiCsvId, biodiCsvFileName)
+    biodiCsvCompleteRows = prepareBiodiCsvComplete(biodiCsvRows, biodiCsvCompleteId, mouseInfo)
+
+    return None
+
+
 def getMetas():
     try:
-        metas = db.getMetas()
+        metas = db.getBiodiCsvMetas()
     except BaseException as e:
         raise e
 
@@ -56,7 +75,7 @@ def getMetas():
 
 def getCsv(csvId):
     try:
-        fileName, csvRows = db.getCsv(csvId)
+        fileName, csvRows = db.getBiodiCsv(csvId)
         si = StringIO()
         cw = csv.writer(si)
         protocolName = csvRows[0][1]
@@ -79,11 +98,10 @@ def getCsv(csvId):
 def biodiCsv():
     if request.method == 'POST':
         try:
-            print(request.get_json())
             biodiCsvRequestDict = BiodiCsvRequestSchema().load(request.get_json())
             print(biodiCsvRequestDict)
             # TODO: delegate responsibilities
-            # createCsvs(biodiCsvRequestDict['files'])
+            biodiCsvRows, biodiCsvId, biodiCsvFileName = createBiodiCsv(biodiCsvRequestDict['biodiCsv'])
         except ValidationError as e:
             result = StandardResponse(e.__str__())
             # result = StandardResponse("Failed to validate the CSV, please use only csv with headers:"
