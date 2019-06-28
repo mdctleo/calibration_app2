@@ -3,8 +3,8 @@ from flask import request
 import csv
 import json
 from io import StringIO
-from calibration_app.biodi_csv.BiodiCsvModel import BiodiCsv,  BiodiCsvRow
-from calibration_app.biodi_csv.BiodiCsvCompleteModel import BiodiCsvComplete, BiodiCsvCompleteRows
+from calibration_app.biodi_csv.BiodiCsvModel import BiodiCsvRow
+from calibration_app.biodi_csv.BiodiCsvCompleteModel import BiodiCsvCompleteRow
 from calibration_app.biodi_csv.DatabaseHelper import DatabaseHelper as db
 from calibration_app.biodi_csv.Schema import BiodiCsvSchema, BiodiCsvRequestSchema
 from werkzeug.utils import secure_filename
@@ -16,11 +16,11 @@ from flask import make_response
 from flask import Response
 
 
-def prepareBiodiCsvMeta(biodiCsv):
-    return BiodiCsv(biodiCsv["fileName"], biodiCsv["file"][0]["protocolId"], 'Carlos')
+# def prepareBiodiCsvMeta(biodiCsv):
+#     return BiodiCsv(biodiCsv["fileName"], biodiCsv["file"][0]["protocolId"], 'Carlos')
 
 
-def prepareBiodiCsv(biodiCsv, biodiCsvId):
+def prepareBiodiCsvRows(biodiCsv, biodiCsvId):
     biodiCsvRows = []
     csvData = biodiCsv["file"][0]
     for i, row in enumerate(csvData):
@@ -35,33 +35,43 @@ def prepareBiodiCsv(biodiCsv, biodiCsvId):
 
 
 
-def createBiodiCsv(biodiCsv):
+def prepareStudyInformation(studyInfo, gammaInfo, biodiCsvId, biodiCsvFilename):
+
+    return None
+
+def prepareBiodiCsvCompleteRows(biodiCsvRows, csvId, mouseInfo, organInfo):
+    # biodiCsvRowsCompleteRows = []
+    # for i, row in enumerate(biodiCsvRows):
+    #     for i, row in enumerate(mouseInfo):
+    #         for
+
+    # biodiCsvCompleteRows = []
+    # for i, row in enumerate(biodiCsvRows):
+    #     rowNum = i +1
+    #     biodiCsvCompleteRows.append(BiodiCsvCompleteRow(
+    #         rowNumber=rowNum,
+    #         csvId=csvId,
+    #         mouseGender= mouseInfo[i].gender,
+    #
+    #     ))
+
+
+    return None
+
+def createBiodiCsvComplete(biodiCsvRequestDict):
     try:
-        meta = prepareBiodiCsvMeta(biodiCsv)
-        biodiCsvId = db.createBiodiCsv(meta)
-        biodiCsvRows = prepareBiodiCsv(biodiCsv, biodiCsvId)
+        studyInformation = prepareStudyInformation(biodiCsvRequestDict['studyInfo'],
+                                                   biodiCsvRequestDict['gammaInfo'],
+                                                   biodiCsvRequestDict['mouseInfo'])
+        csvId = db.createStudyInformation(studyInformation)
+        biodiCsvRows = prepareBiodiCsvRows(biodiCsvRequestDict['biodiCsv'], csvId)
         db.createBiodiCsvRows(biodiCsvRows)
-        return biodiCsvRows, biodiCsvId, meta.fileName
+        biodiCsvCompleteRows = prepareBiodiCsvCompleteRows(biodiCsvRows, csvId,
+                                                           biodiCsvRequestDict['mouseInfo'],
+                                                           biodiCsvRequestDict['organInfo'])
+        db.createBiodiCsvCompleteRows(biodiCsvCompleteRows)
     except BaseException as e:
         raise e
-
-def prepareBiodiCsvCompleteMeta(studyInfo, gammaInfo, biodiCsvId, biodiCsvFilename):
-    BiodiCsvComplete(
-        fileName=biodiCsvFilename + "_complete",
-        isotope=studyInfo['radioIsotope'],
-
-    )
-
-    return None
-
-def prepareBiodiCsvComplete(biodiCsvRows, biodiCsvCompleteId, mouseInfo):
-
-    return None
-
-def createBiodiCsvComplete(biodiCsvRows, biodiCsvId, biodiCsvFileName, studyInfo, gammaInfo, mouseInfo):
-    biodiCsvCompleteMeta = prepareBiodiCsvCompleteMeta(studyInfo, gammaInfo, biodiCsvId, biodiCsvFileName)
-    biodiCsvCompleteRows = prepareBiodiCsvComplete(biodiCsvRows, biodiCsvCompleteId, mouseInfo)
-
     return None
 
 
@@ -100,8 +110,7 @@ def biodiCsv():
         try:
             biodiCsvRequestDict = BiodiCsvRequestSchema().load(request.get_json())
             print(biodiCsvRequestDict)
-            # TODO: delegate responsibilities
-            biodiCsvRows, biodiCsvId, biodiCsvFileName = createBiodiCsv(biodiCsvRequestDict['biodiCsv'])
+            createBiodiCsvComplete(biodiCsvRequestDict)
         except ValidationError as e:
             result = StandardResponse(e.__str__())
             # result = StandardResponse("Failed to validate the CSV, please use only csv with headers:"

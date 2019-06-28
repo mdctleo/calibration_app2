@@ -10,12 +10,6 @@ class DatabaseHelper:
     def createBiodiCsvRows(biodiCsvRows):
         for row in biodiCsvRows:
             db.session.add(row)
-        try:
-            db.session.commit()
-        except SQLAlchemyError as e:
-            db.session.rollback()
-            db.session.remove()
-            raise BaseException(e.__str__())
 
         return True
 
@@ -48,15 +42,9 @@ class DatabaseHelper:
         return fileName, csvRows
 
     @staticmethod
-    def createBiodiCsv(meta):
-        db.session.add(meta)
-        try:
-            db.session.commit()
-            csvId = meta.id
-        except SQLAlchemyError as e:
-            db.session.rollback()
-            db.session.remove()
-            raise BaseException(e.__str__())
+    def createStudyInformation(studyInformation):
+        db.session.add(studyInformation)
+        csvId = db.session.flush()
 
         return csvId
 
@@ -69,27 +57,16 @@ class DatabaseHelper:
 
         return result
 
-    @staticmethod
-    def createBiodiCsvComplete(meta):
-        db.session.add(meta)
-        try:
-            db.session.commit()
-            csvId = meta.id
-        except SQLAlchemyError as e:
-            db.session.rollback()
-            db.session.remove()
-            raise BaseException(e.__str__())
-
-        return csvId
 
     @staticmethod
-    def createBiodiCsvComplete(biodiCsvCompleteRows):
+    def createBiodiCsvCompleteRows(biodiCsvCompleteRows):
         for row in biodiCsvCompleteRows:
             db.session.add(row)
         try:
             db.session.commit()
         except SQLAlchemyError as e:
+            db.session.rollback()
+            db.session.remove()
             raise BaseException(e.__str__())
-
 
         return True

@@ -1,6 +1,7 @@
 <template>
     <div class="form">
-        <el-form :model="gammaForm" :rules="rules" ref="form" label-width="120px" label-position="top" class="demo-ruleForm">
+        <el-form :model="gammaForm" :rules="rules" ref="form" label-width="120px" label-position="top"
+                 class="demo-ruleForm">
             <el-row>
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Gamma Counter ID" prop="gammaCounter">
@@ -8,17 +9,6 @@
                             <el-option label="Zone one" value="shanghai"></el-option>
                             <el-option label="Zone two" value="beijing"></el-option>
                         </el-select>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-            <el-row>
-                <el-col :span="12" :offset="6">
-                    <el-form-item label="Gamma Counter Run Date & Time" prop="gammaCounterRunDateTime">
-                        <el-date-picker
-                                v-model="gammaCounterRunDateTime"
-                                type="datetime"
-                                placeholder="Select date and time">
-                        </el-date-picker>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -37,22 +27,32 @@
                 </el-col>
             </el-row>
         </el-form>
+        <el-divider class="divider"></el-divider>
+        <h4>Upload your Mouse Csv</h4>
+        <BiodiCsvMouseInfo></BiodiCsvMouseInfo>
+        <el-divider class="divider"></el-divider>
+        <h4>Upload your Organ Csv</h4>
+        <BiodiCsvOrganOrder></BiodiCsvOrganOrder>
+        <el-divider class="divider"></el-divider>
+        <h4>Upload your Biodi Csv</h4>
+        <BiodiCsvUpload></BiodiCsvUpload>
     </div>
 </template>
 
 <script>
-    import GammaCounterForm from "./GammaCounterForm";
     import {mapActions, mapGetters} from "vuex";
     import * as types from '../../../store/modules/BiodiCsv/BiodiCsvUploadTypes.js'
-
+    import BiodiCsvMouseInfo from "./BiodiCsvMouseInfo";
+    import BiodiCsvUpload from "./BiodiCsvUpload";
+    import BiodiCsvOrganOrder from "./BiodiCsvOrganOrder";
 
     export default {
         name: "BiodiCsvGammaCounterInformation",
-        components: {GammaCounterForm},
+        components: {BiodiCsvOrganOrder, BiodiCsvUpload, BiodiCsvMouseInfo},
         props: {
             bus: Object
         },
-        data () {
+        data() {
             return {
                 rules: {
                     gammaCounter: [
@@ -60,10 +60,10 @@
                     ],
                     gammaCounterRunDateTime: [
                         {required: true, type: 'date', message: 'Please pick a date & time', trigger: 'change'},
-                        {type: 'date', message: 'Format for this field must be a date', trigger:'change'}
+                        {type: 'date', message: 'Format for this field must be a date', trigger: 'change'}
                     ],
                     comments: [
-                        { min: 0, max: 5000, message: 'Length should be less than 5000', trigger: 'blur' }
+                        {min: 0, max: 5000, message: 'Length should be less than 5000', trigger: 'blur'}
                     ]
                 }
             }
@@ -76,44 +76,46 @@
                 getGammaCounter: 'biodiCsvUpload/gammaCounter',
                 getGammaCounterRunDateTime: 'biodiCsvUpload/gammaCounterRunDateTime',
                 getGammaCounterRunTimeOffset: 'biodiCsvUpload/gammaCounterRunTimeOffset',
-                getGammaCounterRunComments: 'biodiCsvUpload/gammaCounterRunComments'
+                getGammaCounterRunComments: 'biodiCsvUpload/gammaCounterRunComments',
+                mouseCsv: 'biodiCsvUpload/mouseCsv',
+                biodiCsvs: 'biodiCsvUpload/biodiCsvs'
             }),
 
             gammaForm: {
-                get () {
+                get() {
                     return this.getGammaForm
                 },
 
-                set (value) {
+                set(value) {
                 }
             },
 
             gammaCounter: {
-                get () {
+                get() {
                     return this.getGammaCounter
                 },
 
-                set (value) {
+                set(value) {
                     this.setGammaCounter({gammaCounter: value})
                 }
             },
 
             gammaCounterRunDateTime: {
-                get () {
+                get() {
                     return this.getGammaCounterRunDateTime
                 },
 
-                set (value) {
+                set(value) {
                     this.setGammaCounterRunDateTime({gammaCounterRunDateTime: value})
                 }
             },
 
             gammaCounterRunTimeOffset: {
-                get () {
+                get() {
                     return this.getGammaCounterRunTimeOffset
                 },
 
-                set (value) {
+                set(value) {
                     this.setGammaCounterRunTimeOffset({gammaCounterRunTimeOffset: value})
                 }
             },
@@ -132,7 +134,26 @@
         watch: {
             startValidation: function (val) {
                 if (val === true) {
-                    this.submitForm('form')
+                    let validationArr = [
+                        this.$refs['form'].validate(),
+                        this.handleMouseCsv({mouseCsv: this.mouseCsv}),
+                        this.handleBiodiCsv({biodiCsvs: this.biodiCsvs})
+                    ]
+
+                    Promise.all(validationArr)
+                        .then((result) => {
+                            let formValid = result[0]
+                            let mouseCsvValid = result[1]
+                            let biodiCsvValid = result[2]
+                            if (formValid && mouseCsvValid && biodiCsvValid) {
+                                this.$emit('validated', true)
+                            } else {
+                                this.$emit('validated', false)
+                            }
+                        })
+                        .catch((error) => {
+                            this.$emit('validated', false)
+                        })
                 }
             }
         },
@@ -142,7 +163,9 @@
                 'setGammaCounter': types.SET_GAMMA_COUNTER,
                 'setGammaCounterRunDateTime': types.SET_GAMMA_COUNTER_RUN_DATE_TIME,
                 'setGammaCounterRunTimeOffset': types.SET_GAMMA_COUNTER_RUN_TIME_OFFSET,
-                'setGammaCounterRunComments': types.SET_GAMMA_COUNTER_RUN_COMMENTS
+                'setGammaCounterRunComments': types.SET_GAMMA_COUNTER_RUN_COMMENTS,
+                'handleBiodiCsv': types.HANDLE_BIODI_CSV,
+                'handleMouseCsv': types.HANDLE_MOUSE_CSV,
             }),
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
@@ -168,6 +191,12 @@
 
     .form .el-date-picker {
         width: 100%;
+    }
+
+    .divider {
+        width: 90% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
     }
 
 

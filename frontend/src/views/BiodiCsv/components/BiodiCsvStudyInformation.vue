@@ -105,16 +105,6 @@
             </el-row>
             <el-row>
                 <el-col :span="12" :offset="6">
-                    <el-form-item label="Radio Activity" prop="radioActivity">
-                        <el-input v-model.number="radioActivity" type="number">
-                            <el-option label="Zone one" value="shanghai"></el-option>
-                            <el-option label="Zone two" value="beijing"></el-option>
-                        </el-input>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-            <el-row>
-                <el-col :span="12" :offset="6">
                     <el-form-item label="Radio Purity" prop="radioPurity">
                         <el-input v-model.number="radioPurity" type="number"></el-input>
                     </el-form-item>
@@ -180,10 +170,6 @@
                     tumorModel: [
                         {required: true, message: 'Please select a tumor model', trigger: 'change'}
                     ],
-                    radioActivity: [
-                        {required: true, message: 'Please input radio activity', trigger: 'blur'},
-                        {type: 'number', message: 'Format of this field must be a number', trigger: 'blur'}
-                    ],
                     radioPurity: [
                         {required: true, message: 'Please input radio purity', trigger: 'blur'},
                         {type: 'number', message: 'Format of this field must be a number'}
@@ -209,7 +195,6 @@
                 getCellLine: 'biodiCsvUpload/cellLine',
                 getMouseStrain: 'biodiCsvUpload/mouseStrain',
                 getTumorModel: 'biodiCsvUpload/tumorModel',
-                getRadioActivity: 'biodiCsvUpload/radioActivity',
                 getRadioPurity: 'biodiCsvUpload/radioPurity',
                 getComments: 'biodiCsvUpload/comments'
             }),
@@ -334,16 +319,6 @@
 
             },
 
-            radioActivity: {
-                get() {
-                    return this.getRadioActivity
-                },
-
-                set(value) {
-                    this.setRadioActivity({radioActivity: value})
-                },
-            },
-
             radioPurity: {
                 get() {
                     return this.getRadioPurity
@@ -386,7 +361,6 @@
                 'setCellLine': types.SET_CELL_LINE,
                 'setMouseStrain': types.SET_MOUSE_STRAIN,
                 'setTumorModel': types.SET_TUMOR_MODEL,
-                'setRadioActivity': types.SET_RADIO_ACTIVITY,
                 'setRadioPurity': types.SET_RADIO_PURITY,
                 'setComments': types.SET_COMMENTS
             }),

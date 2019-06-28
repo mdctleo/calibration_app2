@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-button type="primary" class="controls" @click="downloadMouseCsvFormat">Download Csv Format</el-button>
+        <el-button type="primary" class="controls" @click="downloadMouseCsvFormat">Download Mouse Csv</el-button>
         <BiodiCsvUploadForm tips="Upload your completed mouse info file" @upload-file="handleUploadfile"
                         @remove-file="handleRemovefile"></BiodiCsvUploadForm>
     </div>
@@ -21,18 +21,18 @@
 
         computed: {
             ...mapGetters({
-                startValidation: 'biodiCsvUpload/startValidation',
+                // startValidation: 'biodiCsvUpload/startValidation',
                 mouseCsv: 'biodiCsvUpload/mouseCsv',
             })
         },
 
-        watch: {
-            startValidation: function (val) {
-                if (val === true) {
-                    this.handleStartValidation()
-                }
-            }
-        },
+        // watch: {
+        //     startValidation: function (val) {
+        //         if (val === true) {
+        //             this.handleStartValidation()
+        //         }
+        //     }
+        // },
 
         methods: {
             ...mapActions({
@@ -49,19 +49,19 @@
                 this.setMouseCsv({mouseCsv: null})
             },
 
-            handleStartValidation() {
-                this.handleMouseCsv({mouseCsv: this.mouseCsv})
-                    .then((validated) => {
-                        if (validated) {
-                            this.$emit('validated', true)
-                        } else {
-                            this.$emit('validated', false);
-                        }
-                    })
-                    .catch((err) => {
-                        this.$emit('validated', false)
-                    });
-            }
+            // handleStartValidation() {
+            //     this.handleMouseCsv({mouseCsv: this.mouseCsv})
+            //         .then((validated) => {
+            //             if (validated) {
+            //                 this.$emit('validated', true)
+            //             } else {
+            //                 this.$emit('validated', false);
+            //             }
+            //         })
+            //         .catch((err) => {
+            //             this.$emit('validated', false)
+            //         });
+            // }
         },
     }
 </script>

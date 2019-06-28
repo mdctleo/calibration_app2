@@ -1,25 +1,19 @@
 <template>
     <div>
-        <el-button type="primary" class="controls" @click="downloadOrganCsvFormat">Download Csv Format</el-button>
+        <el-button type="primary" class="controls" @click="downloadOrganCsvFormat">Download Organ Csv</el-button>
         <BiodiCsvUploadForm tips="Upload your organ list"
                         @upload-file="handleUploadfile"
                         @remove-file="handleRemovefile"></BiodiCsvUploadForm>
-        <component
-                v-for="organForm in selectedOrgans(-1)"
-                :key="organForm.key"
-                :is="organForm.type"
-                v-bind="organForm"
-                :index="index"
-                @validated-one-organ-form="handleValidation"
-                :availableOrgans="availableOrgans"
-        >
-        </component>
-<!--        <el-row class="controls">-->
-<!--            <el-col :span="12" :offset="6">-->
-<!--                <el-button type="primary" @click="addOrgan">Add Organ</el-button>-->
-<!--                <el-button type="danger" @click="removeOrgan">Remove Organ</el-button>-->
-<!--            </el-col>-->
-<!--        </el-row>-->
+<!--        <component-->
+<!--                v-for="organForm in selectedOrgans(-1)"-->
+<!--                :key="organForm.key"-->
+<!--                :is="organForm.type"-->
+<!--                v-bind="organForm"-->
+<!--                :index="index"-->
+<!--                @validated-one-organ-form="handleValidation"-->
+<!--                :availableOrgans="availableOrgans"-->
+<!--        >-->
+<!--        </component>-->
     </div>
 </template>
 
@@ -41,20 +35,20 @@
 
         computed: {
           ...mapGetters({
-              startValidation: 'biodiCsvUpload/startValidation',
+              // startValidation: 'biodiCsvUpload/startValidation',
               organCsv: 'biodiCsvUpload/organCsv',
-              selectedOrgans: 'biodiCsvUpload/selectedOrgans',
-              availableOrgans: 'biodiCsvUpload/availableOrgans'
+              // selectedOrgans: 'biodiCsvUpload/selectedOrgans',
+              // availableOrgans: 'biodiCsvUpload/availableOrgans'
           })
         },
 
-        watch: {
-          startValidation: function (val) {
-              if (val === true && this.selectedOrgans.length === 0) {
-                  this.$emit('validated', false)
-              }
-          }
-        },
+        // watch: {
+        //   startValidation: function (val) {
+        //       if (val === true && this.selectedOrgans.length === 0) {
+        //           this.$emit('validated', false)
+        //       }
+        //   }
+        // },
 
         methods: {
             ...mapActions({
@@ -72,17 +66,17 @@
                 this.handleOrganCsv({organCsv: null})
             },
 
-            handleValidation(validated) {
-                if (validated === true) {
-                    this.validatedOrganForms++
-                    if (this.validatedOrganForms === this.selectedOrgans.length) {
-                        this.$emit('validated', true)
-                    }
-                } else {
-                    this.validatedOrganForms = 0
-                    this.$emit('validated', false)
-                }
-            }
+            // handleValidation(validated) {
+            //     if (validated === true) {
+            //         this.validatedOrganForms++
+            //         if (this.validatedOrganForms === this.selectedOrgans.length) {
+            //             this.$emit('validated', true)
+            //         }
+            //     } else {
+            //         this.validatedOrganForms = 0
+            //         this.$emit('validated', false)
+            //     }
+            // }
 
         }
     }

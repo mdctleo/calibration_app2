@@ -16,14 +16,12 @@ const defaultState = {
         cellLine: "",
         mouseStrain: "",
         tumorModel: "",
-        radioActivity: "",
         radioPurity: "",
         comments: "",
     },
 
     gammaForm: {
         gammaCounter: "",
-        gammaCounterRunDateTime: "",
         gammaCounterRunTimeOffset: "",
         gammaCounterRunComments: "",
     },
@@ -42,7 +40,7 @@ const defaultState = {
     mouseCsvFormat: "Mouse ID, Gender, Age, Group ID, Euthanasia Date, Euthanasia Time, Weight (g), Injection Date, Pre-Injection Time, Injection Time, Post-Injection Time, Pre-Injection MBq, Post-Injection MBq, Comments",
     mouseCsv: null,
     mouseCsvJson: null,
-    organCsvFormat: "Organ Order",
+    organCsvFormat: " , Group ID, \n Tube ID, Mouse ID",
     organCsv: null,
 };
 
@@ -93,10 +91,6 @@ const actions = {
 
     setTumorModel: (context, payload) => {
         context.commit('SET_TUMOR_MODEL', payload)
-    },
-
-    setRadioActivity: (context, payload) => {
-        context.commit('SET_RADIO_ACTIVITY', payload)
     },
 
     setRadioPurity: (context, payload) => {
@@ -230,7 +224,7 @@ const actions = {
             let csvFile = await context.dispatch('readFile', mouseCsv)
             // validate headers
             if (csvFile.substring(0, context.state.mouseCsvFormat.length) !== context.state.mouseCsvFormat) {
-                context.commit('SET_ERROR', {error: "Do not mess with the headers"})
+                context.commit('SET_ERROR', {error: "Do not mess with mouse csv headers"})
                 return false
             }
             let csvFileJson = await csv().fromString(csvFile)
@@ -275,12 +269,13 @@ const actions = {
 
             let csvFile = await context.dispatch('readFile', organCsv);
             // validate headers
-            if (csvFile.substring(0, context.state.organCsvFormat.length) !== context.state.organCsvFormat) {
-                context.commit('SET_ERROR', {error: "Do not mess with the headers"});
-                return false;
-            }
+            // if (csvFile.substring(0, context.state.organCsvFormat.length) !== context.state.organCsvFormat) {
+            //     context.commit('SET_ERROR', {error: "Do not mess with the headers"});
+            //     return false;
+            // }
 
             let csvFileJson = await csv().fromString(csvFile);
+            console.log(csvFileJson)
 
             let selectedOrgans = [];
             for (let i = 0; i < csvFileJson.length; i++) {
@@ -474,10 +469,6 @@ const mutations = {
         return state.studyForm.tumorModel = payload.tumorModel
     },
 
-    SET_RADIO_ACTIVITY: (state, payload) => {
-        return state.studyForm.radioActivity = payload.radioActivity
-    },
-
     SET_RADIO_PURITY: (state, payload) => {
         return state.studyForm.radioPurity = payload.radioPurity
     },
@@ -554,7 +545,6 @@ const getters = {
     cellLine: state => state.studyForm.cellLine,
     mouseStrain: state => state.studyForm.mouseStrain,
     tumorModel: state => state.studyForm.tumorModel,
-    radioActivity: state => state.studyForm.radioActivity,
     radioPurity: state => state.studyForm.radioPurity,
     comments: state => state.studyForm.comments,
 
