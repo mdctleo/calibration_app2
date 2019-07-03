@@ -14,46 +14,23 @@
         components: {BiodiCsvUploadForm},
         computed: {
             ...mapGetters({
-                // startValidation: 'biodiCsvUpload/startValidation',
                 biodiCsvs: 'biodiCsvUpload/biodiCsvs'
             })
         },
-        // watch: {
-        //     startValidation: function (val) {
-        //         if (val === true) {
-        //             this.handleStartValidation()
-        //         }
-        //     }
-        // },
+
         methods: {
             ...mapActions({
-                'setBiodiCsv': types.SET_BIODI_CSV,
-                'handleBiodiCsv': types.HANDLE_BIODI_CSV
+                'setBiodiCsvs': types.SET_BIODI_CSVS,
             }),
 
             handleUploadfile(fileList) {
-                this.setBiodiCsv({biodiCsvs: fileList})
+                this.setBiodiCsvs({biodiCsvs: fileList})
             },
 
             handleRemovefile() {
-                this.setBiodiCsv({biodiCsvs: null})
+                this.setBiodiCsvs({biodiCsvs: null})
 
             },
-
-            // handleStartValidation() {
-            //     // TODO: Add in front end validationa and refactor the other two csvs validate -> handle logic
-            //     this.handleBiodiCsv({biodiCsvs: this.biodiCsvs})
-            //         .then((validated) => {
-            //             if (validated) {
-            //                 this.$emit('validated', true)
-            //             } else {
-            //                 this.$emit('validated', false);
-            //             }
-            //         })
-            //         .catch((error) => {
-            //             this.$emit('validated', false)
-            //         })
-            // }
         }
 
     }

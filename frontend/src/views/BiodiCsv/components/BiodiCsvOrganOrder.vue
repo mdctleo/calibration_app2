@@ -27,16 +27,16 @@
         components: {BiodiCsvUploadForm, OrganForm},
         data() {
             return {
-                organForms: [],
-                index: 0,
-                validatedOrganForms: 0,
+                // organForms: [],
+                // index: 0,
+                // validatedOrganForms: 0,
             }
         },
 
         computed: {
           ...mapGetters({
               // startValidation: 'biodiCsvUpload/startValidation',
-              organCsv: 'biodiCsvUpload/organCsv',
+              organCsvs: 'biodiCsvUpload/organCsvs',
               // selectedOrgans: 'biodiCsvUpload/selectedOrgans',
               // availableOrgans: 'biodiCsvUpload/availableOrgans'
           })
@@ -53,17 +53,17 @@
         methods: {
             ...mapActions({
                 'downloadOrganCsvFormat': types.DOWNLOAD_ORGAN_CSV_FORMAT,
-                'setOrganCsv': types.SET_ORGAN_CSV,
-                'handleOrganCsv': types.HANDLE_ORGAN_CSV
+                'setOrganCsvs': types.SET_ORGAN_CSVS,
             }),
 
             handleUploadfile(fileList) {
-                this.setOrganCsv({organCsv: fileList})
-                this.handleOrganCsv({organCsv: this.organCsv})
+                this.setOrganCsvs({organCsvs: fileList})
+                // this.handleOrganCsv({organCsv: this.organCsv})
             },
 
             handleRemovefile() {
-                this.handleOrganCsv({organCsv: null})
+                this.setOrganCsvs({organCsvs: null})
+                // this.handleOrganCsv({organCsv: null})
             },
 
             // handleValidation(validated) {

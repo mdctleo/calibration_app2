@@ -37,16 +37,16 @@
         methods: {
             ...mapActions({
                 'downloadMouseCsvFormat': types.DOWNLOAD_MOUSE_CSV_FORMAT,
-                'handleMouseCsv': types.HANDLE_MOUSE_CSV,
-                'setMouseCsv': types.SET_MOUSE_CSV
+                // 'handleMouseCsvs': types.HANDLE_MOUSE_CSVS,
+                'setMouseCsvs': types.SET_MOUSE_CSVS
             }),
 
             handleUploadfile(fileList) {
-                this.setMouseCsv({mouseCsv: fileList})
+                this.setMouseCsvs({mouseCsvs: fileList})
             },
 
             handleRemovefile() {
-                this.setMouseCsv({mouseCsv: null})
+                this.setMouseCsvs({mouseCsvs: null})
             },
 
             // handleStartValidation() {

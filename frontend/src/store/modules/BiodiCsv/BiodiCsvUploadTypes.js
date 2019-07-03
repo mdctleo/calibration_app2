@@ -24,18 +24,16 @@ export const SET_GAMMA_COUNTER_RUN_TIME_OFFSET = "biodiCsvUpload/setGammaCounter
 export const SET_GAMMA_COUNTER_RUN_COMMENTS = "biodiCsvUpload/setGammaCounterRunComments";
 
 
-export const SET_MICE = "biodiCsvUpload/setMice";
-
 export const DOWNLOAD_MOUSE_CSV_FORMAT = "biodiCsvUpload/downloadMouseCsvFormat";
-export const HANDLE_MOUSE_CSV = "biodiCsvUpload/handleMouseCsv";
-export const SET_MOUSE_CSV = "biodiCsvUpload/setMouseCsv";
+export const HANDLE_MOUSE_CSVS = "biodiCsvUpload/handleMouseCsvs";
+export const SET_MOUSE_CSVS = "biodiCsvUpload/setMouseCsvs";
 
 export const DOWNLOAD_ORGAN_CSV_FORMAT = "biodiCsvUpload/downloadOrganCsvFormat";
-export const HANDLE_ORGAN_CSV = "biodiCsvUpload/handleOrganCsv";
-export const SET_ORGAN_CSV = "biodiCsvUpload/setOrganCsv";
+export const HANDLE_ORGAN_CSVS = "biodiCsvUpload/handleOrganCsvs";
+export const SET_ORGAN_CSVS = "biodiCsvUpload/setOrganCsvs";
 export const SET_SELECTED_ORGAN = "biodiCsvUpload/setSelectedOrgan";
 
-export const SET_BIODI_CSV = "biodiCsvUpload/setBiodiCsvs";
-export const HANDLE_BIODI_CSV = "biodiCsvUpload/handleBiodiCsvs";
+export const SET_BIODI_CSVS = "biodiCsvUpload/setBiodiCsvs";
+export const HANDLE_BIODI_CSVS = "biodiCsvUpload/handleBiodiCsvs";
 
 export const POST_BIODI_CSV = "biodiCsvUpload/postBiodiCsv"

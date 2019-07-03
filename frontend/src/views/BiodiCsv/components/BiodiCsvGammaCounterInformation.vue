@@ -77,8 +77,9 @@
                 getGammaCounterRunDateTime: 'biodiCsvUpload/gammaCounterRunDateTime',
                 getGammaCounterRunTimeOffset: 'biodiCsvUpload/gammaCounterRunTimeOffset',
                 getGammaCounterRunComments: 'biodiCsvUpload/gammaCounterRunComments',
-                mouseCsv: 'biodiCsvUpload/mouseCsv',
-                biodiCsvs: 'biodiCsvUpload/biodiCsvs'
+                mouseCsvs: 'biodiCsvUpload/mouseCsvs',
+                biodiCsvs: 'biodiCsvUpload/biodiCsvs',
+                organCsvs: 'biodiCsvUpload/organCsvs'
             }),
 
             gammaForm: {
@@ -136,16 +137,18 @@
                 if (val === true) {
                     let validationArr = [
                         this.$refs['form'].validate(),
-                        this.handleMouseCsv({mouseCsv: this.mouseCsv}),
-                        this.handleBiodiCsv({biodiCsvs: this.biodiCsvs})
+                        this.handleMouseCsvs({mouseCsvs: this.mouseCsvs}),
+                        this.handleOrganCsvs({organCsvs: this.organCsvs}),
+                        this.handleBiodiCsvs({biodiCsvs: this.biodiCsvs}),
                     ]
 
                     Promise.all(validationArr)
                         .then((result) => {
                             let formValid = result[0]
                             let mouseCsvValid = result[1]
-                            let biodiCsvValid = result[2]
-                            if (formValid && mouseCsvValid && biodiCsvValid) {
+                            let organCsvValid = result[2]
+                            let biodiCsvValid = result[3]
+                            if (formValid && mouseCsvValid && organCsvValid && biodiCsvValid) {
                                 this.$emit('validated', true)
                             } else {
                                 this.$emit('validated', false)
@@ -164,8 +167,9 @@
                 'setGammaCounterRunDateTime': types.SET_GAMMA_COUNTER_RUN_DATE_TIME,
                 'setGammaCounterRunTimeOffset': types.SET_GAMMA_COUNTER_RUN_TIME_OFFSET,
                 'setGammaCounterRunComments': types.SET_GAMMA_COUNTER_RUN_COMMENTS,
-                'handleBiodiCsv': types.HANDLE_BIODI_CSV,
-                'handleMouseCsv': types.HANDLE_MOUSE_CSV,
+                'handleBiodiCsvs': types.HANDLE_BIODI_CSVS,
+                'handleOrganCsvs': types.HANDLE_ORGAN_CSVS,
+                'handleMouseCsvs': types.HANDLE_MOUSE_CSVS,
             }),
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {

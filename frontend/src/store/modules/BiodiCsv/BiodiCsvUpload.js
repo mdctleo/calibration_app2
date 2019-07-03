@@ -38,10 +38,11 @@ const defaultState = {
     error: null,
     startValidation: false,
     mouseCsvFormat: "Mouse ID, Gender, Age, Group ID, Euthanasia Date, Euthanasia Time, Weight (g), Injection Date, Pre-Injection Time, Injection Time, Post-Injection Time, Pre-Injection MBq, Post-Injection MBq, Comments",
-    mouseCsv: null,
+    mouseCsvs: null,
     mouseCsvJson: null,
     organCsvFormat: " , Group ID, \n Tube ID, Mouse ID",
-    organCsv: null,
+    organCsvs: null,
+    organCsvJson: null
 };
 
 const actions = {
@@ -105,10 +106,6 @@ const actions = {
         context.commit('SET_GAMMA_COUNTER', payload)
     },
 
-    setGammaCounterRunDateTime: (context, payload) => {
-        context.commit('SET_GAMMA_COUNTER_RUN_DATE_TIME', payload)
-    },
-
     setGammaCounterRunTimeOffset: (context, payload) => {
         context.commit('SET_GAMMA_COUNTER_RUN_TIME_OFFSET', payload)
     },
@@ -117,16 +114,12 @@ const actions = {
         context.commit('SET_GAMMA_COUNTER_RUN_COMMENTS', payload)
     },
 
-    setMice: (context, payload) => {
-        context.commit('SET_MICE', payload)
+    setMouseCsvs: (context, payload) => {
+        context.commit('SET_MOUSE_CSVS', payload)
     },
 
-    setMouseCsv: (context, payload) => {
-        context.commit('SET_MOUSE_CSV', payload)
-    },
-
-    setOrganCsv: (context, payload) => {
-        context.commit('SET_ORGAN_CSV', payload)
+    setOrganCsvs: (context, payload) => {
+        context.commit('SET_ORGAN_CSVS', payload)
     },
 
     setSelectedOrgan: (context, payload) => {
@@ -211,15 +204,15 @@ const actions = {
     },
 
 
-    handleMouseCsv: async (context, payload) => {
+    handleMouseCsvs: async (context, payload) => {
         try {
             context.commit('SET_LOADING', {loading: true})
             // did not upload file
-            if (payload.mouseCsv === null) {
+            if (payload.mouseCsvs === null) {
                 context.commit('SET_ERROR', {error: "mouse csv not uploaded"})
                 return false
             }
-            let mouseCsv = payload.mouseCsv[0].raw
+            let mouseCsv = payload.mouseCsvs[0].raw
 
             let csvFile = await context.dispatch('readFile', mouseCsv)
             // validate headers
@@ -257,37 +250,82 @@ const actions = {
         }
     },
 
-    handleOrganCsv: async (context, payload) => {
+    validateOrgan: async (context, payload) => {
+        let row = payload.row
+        if (row['mouseId'] === "" || row['mouseId'] === undefined) {
+            return false
+        } else if (row['groupId'] === "" || row['groupId'] === undefined) {
+            return false
+        } else {
+            return true
+        }
+    },
+
+    parseOrganCsv: async (context, payload) => {
+        let csvFile = payload.organCsv.trim()
+
+        let csvFileMatrix = csvFile.split("\n")
+
+        for (let i = 0; i < csvFileMatrix.length; i++) {
+            csvFileMatrix[i] = csvFileMatrix[i].split(",")
+        }
+
+        let jLength = csvFileMatrix[0].length
+        let iLength = csvFileMatrix.length
+        let output = []
+
+        for (let j = 2; j < jLength; j++) {
+            let organObj = {}
+            for (let i = 1; i < iLength; i++) {
+                if (i === 1) {
+                    organObj.mouseId = csvFileMatrix[i][j]
+                    organObj.groupId = csvFileMatrix[0][j]
+                } else {
+                    let tubeId = csvFileMatrix[i][0]
+                    let organ = csvFileMatrix[i][1]
+                    let organMass = csvFileMatrix[i][j]
+                    organObj[tubeId] = {organ: organ, organMass: organMass}
+                }
+            }
+            output.push(organObj)
+        }
+
+        return output
+    },
+
+    handleOrganCsvs: async (context, payload) => {
         try {
             context.commit('SET_LOADING', {loading: true});
-            if (payload.organCsv === null) {
+            if (payload.organCsvs === null) {
                 context.commit('SET_ERROR', {error: "organ csv not uploaded"});
                 return context.commit('SET_SELECTED_ORGANS', {selectedOrgans: []})
             }
 
-            let organCsv = payload.organCsv[0].raw;
+            let organCsv = payload.organCsvs[0].raw;
 
-            let csvFile = await context.dispatch('readFile', organCsv);
-            // validate headers
-            // if (csvFile.substring(0, context.state.organCsvFormat.length) !== context.state.organCsvFormat) {
-            //     context.commit('SET_ERROR', {error: "Do not mess with the headers"});
-            //     return false;
-            // }
+            organCsv = await context.dispatch('readFile', organCsv);
 
-            let csvFileJson = await csv().fromString(csvFile);
-            console.log(csvFileJson)
+            let organCsvJson = await context.dispatch('parseOrganCsv', {organCsv: organCsv})
 
-            let selectedOrgans = [];
-            for (let i = 0; i < csvFileJson.length; i++) {
-                selectedOrgans.push({
-                    key: i,
-                    label: i,
-                    type: 'OrganForm',
-                    value: csvFileJson[i]['Organ Order']
-                })
+            let rowValidated = true
+            for (let i = 0; i < organCsvJson.length; i++) {
+                let row = organCsvJson[i]
+                rowValidated = await context.dispatch('validateOrgan', {row: row})
+
+                if (!rowValidated) {
+                    break
+                }
+
             }
 
-            return context.commit('SET_SELECTED_ORGANS', {selectedOrgans: selectedOrgans})
+            if (rowValidated) {
+                context.commit('SET_ORGAN_CSV_JSON', {organCsvJson: organCsvJson})
+                return true
+            } else {
+                context.commit('SET_ERROR', {error: "There is an error  wirth your organ_order csv"})
+                return false
+            }
+
         } catch (err) {
             context.commit('SET_ERROR', {error: err.message});
             return false;
@@ -325,9 +363,6 @@ const actions = {
         }
     },
 
-    /**
-     * File upload start
-     **/
     handleBiodiCsvs: async (context, payload) => {
         try {
             context.commit('SET_LOADING', {loading: true});
@@ -390,10 +425,6 @@ const actions = {
         }
     },
 
-
-    /**
-     * File upload ends
-     */
     postBiodiCsv(context, payload) {
         console.log(payload)
         context.commit('SET_LOADING', {loading: true})
@@ -481,20 +512,12 @@ const mutations = {
         return state.gammaForm.gammaCounter = payload.gammaCounter
     },
 
-    SET_GAMMA_COUNTER_RUN_DATE_TIME: (state, payload) => {
-        return state.gammaForm.gammaCounterRunDateTime = payload.gammaCounterRunDateTime
-    },
-
     SET_GAMMA_COUNTER_RUN_TIME_OFFSET: (state, payload) => {
         return state.gammaForm.gammaCounterRunTimeOffset = payload.gammaCounterRunTimeOffset
     },
 
     SET_GAMMA_COUNTER_RUN_COMMENTS: (state, payload) => {
         return state.gammaForm.gammaCounterRunComments = payload.gammaCounterRunComments
-    },
-
-    SET_MICE: (state, payload) => {
-        return state.mice = payload.mice
     },
 
     SET_AVAILABLE_ORGANS: (state, payload) => {
@@ -509,16 +532,20 @@ const mutations = {
         return state.organForm.selectedOrgans[payload.index].value = payload.organ
     },
 
-    SET_MOUSE_CSV: (state, payload) => {
-        return state.mouseCsv = payload.mouseCsv
+    SET_MOUSE_CSVS: (state, payload) => {
+        return state.mouseCsvs = payload.mouseCsvs
     },
 
     SET_MOUSE_CSV_JSON: (state, payload) => {
         return state.mouseCsvJson = payload.mouseCsvJson
     },
 
-    SET_ORGAN_CSV: (state, payload) => {
-        return state.organCsv = payload.organCsv
+    SET_ORGAN_CSVS: (state, payload) => {
+        return state.organCsvs = payload.organCsvs
+    },
+
+    SET_ORGAN_CSV_JSON: (state, payload) => {
+        return state.organCsvJson = payload.organCsvJson
     },
 
     SET_BIODI_CSVS: (state, payload) => {
@@ -550,14 +577,14 @@ const getters = {
 
     gammaForm: state => state.gammaForm,
     gammaCounter: state => state.gammaForm.gammaCounter,
-    gammaCounterRunDateTime: state => state.gammaForm.gammaCounterRunDateTime,
     gammaCounterRunTimeOffset: state => state.gammaForm.gammaCounterRunTimeOffset,
     gammaCounterRunComments: state => state.gammaForm.gammaCounterRunComments,
 
     mice: state => state.mice,
 
     availableOrgans: state => state.availableOrgans,
-    organCsv: state => state.organCsv,
+    organCsvs: state => state.organCsvs,
+    organCsvJson: state => state.organCsvJson,
     organForm: state => state.organForm,
     selectedOrgans: state => index => {
         return (index === -1) ? state.organForm.selectedOrgans : state.organForm.selectedOrgans[index]
@@ -565,7 +592,7 @@ const getters = {
 
     loading: state => state.loading,
     error: state => state.error,
-    mouseCsv: state => state.mouseCsv,
+    mouseCsvs: state => state.mouseCsvs,
     mouseCsvJson: state => state.mouseCsvJson,
     biodiCsvs: state => state.biodiCsvs,
     biodiCsvJson: state => state.biodiCsvJson
