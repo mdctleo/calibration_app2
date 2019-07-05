@@ -1,23 +1,17 @@
 from app import db
-from calibration_app.biodi_csv.BiodiCsvModel import BiodiCsv, BiodiCsvRow, Protocol
-from calibration_app.biodi_csv.BiodiCsvCompleteModel import BiodiCsvComplete
+from calibration_app.biodi_csv.BiodiCsvModel import BiodiCsvRow, Protocol
+from calibration_app.biodi_csv.BiodiCsvCompleteModel import StudyInformation
 from sqlalchemy.exc import *
 from exceptions.Exceptions import *
 
 class DatabaseHelper:
 
-    @staticmethod
-    def createBiodiCsvRows(biodiCsvRows):
-        for row in biodiCsvRows:
-            db.session.add(row)
-
-        return True
 
     @staticmethod
     def getBiodiCsv(csvId):
         try:
-            fileName = db.session.query(BiodiCsv).with_entities(BiodiCsv.fileName).filter(BiodiCsv.id == csvId).first()
-            csvRows = db.session.query(BiodiCsv, BiodiCsvRow, Protocol) \
+            fileName = db.session.query(StudyInformation).with_entities(StudyInformation.studyName).filter(StudyInformation.id == csvId).first()
+            csvRows = db.session.query(StudyInformation, BiodiCsvRow, Protocol) \
                 .with_entities(
                 Protocol.id,
                 Protocol.protocolName,
@@ -33,13 +27,22 @@ class DatabaseHelper:
                 BiodiCsvRow.cpm,
                 BiodiCsvRow.error,
                 BiodiCsvRow.info) \
-                .filter(BiodiCsv.id == csvId) \
-                .filter(BiodiCsvRow.csvId == BiodiCsv.id) \
-                .filter(Protocol.id == BiodiCsv.protocolId) \
+                .filter(StudyInformation.id == csvId) \
+                .filter(BiodiCsvRow.csvId == StudyInformation.id) \
+                .filter(Protocol.id == StudyInformation.protocolId) \
                 .order_by(BiodiCsvRow.rowNum).all()
         except SQLAlchemyError as e:
             raise BaseException(e.__str__())
         return fileName, csvRows
+
+    @staticmethod
+    def getBiodiCsvMetas():
+        try:
+            result = StudyInformation.query.with_entities(StudyInformation.id, StudyInformation.studyName, StudyInformation.createdBy, StudyInformation.createdOn).all()
+        except SQLAlchemyError as e:
+            raise BaseException(e.__str__())
+
+        return result
 
     @staticmethod
     def createStudyInformation(studyInformation):
@@ -49,24 +52,27 @@ class DatabaseHelper:
         return csvId
 
     @staticmethod
-    def getBiodiCsvMetas():
-        try:
-            result = BiodiCsv.query.with_entities(BiodiCsv.id, BiodiCsv.fileName, BiodiCsv.createdBy, BiodiCsv.createdOn).all()
-        except SQLAlchemyError as e:
-            raise BaseException(e.__str__())
+    def createBiodiCsvRows(biodiCsvRows):
+        for row in biodiCsvRows:
+            db.session.add(row)
 
-        return result
+        return True
 
 
     @staticmethod
     def createBiodiCsvCompleteRows(biodiCsvCompleteRows):
         for row in biodiCsvCompleteRows:
             db.session.add(row)
+
+        return True
+
+    @staticmethod
+    def createMice(mice):
+        for mouse in mice:
+            db.session.add(mouse)
         try:
             db.session.commit()
         except SQLAlchemyError as e:
             db.session.rollback()
-            db.session.remove()
-            raise BaseException(e.__str__())
-
-        return True
+        db.session.remove()
+        raise BaseException(e.__str__())

@@ -13,7 +13,7 @@
                 studyForm: "biodiCsvUpload/studyForm",
                 gammaForm: "biodiCsvUpload/gammaForm",
                 mouseCsvJson: "biodiCsvUpload/mouseCsvJson",
-                selectedOrgans: "biodiCsvUpload/selectedOrgans",
+                organCsvJson: "biodiCsvUpload/organCsvJson",
                 biodiCsvJson: "biodiCsvUpload/biodiCsvJson"
             })
         },
@@ -24,15 +24,12 @@
             }),
 
             handleSubmit() {
-                let selectedOrgans = this.selectedOrgans(-1).map((organ) => {
-                    return organ.value
-                })
                 this.postBiodiCsv({
                     biodiCsv: this.biodiCsvJson,
                     studyInfo: this.studyForm,
                     gammaInfo: this.gammaForm,
                     mouseInfo: this.mouseCsvJson,
-                    organInfo: selectedOrgans})
+                    organInfo: this.organCsvJson})
             }
         }
     }

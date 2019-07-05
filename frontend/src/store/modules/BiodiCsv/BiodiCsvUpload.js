@@ -173,33 +173,33 @@ const actions = {
 
     validateMouse: (context, row) => {
         if (row['Mouse ID'] === "") {
-            return false
-        } else if (row['Gender'] === "") {
-            return false
+            return {status: false, error: "Mouse ID validation failed"}
+        } else if (row['Gender'] !== "M" && row['Gender'] !== "F") {
+            return {status: false, error: "Gender validation failed"}
         } else if (row['Age'] === "") {
-            return false
+            return {status: false, error: "Age validation failed"}
         } else if (row['Group ID'] === "") {
-            return false
+            return {status: false, error: "Group ID validation failed"}
         } else if (row['Euthanasia Date'] === "" || !moment(row['Euthanasia Date'], "YYYY-MM-DD", true).isValid()) {
-            return false
+            return {status: false, error: "Euthanasia Date validation failed"}
         } else if (row['Euthanasia Time'] === "" || !moment(row['Euthanasia Time'], "HH:mm", true).isValid()) {
-            return false
+            return {status: false, error: "Euthanasia Time validation failed"}
         } else if (row['Weight (g)'] === "") {
-            return false
+            return {status: false, error: "Weight validation failed"}
         } else if (row['Injection Date'] === "" || !moment(row['Injection Date'], "YYYY-MM-DD", true).isValid()) {
-            return false
+            return {status: false, error: "Injection Date validation failed"}
         } else if (row['Pre-Injection Time'] === "" || !moment(row['Pre-Injection Time'], "HH:mm", true).isValid()) {
-            return false
+            return {status: false, error: "Pre-Injection Time validation failed"}
         } else if (row['Injection Time'] === "" || !moment(row['Injection Time'], "HH:mm", true).isValid()) {
-            return false
+            return {status: false, error: "Injection Time validation failed"}
         } else if (row['Post-Injection Time'] === "" || !moment(row['Post-Injection Time'], "HH:mm", true).isValid()) {
-            return false
+            return {status: false, error: "Post-Injection Time validation failed"}
         } else if (row['Pre-Injection MBq'] === "") {
-            return false
+            return {status: false, error: "Pre-Injection MBq validation failed"}
         } else if (row['Post-Injection MBq'] === "") {
-            return false
+            return {status: false, error: "Post-Injection MBq validation failed"}
         } else {
-            return true;
+            return {status: true, error: null}
         }
     },
 
@@ -224,22 +224,27 @@ const actions = {
             let indexHolder = 0
             let rowValidated = true
 
+            if (csvFileJson.length === 0) {
+                context.commit('SET_ERROR', {error: "mouse csv empty"})
+                return false
+            }
+
             // validate each existing rows for required cells
             for (let i = 0; i < csvFileJson.length; i++) {
                 let row = csvFileJson[i]
                 indexHolder = i
                 rowValidated = await context.dispatch('validateMouse', row)
 
-                if (!rowValidated) {
+                if (!rowValidated.status) {
                     break
                 }
             }
 
-            if (rowValidated) {
+            if (rowValidated.status) {
                 context.commit('SET_MOUSE_CSV_JSON', {mouseCsvJson: csvFileJson})
                 return true
             } else {
-                context.commit('SET_ERROR', {error: "There is an error on row " + (indexHolder + 2)})
+                context.commit('SET_ERROR', {error: rowValidated.error + " in mouse csv on row " + (indexHolder + 2)})
                 return false
             }
         } catch (err) {
@@ -280,11 +285,17 @@ const actions = {
                 if (i === 1) {
                     organObj.mouseId = csvFileMatrix[i][j]
                     organObj.groupId = csvFileMatrix[0][j]
+                    organObj.organs = []
                 } else {
                     let tubeId = csvFileMatrix[i][0]
                     let organ = csvFileMatrix[i][1]
                     let organMass = csvFileMatrix[i][j]
-                    organObj[tubeId] = {organ: organ, organMass: organMass}
+                    if (organObj.organs[tubeId - 1] === undefined) {
+                        organObj.organs[tubeId - 1] = {organ: organ, organMass: organMass}
+                    } else {
+                        throw Error('Duplicate tube Id for organ Csv, parsing failed')
+                    }
+
                 }
             }
             output.push(organObj)
@@ -376,6 +387,11 @@ const actions = {
             let rowValidated = true
             let indexHolder = 0
 
+            if (csvFileJson.length === 0) {
+                context.commit('SET_ERROR', {error: "biodii csv empty"})
+                return false
+            }
+
 
             for (let i = 0; i < csvFileJson.length; i++) {
                 indexHolder = i
@@ -412,7 +428,7 @@ const actions = {
                 context.commit('SET_BIODI_CSV_JSON', {biodiCsvJson: fileFormat})
                 return true
             } else {
-                context.commit('SET_ERROR', {error: "There is an error on row " + (indexHolder + 2)})
+                context.commit('SET_ERROR', {error: "There is an error in biodi csv on row " + (indexHolder + 2)})
                 return false
 
             }

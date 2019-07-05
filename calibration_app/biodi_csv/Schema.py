@@ -15,9 +15,9 @@ class BiodiCsvSchema(Schema):
 
 class BiodiCsvRowSchema(Schema):
     rowNum = fields.Int(dump_only=True)
-    protocolId = fields.Integer(data_key="Protocol ID")
+    protocolId = fields.Integer(data_key="Protocol ID", required=True)
     protocolName = fields.Str(dump_only=True)
-    measurementTime = fields.DateTime(data_key='Measurement date & time')
+    measurementTime = fields.DateTime(data_key='Measurement date & time', required=True)
     completionStatus = fields.Int(data_key='Completion status')
     runId = fields.Int(data_key='Run ID')
     rack = fields.Int(data_key='Rack')
@@ -48,14 +48,12 @@ class StudyInfoSchema(Schema):
     cellLine = fields.Str(required=True)
     mouseStrain = fields.Str(required=True)
     tumorModel = fields.Str(required=True)
-    radioActivity = fields.Float(required=True)
     radioPurity = fields.Float(required=True)
     comments = fields.Str()
 
 
 class GammaInfoSchema(Schema):
     gammaCounter = fields.Str(required=True)
-    gammaCounterRunDateTime = fields.DateTime(required=True)
     gammaCounterRunTimeOffset = fields.Str()
     gammaCounterRunComments = fields.Str()
 
@@ -63,6 +61,7 @@ class GammaInfoSchema(Schema):
 class MouseCsvRowSchema(Schema):
     mouseId = fields.Str(data_key="Mouse ID", required=True)
     gender = fields.Str(data_key="Gender", required=True)
+    cage = fields.Str(data_key="Cage", required=True)
     age = fields.Number(data_key="Age", required=True)
     groupId = fields.Str(data_key="Group ID", required=True)
     euthanasiaDate = fields.Date(data_key="Euthanasia Date", required=True)
@@ -79,6 +78,13 @@ class MouseCsvRowSchema(Schema):
 
 class OrganSchema(Schema):
     organ = fields.Str(required=True)
+    organMass = fields.Float(required=True)
+
+
+class OrganInfoSchema(Schema):
+    organs = fields.Nested(OrganSchema, many=True)
+    groupId = fields.Str(required=True)
+    mouseId = fields.Str(required=True)
 
 
 class BiodiCsvRequestSchema(Schema):
@@ -86,4 +92,4 @@ class BiodiCsvRequestSchema(Schema):
     studyInfo = fields.Nested(StudyInfoSchema)
     gammaInfo = fields.Nested(GammaInfoSchema)
     mouseInfo = fields.Nested(MouseCsvRowSchema, many=True)
-    organInfo = fields.List(fields.Str(), required=True)
+    organInfo = fields.Nested(OrganInfoSchema, many=True)

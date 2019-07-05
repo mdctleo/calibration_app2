@@ -64,7 +64,7 @@ app.app_context().push()
 def make_shell_context():
     return {'db': db, 'Isotope': isotopeModel.Isotope, 'CalibrationFactor': calibrationModel.CalibrationFactor,
             'GammaCounter': gammaCounterModel.GammaCounter, 'User': userModel.User, 'Protocol': biodiCsvModel.Protocol,
-            'BiodiCsv': biodiCsvModel.BiodiCsv, 'BiodiCsvRow': biodiCsvModel.BiodiCsvRow}
+            'BiodiCsvRow': biodiCsvModel.BiodiCsvRow}
 
 
 
