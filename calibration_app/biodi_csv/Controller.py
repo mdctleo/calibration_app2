@@ -4,7 +4,7 @@ import csv
 import json
 from io import StringIO
 from calibration_app.biodi_csv.BiodiCsvModel import BiodiCsvRow
-from calibration_app.biodi_csv.BiodiCsvCompleteModel import BiodiCsvCompleteRow, StudyInformation, Mouse
+from calibration_app.biodi_csv.BiodiCsvCompleteModel import BiodiCsvCompleteRow, StudyInformation, Mouse, Window
 from calibration_app.biodi_csv.DatabaseHelper import DatabaseHelper as db
 from calibration_app.biodi_csv.Schema import BiodiCsvSchema, BiodiCsvRequestSchema
 from werkzeug.utils import secure_filename
@@ -37,24 +37,25 @@ def prepareBiodiCsvRows(biodiCsv, biodiCsvId):
 
 
 
-def prepareStudyInformation(studyInfo, gammaInfo, biodiCsvFile):
+def prepareStudyInformation(studyInfo, gammaInfo, biodiCsvRows):
+    print(biodiCsvRows)
     return StudyInformation(studyName=studyInfo['studyName'],
                             studyDate=studyInfo['studyDate'],
                             researcherName =studyInfo['researcherName'],
                             piName=studyInfo['piName'],
-                            isotope=studyInfo['radioIsotope'],
-                            chelator=studyInfo['chelator'],
-                            vector=studyInfo['vector'],
+                            isotopeName=studyInfo['radioIsotope'],
+                            chelatorName=studyInfo['chelator'],
+                            vectorName=studyInfo['vector'],
                             target=studyInfo['target'],
-                            cellLine=studyInfo['cellLine'],
-                            mouseStrain=studyInfo['mouseStrain'],
-                            tumorModel=studyInfo['tumorModel'],
+                            cellLineName=studyInfo['cellLine'],
+                            mouseStrainName=studyInfo['mouseStrain'],
+                            tumorModelName=studyInfo['tumorModel'],
                             radioPurity=studyInfo['radioPurity'],
                             comments=studyInfo['comments'],
                             gammaCounter=gammaInfo['gammaCounter'],
-                            runDateTime=biodiCsvFile[0]['measurementTime'],
+                            runDateTime=biodiCsvRows[0]['measurementTime'],
                             gammaRunComments=gammaInfo['gammaCounterRunComments'],
-                            protocolId=biodiCsvFile[0]['protocolId']
+                            protocolId=biodiCsvRows[0]['protocolId']
                             )
 
 def assignOrgansToMouse(mouseInfo, organInfo):
@@ -69,28 +70,45 @@ def assignOrgansToMouse(mouseInfo, organInfo):
     return mouseOrgans
 
 
-def prepareBiodiCsvCompleteRows(csvId, mouseOrgans):
+def prepareBiodiCsvCompleteRows(csvId, mouseOrgans, biodiCsvRows):
     biodiCsvCompleteRows = []
-    for mouse in mouseOrgans:
+    for i, mouse in enumerate(mouseOrgans):
         for j, organs in enumerate(mouse['organs']):
+            currRow = (i * j) if (i != 0) else (i + j)
             biodiCsvCompleteRows.append(
                 BiodiCsvCompleteRow(
-                    rowNumber=j,
+                    rowNumber= currRow,
                     csvId=csvId,
                     organ=organs[j]['organ'],
                     organMass=organs[j]['organMass'],
-                    deadTimeFactor=1.00
+                    deadTimeFactor=biodiCsvRows[currRow]['error']
                 )
             )
 
     return biodiCsvCompleteRows
+
+# def prepareWindows(csvId, biodiCsvRows):
+#     windows = []
+#     for i, biodiCsvRow in enumerate(biodiCsvRows):
+#         windows.append(
+#             Window(
+#                 csvId=csvId,
+#                 rowNumber=i,
+#                 windowNum=1,
+#                 counts=biodiCsvRow['counts'],
+#                 correctedCounts=biodiCsvRow[],
+#                 cpm=biodiCsvRow['cpm']
+#             )
+#         )
+#
+#     return windows
 
 def prepareMice(csvId, mouseOrgans):
     mice = []
     for mouse in mouseOrgans:
         mice.append(
             Mouse(
-                csvId=mouse['csvId'],
+                csvId=csvId,
                 mouseId=mouse['mouseId'],
                 groupId=mouse['groupId'],
                 euthanizeDateTime=datetime.datetime.combine(mouse['euthanasiaDate'],
@@ -110,20 +128,21 @@ def prepareMice(csvId, mouseOrgans):
     return mice
 
 
-def createBiodiCsvComplete(biodiCsvRequestDict):
+def createStudy(biodiCsvRequestDict):
     try:
         studyInformation = prepareStudyInformation(biodiCsvRequestDict['studyInfo'],
                                                    biodiCsvRequestDict['gammaInfo'],
-                                                   biodiCsvRequestDict['biodiCsv'])
+                                                   biodiCsvRequestDict['biodiCsv']['file'])
         csvId = db.createStudyInformation(studyInformation)
         mouseOrgans = assignOrgansToMouse(biodiCsvRequestDict['mouseInfo'], biodiCsvRequestDict['organInfo'])
         biodiCsvRows = prepareBiodiCsvRows(biodiCsvRequestDict['biodiCsv'], csvId)
-        biodiCsvCompleteRows = prepareBiodiCsvCompleteRows(csvId, mouseOrgans)
+        biodiCsvCompleteRows = prepareBiodiCsvCompleteRows(csvId, mouseOrgans, biodiCsvRequestDict['biodiCsv']['file'])
+        # windows = prepareWindows(csvId, biodiCsvRequestDict['biodiCsv'])
         mice = prepareMice(csvId, mouseOrgans)
 
         db.createBiodiCsvRows(biodiCsvRows)
         db.createBiodiCsvCompleteRows(biodiCsvCompleteRows)
-        db.createMiceInformation(mice)
+        db.createMice(mice)
     except BaseException as e:
         raise e
     return None
@@ -163,8 +182,7 @@ def biodiCsv():
     if request.method == 'POST':
         try:
             biodiCsvRequestDict = BiodiCsvRequestSchema().load(request.get_json())
-            print(biodiCsvRequestDict)
-            # createBiodiCsvComplete(biodiCsvRequestDict)
+            createStudy(biodiCsvRequestDict)
         except ValidationError as e:
             result = StandardResponse(e.__str__())
             # result = StandardResponse("Failed to validate the CSV, please use only csv with headers:"

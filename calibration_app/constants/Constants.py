@@ -51,10 +51,10 @@ VECTOR_C_NAME = "name"
 VECTOR_C_TYPE = "type"
 
 TUMOR_MODEL_T_NAME = "tumor_model"
-TUMOR_MODEL_C_MODEL = "model"
+TUMOR_MODEL_C_NAME = "name"
 
 MOUSE_STRAIN_T_NAME = "mouse_strain"
-MOUSE_STRAIN_C_STRAIN = "strain"
+MOUSE_STRAIN_C_NAME = "name"
 
 CELL_LINE_T_NAME = "cell_line"
 CELL_LINE_C_NAME = "name"
