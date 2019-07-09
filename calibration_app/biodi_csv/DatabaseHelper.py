@@ -70,9 +70,12 @@ class DatabaseHelper:
     def createMice(mice):
         for mouse in mice:
             db.session.add(mouse)
+
+    @staticmethod
+    def executeCreateStudy():
         try:
             db.session.commit()
         except SQLAlchemyError as e:
             db.session.rollback()
-        db.session.remove()
-        raise BaseException(e.__str__())
+            db.session.remove()
+            raise BaseException(e.__str__())

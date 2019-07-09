@@ -78,14 +78,15 @@ class StudyInformation(db.Model):
     gammaCounter = db.Column(STUDY_INFORMATION_C_GAMMA_COUNTER, db.String(8), db.ForeignKey(GAMMA_COUNTERS_T_NAME + '.' + GAMMA_COUNTERS_C_MODEL), nullable=False)
     runDateTime = db.Column(STUDY_INFORMATION_C_RUN_DATE_TIME, db.DateTime, nullable=False)
     gammaRunCommnets = db.Column(STUDY_INFORMATION_C_GAMMA_RUN_COMMENTS, db.Text)
-    protocolId = db.Column(STUDY_INFORMATION_C_PROTOCOL_ID, db.Integer, db.ForeignKey(PROTOCOL_T_NAME + '.' + PROTOCOL_C_NAME), nullable=False)
+    protocolId = db.Column(STUDY_INFORMATION_C_PROTOCOL_ID, db.Integer, db.ForeignKey(PROTOCOL_T_NAME + '.' + PROTOCOL_C_ID), nullable=False)
     biodiCsvRow = db.relationship('BiodiCsvRow', cascade="all, delete-orphan", backref=STUDY_INFORMATION_T_NAME)
     biodiCsvCompleteRow = db.relationship('BiodiCsvCompleteRow', cascade="all, delete-orphan", backref=STUDY_INFORMATION_T_NAME)
-    windows = db.relationship('Window', cascade="all, delete-orphan", backref=STUDY_INFORMATION_T_NAME)
+    # windows = db.relationship('Window', cascade="all, delete-orphan", backref=STUDY_INFORMATION_T_NAME)
     mouse = db.relationship('Mouse', cascade="all, delete-orphan", backref=STUDY_INFORMATION_T_NAME)
 
     def __init__(self, studyName, studyDate, researcherName, piName, isotopeName, chelatorName, vectorName, target, cellLineName, tumorModelName,
-                 mouseStrainName, radioPurity, comments, gammaCounter, runDateTime, gammaRunComments, protocolId):
+                 mouseStrainName, radioPurity, comments, gammaCounter, runDateTime, gammaRunComments, protocolId,
+                 biodiCsvRows, biodiCsvCompleteRows, mice):
         self.studyName = studyName
         self.studyDate = studyDate
         self.researcherName = researcherName
@@ -103,6 +104,9 @@ class StudyInformation(db.Model):
         self.runDateTime = runDateTime
         self.gammaRunCommnets = gammaRunComments
         self.protocolId = protocolId
+        self.biodiCsvRow = biodiCsvRows
+        self.biodiCsvCompleteRow = biodiCsvCompleteRows
+        self.mouse = mice
 
 class Mouse(db.Model):
     __tablename__ = MOUSE_INFORMATION_T_NAME
@@ -121,9 +125,8 @@ class Mouse(db.Model):
     preInjectionActivity = db.Column(MOUSE_INFORMATION_C_PRE_INJECTION_ACTIVITY, db.Float, nullable=False)
     postInjectionActivity = db.Column(MOUSE_INFORMATION_C_POST_INJECTION_ACTIVITY, db.Float, nullable=False)
 
-    def __init__(self, csvId, mouseId, groupId, euthanizeDateTime, mouseGender, cage, age, injectionDate, preInjectionTime,
+    def __init__(self, mouseId, groupId, euthanizeDateTime, mouseGender, cage, age, injectionDate, preInjectionTime,
                  injectionTime, postInjectionTime, preInjectionActivity, postInjectionActivity):
-        self.csvId = csvId
         self.mouseId = mouseId
         self.groupId = groupId
         self.euthanizeDateTime = euthanizeDateTime
@@ -153,35 +156,31 @@ class BiodiCsvCompleteRow(db.Model):
     deadTimeFactor = db.Column(BIODI_CSV_COMPLETE_ROWS_C_DEAD_TIME_FACTOR, db.Float, nullable=False)
 
     # TODO: this is a lot of parameters, perhaps pass in a dictionary instead?
-    def __init__(self, rowNumber, csvId, organ, organMass, count,
-                 rack, vial, time, deadTimeFactor):
+    def __init__(self, rowNumber, organ, organMass, deadTimeFactor):
         self.rowNumber = rowNumber
-        self.csvId = csvId
         self.organ = organ
         self.organMass = organMass
         # self.count = count
         # self.rack = rack
         # self.vial = vial
-        self.time = time
         self.deadTimeFactor = deadTimeFactor
 
 
 
-class Window(db.Model):
-    __tablenme__ = WINDOWS_T_NAME
-    id = db.Column(WINDOWS_C_ID, db.Integer, primary_key=True, autoincrement=True)
-    rowNumber = db.Column(WINDOWS_C_ROW_NUM, db.Integer, nullable=False)
-    csvId = db.Column(WINDOWS_C_CSV_ID, db.Integer, db.ForeignKey(STUDY_INFORMATION_T_NAME + '.' + STUDY_INFORMATION_C_ID), nullable=False)
-    windowNum = db.Column(WINDOWS_C_WINDOW_NUM, db.SmallInteger, nullable=False)
-    # counts = db.Column(WINDOWS_C_COUNTS, db.Integer, nullable=False)
-    # correctedCounts = db.Column(WINDOWS_C_CORRECTED_COUNTS, db.Integer, nullable=False)
-    # cpm = db.Column(WINDOWS_C_CPM, db.Integer, nullable=False)
-
-    def __init__(self, rowNumber, csvId, windowNum, isotope):
-        self.rowNumber = rowNumber
-        self.csvId = csvId
-        self.windowNum = windowNum
-        self.isotope = isotope
-        # self.counts = counts
-        # self.correctedCounts = correctedCounts
-        # self.cpm = cpm
+# class Window(db.Model):
+#     __tablenme__ = WINDOWS_T_NAME
+#     id = db.Column(WINDOWS_C_ID, db.Integer, primary_key=True, autoincrement=True)
+#     rowNumber = db.Column(WINDOWS_C_ROW_NUM, db.Integer, nullable=False)
+#     csvId = db.Column(WINDOWS_C_CSV_ID, db.Integer, db.ForeignKey(STUDY_INFORMATION_T_NAME + '.' + STUDY_INFORMATION_C_ID), nullable=False)
+#     windowNum = db.Column(WINDOWS_C_WINDOW_NUM, db.SmallInteger, nullable=False)
+#     # counts = db.Column(WINDOWS_C_COUNTS, db.Integer, nullable=False)
+#     # correctedCounts = db.Column(WINDOWS_C_CORRECTED_COUNTS, db.Integer, nullable=False)
+#     # cpm = db.Column(WINDOWS_C_CPM, db.Integer, nullable=False)
+#
+#     def __init__(self, rowNumber, windowNum, isotope):
+#         self.rowNumber = rowNumber
+#         self.windowNum = windowNum
+#         self.isotope = isotope
+#         # self.counts = counts
+#         # self.correctedCounts = correctedCounts
+#         # self.cpm = cpm

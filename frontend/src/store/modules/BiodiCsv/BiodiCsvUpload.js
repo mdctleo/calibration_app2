@@ -37,10 +37,10 @@ const defaultState = {
     loading: false,
     error: null,
     startValidation: false,
-    mouseCsvFormat: "Mouse ID, Cage, Gender, Age, Group ID, Euthanasia Date, Euthanasia Time, Weight (g), Injection Date, Pre-Injection Time, Injection Time, Post-Injection Time, Pre-Injection MBq, Post-Injection MBq, Comments",
+    mouseCsvFormat: "Mouse ID,Cage,Gender,Age,Group ID,Euthanasia Date,Euthanasia Time,Weight (g),Injection Date,Pre-Injection Time,Injection Time,Post-Injection Time,Pre-Injection MBq,Post-Injection MBq,Comments",
     mouseCsvs: null,
     mouseCsvJson: null,
-    organCsvFormat: " , Group ID, \n Tube ID, Mouse ID",
+    organCsvFormat: ",Group ID,\nTube ID,Mouse ID",
     organCsvs: null,
     organCsvJson: null
 };
@@ -348,7 +348,7 @@ const actions = {
     validateBiodiCsvs: (context, row) => {
         if (row['Protocol ID'] === "") {
             return false
-        } else if (row['Measurement date & time'] === "" || !moment(row['Measurement date & time'], "YYYY-MM-DD HH:mm", true).isValid()) {
+        } else if (row['Measurement date & time'] === "" || !moment(row['Measurement date & time'], "YYYY-MM-DD HH:mm:ss", true).isValid()) {
             console.log("measurement date & time validation failed")
             return false
         } else if (row['Completion status'] === "") {

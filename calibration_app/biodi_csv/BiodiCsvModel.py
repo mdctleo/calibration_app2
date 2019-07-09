@@ -16,7 +16,7 @@ class Protocol(db.Model):
         self.protocolName = protocolName
 
     def __repr__(self):
-        return '<Protocol %r %r>' % (self.id, self.name)
+        return '<Protocol %r %r>' % (self.id, self.protocolName)
 
 
 # class BiodiCsv(db.Model):
@@ -59,9 +59,8 @@ class BiodiCsvRow(db.Model):
     error = db.Column(BIODI_CSV_ROWS_C_ERROR, db.Float)
     info = db.Column(BIODI_CSV_ROWS_C_INFO, db.CHAR(1))
 
-    def __init__(self, csvId, rowNum, measurementTime, completionStatus, runId,
+    def __init__(self, rowNum, measurementTime, completionStatus, runId,
                  rack, det, pos, time, sampleCode, counts, cpm, error, info):
-        self.csvId = csvId
         self.rowNum = rowNum
         self.measurementTime = measurementTime
         self.completionStatus = completionStatus

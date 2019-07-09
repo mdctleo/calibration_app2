@@ -6,8 +6,8 @@
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Gamma Counter ID" prop="gammaCounter">
                         <el-select v-model="gammaCounter" placeholder="Please select the gamma counter">
-                            <el-option label="Zone one" value="shanghai"></el-option>
-                            <el-option label="Zone two" value="beijing"></el-option>
+                            <el-option label="gammaCounter1" value="gammaCounter1"></el-option>
+                            <el-option label="gammaCounter2" value="gammaCounter2"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>

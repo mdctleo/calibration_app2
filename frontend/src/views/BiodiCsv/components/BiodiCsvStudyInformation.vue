@@ -27,8 +27,8 @@
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Principal Investigator Name" prop="piName">
                         <el-select v-model="piName" placeholder="Please select the radio isotope">
-                            <el-option label="Francois Bernard" value="shanghai"></el-option>
-                            <el-option label="Francois Bernard" value="beijing"></el-option>
+                            <el-option label="Francois Bernard" value="Francois Bernard"></el-option>
+                            <el-option label="Francois Bernard" value="Francois Bernard"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
@@ -37,8 +37,8 @@
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Radioisotope" prop="radioIsotope">
                         <el-select v-model="radioIsotope" placeholder="Please select the radio isotope">
-                            <el-option label="Zone one" value="shanghai"></el-option>
-                            <el-option label="Zone two" value="beijing"></el-option>
+                            <el-option label="F-18" value="F-18"></el-option>
+                            <el-option label="F-18" value="F-18"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
@@ -47,8 +47,8 @@
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Chelator" prop="chelator">
                         <el-select v-model="chelator" placeholder="Please select the chelator">
-                            <el-option label="Zone one" value="shanghai"></el-option>
-                            <el-option label="Zone two" value="beijing"></el-option>
+                            <el-option label="Chelator1" value="chelator1"></el-option>
+                            <el-option label="Chelator2" value="chelator2"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
@@ -57,8 +57,8 @@
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Vector" prop="vector">
                         <el-select v-model="vector" placeholder="Please select the vector">
-                            <el-option label="Zone one" value="shanghai"></el-option>
-                            <el-option label="Zone two" value="beijing"></el-option>
+                            <el-option label="vector1" value="vector1"></el-option>
+                            <el-option label="vector2" value="vector2"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
@@ -75,8 +75,8 @@
                     <el-form-item label="Cell Line" prop="cellLine">
                         <el-select v-model="cellLine"
                                    placeholder="Please select the cell line">
-                            <el-option label="Zone one" value="shanghai"></el-option>
-                            <el-option label="Zone two" value="beijing"></el-option>
+                            <el-option label="cellLine1" value="cellLine1"></el-option>
+                            <el-option label="cellLine2" value="cellLine2"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
@@ -86,8 +86,8 @@
                     <el-form-item label="Mouse Strain" prop="mouseStrain">
                         <el-select v-model="mouseStrain"
                                    placeholder="Please select a mouseStrain">
-                            <el-option label="Zone one" value="shanghai"></el-option>
-                            <el-option label="Zone two" value="beijing"></el-option>
+                            <el-option label="mouseStrain1" value="mouseStrain1"></el-option>
+                            <el-option label="mouseStrain2" value="mouseStrain2"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
@@ -97,8 +97,8 @@
                     <el-form-item label="Tumor Model" prop="tumorModel">
                         <el-select v-model="tumorModel"
                                    placeholder="Please select a tumor model">
-                            <el-option label="Zone one" value="shanghai"></el-option>
-                            <el-option label="Zone two" value="beijing"></el-option>
+                            <el-option label="tumorModel1" value="tumorModel1"></el-option>
+                            <el-option label="tumorModel2" value="tumorModel2"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
