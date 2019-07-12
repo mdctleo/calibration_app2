@@ -59,22 +59,6 @@ class BiodiCsvRow(db.Model):
     error = db.Column(BIODI_CSV_ROWS_C_ERROR, db.Float)
     info = db.Column(BIODI_CSV_ROWS_C_INFO, db.CHAR(1))
 
-    def __init__(self, rowNum, measurementTime, completionStatus, runId,
-                 rack, det, pos, time, sampleCode, counts, cpm, error, info):
-        self.rowNum = rowNum
-        self.measurementTime = measurementTime
-        self.completionStatus = completionStatus
-        self.runId = runId
-        self.rack = rack
-        self.det = det
-        self.pos = pos
-        self.time = time
-        self.sampleCode = sampleCode
-        self.counts = counts
-        self.cpm = cpm
-        self.error = error
-        self.info = info
-
     # def __repr__(self):
     #     return '<BiodiCsvRow %r %r %r %r %r %r %r %r %r %r %r %r %r %r %r>' % \
     #            (self.id, self.csvId, self.rowNum, self.measurementTime, self.completionStatus,

@@ -78,7 +78,8 @@ def make_shell_context():
             'StudyInformation': biodiCsvCompleteModel.StudyInformation,
             'Mouse': biodiCsvCompleteModel.Mouse,
             'BiodiCsvCompleteRow': biodiCsvCompleteModel.BiodiCsvCompleteRow,
-            'Window': biodiCsvCompleteModel.Window}
+            # 'Window': biodiCsvCompleteModel.Window
+            }
 
 
 

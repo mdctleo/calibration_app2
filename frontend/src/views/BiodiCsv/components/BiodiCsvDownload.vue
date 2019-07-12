@@ -11,13 +11,13 @@
             </el-table-column>
             <el-table-column
                     class="el-table-column"
-                    property="fileName"
-                    label="file name">
+                    property="studyName"
+                    label="study name">
             </el-table-column>
             <el-table-column
                     class="el-table-column"
-                    property="createdBy"
-                    label="created By">
+                    property="researcherName"
+                    label="researcher">
             </el-table-column>
             <el-table-column
                     label="Operations">

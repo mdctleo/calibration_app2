@@ -1,10 +1,16 @@
 from app import db
 from calibration_app.biodi_csv.BiodiCsvModel import BiodiCsvRow, Protocol
-from calibration_app.biodi_csv.BiodiCsvCompleteModel import StudyInformation
+from calibration_app.biodi_csv.BiodiCsvCompleteModel import StudyInformation, Chelator, Vector, TumorModel, MouseStrain, Organ, CellLine
+from calibration_app.isotope.Model import Isotope
+from calibration_app.counter.Model import GammaCounter
 from sqlalchemy.exc import *
 from exceptions.Exceptions import *
 
 class DatabaseHelper:
+
+    @staticmethod
+    def getDb():
+        return db
 
 
     @staticmethod
@@ -36,46 +42,52 @@ class DatabaseHelper:
         return fileName, csvRows
 
     @staticmethod
+    def getCompleteStudy(studyId):
+        try:
+            completeStudy = StudyInformation.query.filter(StudyInformation.id == studyId).first()
+        except SQLAlchemyError as e:
+            raise BaseException(e.__str__())
+
+        return completeStudy
+
+
+    @staticmethod
     def getBiodiCsvMetas():
         try:
-            result = StudyInformation.query.with_entities(StudyInformation.id, StudyInformation.studyName, StudyInformation.createdBy, StudyInformation.createdOn).all()
+            result = StudyInformation.query.with_entities(StudyInformation.id,
+                                                          StudyInformation.studyName,
+                                                          StudyInformation.researcherName,
+                                                          StudyInformation.createdOn).all()
         except SQLAlchemyError as e:
             raise BaseException(e.__str__())
 
         return result
 
     @staticmethod
-    def createStudyInformation(studyInformation):
-        db.session.add(studyInformation)
-        csvId = db.session.flush()
-
-        return csvId
-
-    @staticmethod
-    def createBiodiCsvRows(biodiCsvRows):
-        for row in biodiCsvRows:
-            db.session.add(row)
-
-        return True
-
-
-    @staticmethod
-    def createBiodiCsvCompleteRows(biodiCsvCompleteRows):
-        for row in biodiCsvCompleteRows:
-            db.session.add(row)
-
-        return True
-
-    @staticmethod
-    def createMice(mice):
-        for mouse in mice:
-            db.session.add(mouse)
-
-    @staticmethod
-    def executeCreateStudy():
+    def createStudy(study):
         try:
+            db.session.add(study)
             db.session.commit()
         except SQLAlchemyError as e:
             db.session.rollback()
             db.session.remove()
             raise BaseException(e.__str__())
+
+
+    @staticmethod
+    def getOrgan(organName):
+        try:
+            organ = Organ.query.filter_by(name=organName).first()
+        except SQLAlchemyError as e:
+            raise BaseException(e.__str__())
+
+        return organ
+
+    @staticmethod
+    def getVector(vectorName):
+        try:
+            vector = Vector.query.filter_by(name=vectorName).first()
+        except SQLAlchemyError as e:
+            raise BaseException(e.__str__())
+
+        return vector

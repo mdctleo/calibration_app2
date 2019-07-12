@@ -6,11 +6,10 @@ class ProtocolSchema(Schema):
 
 
 class BiodiCsvSchema(Schema):
-    id = fields.Integer()
-    fileName = fields.Str()
-    protocolId = fields.Integer()
-    createdOn = fields.DateTime()
-    createdBy = fields.Str()
+    id = fields.Integer(required=True)
+    studyName = fields.Str(required=True)
+    researcherName = fields.Str(required=True)
+    createdOn = fields.DateTime(required=True)
 
 
 class BiodiCsvRowSchema(Schema):
