@@ -4,6 +4,18 @@ from sqlalchemy.exc import *
 from exceptions.Exceptions import *
 import datetime
 
+class Protocol(db.Model):
+    __tablename__ = PROTOCOL_T_NAME
+    id = db.Column(PROTOCOL_C_ID, db.Integer, primary_key=True, autoincrement=True)
+    protocolName = db.Column(PROTOCOL_C_NAME, db.String(8), nullable=False)
+    studyInformation = db.relationship('StudyInformation', backref=PROTOCOL_T_NAME)
+
+    def __init__(self, protocolName):
+        self.protocolName = protocolName
+
+    def __repr__(self):
+        return '<Protocol %r %r>' % (self.id, self.protocolName)
+
 
 class Chelator(db.Model):
     __tablename__ = CHELATOR_T_NAME
@@ -15,6 +27,9 @@ class Vector(db.Model):
     name = db.Column(VECTOR_C_NAME, db.String(45), primary_key=True)
     type = db.Column(VECTOR_C_TYPE, db.String(45))
     studyInformation = db.relationship('StudyInformation', backref=VECTOR_T_NAME)
+
+    def __repr__(self):
+        return '<Vector %r %r>' % (self.name, self.type)
 
 class TumorModel(db.Model):
     __tablename__ = TUMOR_MODEL_T_NAME
@@ -29,7 +44,7 @@ class MouseStrain(db.Model):
 class Organ(db.Model):
     __tablename__ = ORGAN_T_NAME
     name = db.Column(ORGAN_C_NAME, db.String(45), primary_key=True)
-    studyInformation = db.relationship('BiodiCsvCompleteRow', backref=ORGAN_T_NAME)
+    mouseOrgan = db.relationship('MouseOrgan', backref=ORGAN_T_NAME)
 
 class CellLine(db.Model):
     __tablename__ = CELL_LINE_T_NAME
@@ -59,8 +74,6 @@ class StudyInformation(db.Model):
     protocolId = db.Column(STUDY_INFORMATION_C_PROTOCOL_ID, db.Integer, db.ForeignKey(PROTOCOL_T_NAME + '.' + PROTOCOL_C_ID), nullable=False)
     createdOn = db.Column(STUDY_INFORMATION_C_CREATED_ON, db.TIMESTAMP, default=datetime.datetime.utcnow)
     biodiCsvRows = db.relationship('BiodiCsvRow', cascade="all, delete-orphan", backref=db.backref(STUDY_INFORMATION_T_NAME, lazy='joined'), lazy=True)
-    biodiCsvCompleteRows = db.relationship('BiodiCsvCompleteRow', cascade="all, delete-orphan", backref=db.backref(STUDY_INFORMATION_T_NAME, lazy='joined'), lazy=True)
-    # windows = db.relationship('Window', cascade="all, delete-orphan", backref=STUDY_INFORMATION_T_NAME)
     mice = db.relationship('Mouse', cascade="all, delete-orphan", backref=db.backref(STUDY_INFORMATION_T_NAME, lazy='joined'), lazy=True)
 
 
@@ -80,19 +93,44 @@ class Mouse(db.Model):
     postInjectionTime = db.Column(MOUSE_INFORMATION_C_POST_INJECTION_TIME, db.Time, nullable=False)
     preInjectionActivity = db.Column(MOUSE_INFORMATION_C_PRE_INJECTION_ACTIVITY, db.Float, nullable=False)
     postInjectionActivity = db.Column(MOUSE_INFORMATION_C_POST_INJECTION_ACTIVITY, db.Float, nullable=False)
+    mouseOrgans = db.relationship('MouseOrgan', cascade="all, delete-orphan", backref=db.backref(MOUSE_INFORMATION_T_NAME, lazy='joined'), lazy=True)
 
 
-class BiodiCsvCompleteRow(db.Model):
-    __tablename__ = BIODI_CSV_COMPLETE_ROWS_T_NAME
-    id = db.Column(BIODI_CSV_COMPLETE_ROWS_C_ID, db.Integer, primary_key=True, autoincrement=True)
-    rowNumber = db.Column(BIODI_CSV_COMPLETE_ROWS_C_ROW_NUMBER, db.Integer, nullable=False)
-    csvId = db.Column(BIODI_CSV_COMPLETE_ROWS_C_CSV_ID, db.Integer, db.ForeignKey(STUDY_INFORMATION_T_NAME + '.' + STUDY_INFORMATION_C_ID), nullable=False)
-    organName = db.Column(BIODI_CSV_COMPLETE_ROWS_C_ORGAN, db.String(45), db.ForeignKey(ORGAN_T_NAME + '.' + ORGAN_C_NAME), nullable=False)
-    organMass = db.Column(BIODI_CSV_COMPLETE_ROWS_C_ORGAN_MASS, db.Float, nullable=False)
-    # count = db.Column(BIODI_CSV_COMPLETE_ROWS_C_COUNT, db.Integer, nullable=False)
-    # rack = db.Column(BIODI_CSV_COMPLETE_ROWS_C_RACK, db.SmallInteger, nullable=False)
-    # vial = db.Column(BIODI_CSV_COMPLETE_ROWS_C_VIAL, db.SmallInteger, nullable=False)
-    # deadTimeFactor = db.Column(BIODI_CSV_COMPLETE_ROWS_C_DEAD_TIME_FACTOR, db.Float, nullable=False)
+class MouseOrgan(db.Model):
+    __tablename__ = MOUSE_ORGAN_T_NAME
+    id = db.Column(MOUSE_ORGAN_C_ID, db.Integer, primary_key=True, autoincrement=True)
+    mouseId = db.Column(MOUSE_ORGAN_C_MOUSE_ID, db.Integer, db.ForeignKey(MOUSE_INFORMATION_T_NAME + '.' + MOUSE_INFORMATION_C_ID), nullable=False)
+    organName = db.Column(MOUSE_ORGAN_C_ORGAN_NAME, db.String(45), db.ForeignKey(ORGAN_T_NAME + '.' + ORGAN_C_NAME), nullable=False)
+    organMass = db.Column(MOUSE_ORGAN_C_ORGAN_MASS, db.Float, nullable=False)
+
+class BiodiCsvRow(db.Model):
+    __tablename__ = BIODI_CSV_ROWS_T_NAME
+    id = db.Column(BIODI_CSV_ROWS_C_ID, db.Integer, primary_key=True, autoincrement=True)
+    csvId = db.Column(BIODI_CSV_ROWS_C_CSV_ID, db.Integer, db.ForeignKey(STUDY_INFORMATION_T_NAME + '.' + STUDY_INFORMATION_C_ID), nullable=False)
+    rowNum = db.Column(BIODI_CSV_ROWS_C_ROW_NUM, db.Integer, nullable=False)
+    measurementTime = db.Column(BIODI_CSV_ROWS_C_MEASUREMENT_DATETIME, db.DateTime)
+    completionStatus = db.Column(BIODI_CSV_ROWS_C_COMPLETION_STATUS, db.Integer)
+    runId = db.Column(BIODI_CSV_ROWS_C_RUN_ID, db.Integer)
+    rack = db.Column(BIODI_CSV_ROWS_C_RACK, db.Integer)
+    det = db.Column(BIODI_CSV_ROWS_C_DET, db.Integer)
+    pos = db.Column(BIODI_CSV_ROWS_C_POS, db.Integer)
+    time = db.Column(BIODI_CSV_ROWS_C_TIME, db.Float)
+    sampleCode = db.Column(BIODI_CSV_ROWS_C_SAMPLE_CODE, db.String(45))
+    counts = db.Column(BIODI_CSV_ROWS_C_COUNTS, db.Float)
+    cpm = db.Column(BIODI_CSV_ROWS_C_CPM, db.Float)
+    error = db.Column(BIODI_CSV_ROWS_C_ERROR, db.Float)
+    info = db.Column(BIODI_CSV_ROWS_C_INFO, db.CHAR(1))
+
+    # def __repr__(self):
+    #     return '<BiodiCsvRow %r %r %r %r %r %r %r %r %r %r %r %r %r %r %r>' % \
+    #            (self.id, self.csvId, self.rowNum, self.measurementTime, self.completionStatus,
+    #             self.runId, self.rack, self.det, self.pos, self.time, self.sampleCode, self.counts,
+    #             self.cpm, self.error, self.info)
+
+    def __repr__(self):
+        return '<BiodiCsvRow %r>' % \
+               (self.rowNum)
+
 
 # class Window(db.Model):
 #     __tablenme__ = WINDOWS_T_NAME

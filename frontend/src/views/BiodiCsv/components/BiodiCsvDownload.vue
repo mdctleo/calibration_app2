@@ -12,12 +12,12 @@
             <el-table-column
                     class="el-table-column"
                     property="studyName"
-                    label="study name">
+                    label="Study Name">
             </el-table-column>
             <el-table-column
                     class="el-table-column"
                     property="researcherName"
-                    label="researcher">
+                    label="Researcher">
             </el-table-column>
             <el-table-column
                     label="Operations">

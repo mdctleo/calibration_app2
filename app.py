@@ -47,7 +47,7 @@ from user import Model as userModel
 from calibration_app.isotope import bp as isotope_bp, Model as isotopeModel
 from calibration_app.calibration import bp as calibration_bp, Model as calibrationModel
 from calibration_app.counter import bp as counter_bp, Model as gammaCounterModel
-from calibration_app.biodi_csv import bp as csv_bp, BiodiCsvModel as biodiCsvModel, BiodiCsvCompleteModel as biodiCsvCompleteModel
+from calibration_app.biodi_csv import bp as csv_bp, Model as biodiCsvCompleteModel
 from statistics_app import bp as statistics_bp
 
 app.register_blueprint(isotope_bp)
@@ -67,8 +67,8 @@ def make_shell_context():
             'CalibrationFactor': calibrationModel.CalibrationFactor,
             'GammaCounter': gammaCounterModel.GammaCounter,
             'User': userModel.User,
-            'Protocol': biodiCsvModel.Protocol,
-            'BiodiCsvRow': biodiCsvModel.BiodiCsvRow,
+            'Protocol': biodiCsvCompleteModel.Protocol,
+            'BiodiCsvRow': biodiCsvCompleteModel.BiodiCsvRow,
             'Chelator': biodiCsvCompleteModel.Chelator,
             'Vector': biodiCsvCompleteModel.Vector,
             'TumorModel': biodiCsvCompleteModel.TumorModel,
@@ -77,7 +77,7 @@ def make_shell_context():
             'CellLine': biodiCsvCompleteModel.CellLine,
             'StudyInformation': biodiCsvCompleteModel.StudyInformation,
             'Mouse': biodiCsvCompleteModel.Mouse,
-            'BiodiCsvCompleteRow': biodiCsvCompleteModel.BiodiCsvCompleteRow,
+            'MouseOrgan': biodiCsvCompleteModel.MouseOrgan,
             # 'Window': biodiCsvCompleteModel.Window
             }
 

@@ -374,6 +374,7 @@ const actions = {
         }
     },
 
+
     handleBiodiCsvs: async (context, payload) => {
         try {
             context.commit('SET_LOADING', {loading: true});
@@ -383,9 +384,12 @@ const actions = {
             }
             let biodiCsvFile = payload.biodiCsvs[0]
             let csvFile = await context.dispatch('readFile', biodiCsvFile.raw)
+            console.log(csvFile)
             let csvFileJson = await csv().fromString(csvFile)
             let rowValidated = true
             let indexHolder = 0
+
+            console.log(csvFileJson)
 
             if (csvFileJson.length === 0) {
                 context.commit('SET_ERROR', {error: "biodii csv empty"})
@@ -394,8 +398,7 @@ const actions = {
 
 
             for (let i = 0; i < csvFileJson.length; i++) {
-                indexHolder = i
-                let csvRow = csvFileJson[i]
+                // indexHolder = i
                 let protocolName = csvRow['Protocol name'];
                 let oldCountKey = protocolName + ' Counts';
                 let oldCPMKey = protocolName + ' CPM';
@@ -418,6 +421,9 @@ const actions = {
                     break
                 }
             }
+
+
+            console.log(csvFileJson)
 
             if (rowValidated) {
                 let fileFormat = {
@@ -442,7 +448,6 @@ const actions = {
     },
 
     postBiodiCsv(context, payload) {
-        console.log(payload)
         context.commit('SET_LOADING', {loading: true})
         postBiodiCsv(payload)
             .then((response) => {

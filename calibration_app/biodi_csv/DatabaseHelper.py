@@ -1,8 +1,5 @@
 from app import db
-from calibration_app.biodi_csv.BiodiCsvModel import BiodiCsvRow, Protocol
-from calibration_app.biodi_csv.BiodiCsvCompleteModel import StudyInformation, Chelator, Vector, TumorModel, MouseStrain, Organ, CellLine
-from calibration_app.isotope.Model import Isotope
-from calibration_app.counter.Model import GammaCounter
+from calibration_app.biodi_csv.Model import StudyInformation, Vector, Organ, BiodiCsvRow, Protocol
 from sqlalchemy.exc import *
 from exceptions.Exceptions import *
 

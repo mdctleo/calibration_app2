@@ -3,8 +3,8 @@ from flask import request
 import csv
 import json
 from io import StringIO
-from calibration_app.biodi_csv.BiodiCsvModel import BiodiCsvRow
-from calibration_app.biodi_csv.BiodiCsvCompleteModel import BiodiCsvCompleteRow, StudyInformation, Mouse, Organ
+from calibration_app.biodi_csv.Model import BiodiCsvRow
+from calibration_app.biodi_csv.Model import MouseOrgan, StudyInformation, Mouse, Organ
 from calibration_app.biodi_csv.DatabaseHelper import DatabaseHelper as db
 from calibration_app.biodi_csv.Schema import BiodiCsvSchema, BiodiCsvRequestSchema
 from werkzeug.utils import secure_filename
@@ -15,11 +15,6 @@ from marshmallow import ValidationError
 from flask import make_response
 from flask import Response
 import datetime
-
-
-
-# def prepareBiodiCsvMeta(biodiCsv):
-#     return BiodiCsv(biodiCsv["fileName"], biodiCsv["file"][0]["protocolId"], 'Carlos')
 
 
 def prepareBiodiCsvRows(biodiCsvFile):
@@ -78,24 +73,24 @@ def assignOrgansToMouse(mouseInfo, organInfo):
     return mouseOrgans
 
 
-def prepareBiodiCsvCompleteRows(mouseOrgans):
-    biodiCsvCompleteRows = []
-    currRow = 0
-    for i, mouse in enumerate(mouseOrgans):
-        for j, organ in enumerate(mouse['organs']):
-            currRow = currRow + 1
-            organHolder = db.getOrgan(organ['organ'])
-            db.getOrgan(organ['organ'])
-            biodiCsvCompleteRows.append(
-                BiodiCsvCompleteRow(
-                    rowNumber=currRow,
-                    organ=organHolder,
-                    organMass=organ['organMass'],
-                    deadTimeFactor=2.2
-                )
-            )
-
-    return biodiCsvCompleteRows
+# def prepareBiodiCsvCompleteRows(mouseOrgans):
+#     biodiCsvCompleteRows = []
+#     currRow = 0
+#     for i, mouse in enumerate(mouseOrgans):
+#         for j, organ in enumerate(mouse['organs']):
+#             currRow = currRow + 1
+#             organHolder = db.getOrgan(organ['organ'])
+#             db.getOrgan(organ['organ'])
+#             biodiCsvCompleteRows.append(
+#                 BiodiCsvCompleteRow(
+#                     rowNumber=currRow,
+#                     organ=organHolder,
+#                     organMass=organ['organMass'],
+#                     deadTimeFactor=2.2
+#                 )
+#             )
+#
+#     return biodiCsvCompleteRows
 
 # def prepareWindows(biodiCsvRows):
 #     windows = []
@@ -109,26 +104,32 @@ def prepareBiodiCsvCompleteRows(mouseOrgans):
 #
 #     return windows
 
-def prepareMice(mouseOrgans):
+def prepareMiceAndOrgans(mouseOrgans):
     mice = []
     for mouse in mouseOrgans:
-        mice.append(
-            Mouse(
-                mouseId=mouse['mouseId'],
-                groupId=mouse['groupId'],
-                euthanizeDateTime=datetime.datetime.combine(mouse['euthanasiaDate'],
-                                                            mouse['euthanasiaTime']),
-                mouseGender=mouse['gender'],
-                cage=mouse['cage'],
-                age=mouse['age'],
-                injectionDate=mouse['injectionDate'],
-                preInjectionTime=mouse['preInjectionTime'],
-                injectionTime=mouse['injectionTime'],
-                postInjectionTime=mouse['postInjectionTime'],
-                preInjectionActivity=mouse['preInjectionActivity'],
-                postInjectionActivity=mouse['postInjectionActivity']
-            )
+        mouseHolder = Mouse(
+            mouseId=mouse['mouseId'],
+            groupId=mouse['groupId'],
+            euthanizeDateTime=datetime.datetime.combine(mouse['euthanasiaDate'],
+                                                        mouse['euthanasiaTime']),
+            gender=mouse['gender'],
+            cage=mouse['cage'],
+            age=mouse['age'],
+            injectionDate=mouse['injectionDate'],
+            preInjectionTime=mouse['preInjectionTime'],
+            injectionTime=mouse['injectionTime'],
+            postInjectionTime=mouse['postInjectionTime'],
+            preInjectionActivity=mouse['preInjectionActivity'],
+            postInjectionActivity=mouse['postInjectionActivity']
         )
+        for organ in mouse['organs']:
+            mouseHolder.mouseOrgans.append(
+                MouseOrgan(
+                    organName=organ['organ'],
+                    organMass=organ['organMass']
+                )
+            )
+        mice.append(mouseHolder)
 
     return mice
 
@@ -139,21 +140,14 @@ def createStudy(biodiCsvRequestDict):
 
             mouseOrgans = assignOrgansToMouse(biodiCsvRequestDict['mouseInfo'], biodiCsvRequestDict['organInfo'])
             biodiCsvRows, protocolId = prepareBiodiCsvRows(biodiCsvRequestDict['biodiCsv']['file'])
-            biodiCsvCompleteRows = prepareBiodiCsvCompleteRows(mouseOrgans)
-            # windows = prepareWindows(biodiCsvRequestDict['biodiCsv']['file'])
-            mice = prepareMice(mouseOrgans)
+            mice = prepareMiceAndOrgans(mouseOrgans)
             study = prepareStudyInformation(biodiCsvRequestDict['studyInfo'],
                                             biodiCsvRequestDict['gammaInfo'],
                                             biodiCsvRequestDict['biodiCsv']['file'][0]['protocolId'],
                                             biodiCsvRequestDict['biodiCsv']['file'][0]['measurementTime'])
             study.biodiCsvRows = biodiCsvRows
-            study.biodiCsvCompleteRows = biodiCsvCompleteRows
             study.mice = mice
 
-    # db.createBiodiCsvRows(biodiCsvRows)
-        # db.createBiodiCsvCompleteRows(biodiCsvCompleteRows)
-        # db.createMice(mice)
-        # db.executeCreateStudy()
             db.createStudy(study)
     except BaseException as e:
         raise e
@@ -176,16 +170,17 @@ def getCompleteStudy(studyId):
         fieldnames = [
             "Isotope", "Chelator", "Vector", "VectorType", "Tumor Model", "Mouse Strain", "Mouse Gender", "Cage", "Mouse ID", "Injection Date",
             "Injection Time", "Injected Activity (kBq)", "Organ", "OrganMass(g)", "Euthanasia Date", "Euthanasia Time", "TimePoint (h)",
-            "Count#", "Rack", "Vial", "Time", "Counted Time (s)", "Dead Time Factor"
+            "Count#", "Rack", "Vial", "Time", "Counted Time (s)", "Dead Time Factor", "IsotopeWin1", "Window1 (counts)",
+            "Window1 Corrected (counts)", "Window1 (CPM)", "Normalized Window1 (CPM)", "Normalized Window1 (Bq)"
         ]
 
         cw = csv.DictWriter(si, fieldnames=fieldnames)
+        cw.writeheader()
         completeStudy = db.getCompleteStudy(studyId)
         currRow = 0
 
         for i, mouse in enumerate(completeStudy.mice):
-            for j, completeRow in enumerate(completeStudy.biodiCsvCompleteRows):
-                print(currRow)
+            for j, organ in enumerate(mouse.mouseOrgans):
                 biodiCsvRow = completeStudy.biodiCsvRows[currRow]
                 cw.writerow({
                     'Isotope': completeStudy.isotopeName,
@@ -200,8 +195,8 @@ def getCompleteStudy(studyId):
                     'Injection Date': mouse.injectionDate,
                     'Injection Time': mouse.injectionTime,
                     'Injected Activity (kBq)': 134,
-                    'Organ': completeRow.organName,
-                    'OrganMass(g)': completeRow.organMass,
+                    'Organ': organ.organName,
+                    'OrganMass(g)': organ.organMass,
                     'Euthanasia Date': mouse.euthanizeDateTime.date(),
                     'Euthanasia Time': mouse.euthanizeDateTime.time(),
                     'TimePoint (h)': mouse.groupId,
@@ -210,7 +205,13 @@ def getCompleteStudy(studyId):
                     'Vial': j,
                     'Time': biodiCsvRow.measurementTime,
                     'Counted Time (s)': biodiCsvRow.time,
-                    'Dead Time Factor': completeRow.deadTimeFactor
+                    'Dead Time Factor': biodiCsvRow.error,
+                    "IsotopeWin1": "PlaceHolder",
+                    "Window1 (counts)": "PlaceHolder",
+                    "Window1 Corrected (counts)": "PlaceHolder",
+                    "Window1 (CPM)":  "PlaceHolder",
+                    "Normalized Window1 (CPM)": "PlaceHolder",
+                    "Normalized Window1 (Bq)": "PlaceHolder",
                 })
 
                 currRow = currRow + 1
@@ -274,25 +275,6 @@ def biodiCsv():
         response.headers["Content-Type"] = "text/csv; charset=UTF-8"
 
         return response, 200
-
-    # elif request.method == 'GET':
-    #     try:
-    #         result, fileName = getCsv(request.args.get('id'))
-    #     except BaseException as e:
-    #         result = StandardResponse(e.message)
-    #         response = StandardResponseSchema().dump(result)
-    #         return jsonify(response), 400
-    #     except Exception as e:
-    #         print(e.__str__())
-    #         result = StandardResponse(e.__str__())
-    #         response = StandardResponseSchema().dump(result)
-    #         return jsonify(response), 500
-    #
-    #     response = make_response(result)
-    #     response.headers["Content-Disposition"] = "attachment; filename=" + fileName
-    #     response.headers["Content-Type"] = "test/csv; charset=UTF-8"
-    #     return response, 200
-
 
 
 @bp.route('/biodicsv-metas', methods=['GET'])
