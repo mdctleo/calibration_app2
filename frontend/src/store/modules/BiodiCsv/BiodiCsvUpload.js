@@ -363,17 +363,16 @@ const actions = {
             return false
         } else if (row['Time'] === "") {
             return false
-        } else if (row['Counts'] === "") {
-            return false
-        } else if (row['CPM'] === "") {
-            return false
-        } else if (row['Error %'] === "") {
-            return false
+        // } else if (row['Counts'] === "") {
+        //     return false
+        // } else if (row['CPM'] === "") {
+        //     return false
+        // } else if (row['Error %'] === "") {
+        //     return false
         } else {
             return true
         }
     },
-
 
     handleBiodiCsvs: async (context, payload) => {
         try {
@@ -399,24 +398,25 @@ const actions = {
 
             for (let i = 0; i < csvFileJson.length; i++) {
                 // indexHolder = i
-                let protocolName = csvRow['Protocol name'];
-                let oldCountKey = protocolName + ' Counts';
-                let oldCPMKey = protocolName + ' CPM';
-                let oldErrorKey = protocolName + ' Error %';
-                let oldInfoKey = protocolName + ' Info';
+                let row = csvFileJson[i]
+                // let protocolName = csvRow['Protocol name'];
+                // let oldCountKey = protocolName + ' Counts';
+                // let oldCPMKey = protocolName + ' CPM';
+                // let oldErrorKey = protocolName + ' Error %';
+                // let oldInfoKey = protocolName + ' Info';
+                //
+                // csvRow['Counts'] = csvRow[oldCountKey];
+                // csvRow['CPM'] = csvRow[oldCPMKey];
+                // csvRow['Error %'] = csvRow[oldErrorKey];
+                // csvRow['Info'] = csvRow[oldInfoKey];
+                //
+                // delete csvRow[oldCountKey];
+                // delete csvRow[oldCPMKey];
+                // delete csvRow[oldErrorKey];
+                // delete csvRow[oldInfoKey];
+                // delete csvRow['Protocol name'];
 
-                csvRow['Counts'] = csvRow[oldCountKey];
-                csvRow['CPM'] = csvRow[oldCPMKey];
-                csvRow['Error %'] = csvRow[oldErrorKey];
-                csvRow['Info'] = csvRow[oldInfoKey];
-
-                delete csvRow[oldCountKey];
-                delete csvRow[oldCPMKey];
-                delete csvRow[oldErrorKey];
-                delete csvRow[oldInfoKey];
-                delete csvRow['Protocol name'];
-
-                rowValidated = await context.dispatch('validateBiodiCsvs', csvRow)
+                rowValidated = await context.dispatch('validateBiodiCsvs', row)
                 if (!rowValidated) {
                     break
                 }

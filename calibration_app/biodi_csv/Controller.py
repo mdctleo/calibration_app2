@@ -3,10 +3,9 @@ from flask import request
 import csv
 import json
 from io import StringIO
-from calibration_app.biodi_csv.Model import BiodiCsvRow
-from calibration_app.biodi_csv.Model import MouseOrgan, StudyInformation, Mouse, Organ
+from calibration_app.biodi_csv.Model import MouseOrgan, BiodiCsvRow, StudyInformation, Mouse, Window
 from calibration_app.biodi_csv.DatabaseHelper import DatabaseHelper as db
-from calibration_app.biodi_csv.Schema import BiodiCsvSchema, BiodiCsvRequestSchema
+from calibration_app.biodi_csv.Schema import BiodiCsvRequestSchema, StudyInformationMetaSchema
 from werkzeug.utils import secure_filename
 from flask import jsonify
 from response.response import StandardResponse, StandardResponseSchema
@@ -72,37 +71,53 @@ def assignOrgansToMouse(mouseInfo, organInfo):
 
     return mouseOrgans
 
+def prepareWindows(biodiCsvRows):
+    try:
+        windows = []
+        for rowNum, row in enumerate(biodiCsvRows):
+            window = Window()
+            window.rowNum = rowNum
+            for key in (row.keys()):
+                if (key.find("Counts") != -1):
+                    isotopeCounts = key.split(" ")
 
-# def prepareBiodiCsvCompleteRows(mouseOrgans):
-#     biodiCsvCompleteRows = []
-#     currRow = 0
-#     for i, mouse in enumerate(mouseOrgans):
-#         for j, organ in enumerate(mouse['organs']):
-#             currRow = currRow + 1
-#             organHolder = db.getOrgan(organ['organ'])
-#             db.getOrgan(organ['organ'])
-#             biodiCsvCompleteRows.append(
-#                 BiodiCsvCompleteRow(
-#                     rowNumber=currRow,
-#                     organ=organHolder,
-#                     organMass=organ['organMass'],
-#                     deadTimeFactor=2.2
-#                 )
-#             )
-#
-#     return biodiCsvCompleteRows
+                    if (len(isotopeCounts) != 2):
+                        raise BaseException
 
-# def prepareWindows(biodiCsvRows):
-#     windows = []
-#     for i, biodiCsvRow in enumerate(biodiCsvRows):
-#         windows.append(
-#             Window(
-#                 rowNumber=1,
-#                 windowNum=1,
-#             )
-#         )
-#
-#     return windows
+                    isotopeName = isotopeCounts[0]
+                    window.isotopeName = isotopeName
+                    window.counts = row.get(key)
+
+                elif (key.find("Error %") != -1):
+                    isotopeError = key.split(" ")
+
+                    if (len(isotopeError) != 2):
+                        raise BaseException
+
+                    window.error = row.get(key)
+
+                elif (key.find("CPM") != -1):
+                    isotopeCPM = key.split(" ")
+
+                    if (len(isotopeCPM) != 2):
+                        raise BaseException
+
+                    window.cpm = row.get(key)
+
+                elif (key.find("Info") != -1):
+                    isotopeInfo = key.split(" ")
+
+                    if (len(isotopeInfo) != 2):
+                        raise BaseException
+
+                    window.info = row.get(key)
+
+            windows.append(window)
+
+    except Exception as e:
+        raise e
+
+    return windows
 
 def prepareMiceAndOrgans(mouseOrgans):
     mice = []
@@ -137,18 +152,20 @@ def createStudy(biodiCsvRequestDict):
     try:
 
         with db.getDb().session.no_autoflush:
+            windows = prepareWindows(biodiCsvRequestDict['biodiCsv']['file'])
+            print(windows)
 
-            mouseOrgans = assignOrgansToMouse(biodiCsvRequestDict['mouseInfo'], biodiCsvRequestDict['organInfo'])
-            biodiCsvRows, protocolId = prepareBiodiCsvRows(biodiCsvRequestDict['biodiCsv']['file'])
-            mice = prepareMiceAndOrgans(mouseOrgans)
-            study = prepareStudyInformation(biodiCsvRequestDict['studyInfo'],
-                                            biodiCsvRequestDict['gammaInfo'],
-                                            biodiCsvRequestDict['biodiCsv']['file'][0]['protocolId'],
-                                            biodiCsvRequestDict['biodiCsv']['file'][0]['measurementTime'])
-            study.biodiCsvRows = biodiCsvRows
-            study.mice = mice
-
-            db.createStudy(study)
+    #         mouseOrgans = assignOrgansToMouse(biodiCsvRequestDict['mouseInfo'], biodiCsvRequestDict['organInfo'])
+    #         biodiCsvRows, protocolId = prepareBiodiCsvRows(biodiCsvRequestDict['biodiCsv']['file'])
+    #         mice = prepareMiceAndOrgans(mouseOrgans)
+    #         study = prepareStudyInformation(biodiCsvRequestDict['studyInfo'],
+    #                                         biodiCsvRequestDict['gammaInfo'],
+    #                                         biodiCsvRequestDict['biodiCsv']['file'][0]['protocolId'],
+    #                                         biodiCsvRequestDict['biodiCsv']['file'][0]['measurementTime'])
+    #         study.biodiCsvRows = biodiCsvRows
+    #         study.mice = mice
+    #
+    #         db.createStudy(study)
     except BaseException as e:
         raise e
     return None
@@ -287,5 +304,5 @@ def biodiCsvMetas():
             response = StandardResponseSchema().dump(result)
             return jsonify(response), 500
 
-        response = BiodiCsvSchema(many=True).dump(result)
+        response = StudyInformationMetaSchema(many=True).dump(result)
         return jsonify(response), 200

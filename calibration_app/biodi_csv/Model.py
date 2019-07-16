@@ -132,6 +132,18 @@ class BiodiCsvRow(db.Model):
                (self.rowNum)
 
 
+class Window(db.Model):
+    __tablename__ = WINDOWS_T_NAME
+    id = db.Column(WINDOWS_C_ID, db.Integer, primary_key=True, autoincrement=True)
+    csvId = db.Column(WINDOWS_C_CSV_ID, db.Integer, db.ForeignKey(STUDY_INFORMATION_T_NAME + '.' + STUDY_INFORMATION_C_ID), nullable=False)
+    rowNum = db.Column(WINDOWS_C_ROW_NUM, db.Integer, nullable=False)
+    isotopeName = db.Column(WINDOWS_C_ISOTOPE, db.ForeignKey(ISOTOPE_T_NAME + '.' + ISOTOPE_C_ISOTOPE_NAME), nullable=False)
+    counts = db.Column(WINDOWS_C_COUNTS, db.Float, nullable=False)
+    cpm = db.Column(WINDOWS_C_CPM, db.Float, nullable=False)
+    error = db.Column(WINDOWS_C_ERROR, db.Float, nullable=False)
+    info = db.Column(WINDOWS_C_INFO, db.CHAR(1))
+
+
 # class Window(db.Model):
 #     __tablenme__ = WINDOWS_T_NAME
 #     id = db.Column(WINDOWS_C_ID, db.Integer, primary_key=True, autoincrement=True)

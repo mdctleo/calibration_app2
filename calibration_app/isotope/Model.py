@@ -13,6 +13,7 @@ class Isotope(db.Model):
     # createdBy = db.Column(db.String(100), db.ForeignKey(USERS_T_NAME + '.' + USERS_C_USERNAME), nullable=False)
     calibrationFactor = db.relationship('CalibrationFactor', backref=ISOTOPE_T_NAME)
     studyInformation = db.relationship('StudyInformation', backref=ISOTOPE_T_NAME)
+    windows = db.relationship('Window', backref=ISOTOPE_T_NAME)
 
     def __init__(self, isotopeName, halfLife, createdBy):
         self.isotopeName = isotopeName

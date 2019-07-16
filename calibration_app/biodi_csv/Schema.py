@@ -1,11 +1,11 @@
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, INCLUDE
 
 
 class ProtocolSchema(Schema):
     name = fields.Str(required=True, max_length=8)
 
 
-class BiodiCsvSchema(Schema):
+class StudyInformationMetaSchema(Schema):
     id = fields.Integer(required=True)
     studyName = fields.Str(required=True)
     researcherName = fields.Str(required=True)
@@ -13,6 +13,9 @@ class BiodiCsvSchema(Schema):
 
 
 class BiodiCsvRowSchema(Schema):
+    class Meta:
+        unknown = INCLUDE
+
     rowNum = fields.Int(dump_only=True)
     protocolId = fields.Integer(data_key="Protocol ID", required=True)
     protocolName = fields.Str(dump_only=True)
@@ -24,10 +27,10 @@ class BiodiCsvRowSchema(Schema):
     pos = fields.Int(data_key='Pos')
     time = fields.Float(data_key='Time')
     sampleCode = fields.Str(data_key='Sample code', max_length=45)
-    counts = fields.Float(data_key='Counts')
-    cpm = fields.Float(data_key='CPM')
-    error = fields.Float(data_key='Error %')
-    info = fields.Str(data_key='Info', max_length=1)
+    # counts = fields.Float(data_key='Counts')
+    # cpm = fields.Float(data_key='CPM')
+    # error = fields.Float(data_key='Error %')
+    # info = fields.Str(data_key='Info', max_length=1)
 
 
 class BiodiCsvFileSchema(Schema):
