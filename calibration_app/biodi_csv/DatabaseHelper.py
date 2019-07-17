@@ -1,5 +1,5 @@
 from app import db
-from calibration_app.biodi_csv.Model import StudyInformation, Vector, Organ, BiodiCsvRow, Protocol
+from calibration_app.biodi_csv.Model import StudyInformation, Vector, Organ, BiodiCsvRow, Protocol, Window
 from sqlalchemy.exc import *
 from exceptions.Exceptions import *
 
@@ -42,10 +42,11 @@ class DatabaseHelper:
     def getCompleteStudy(studyId):
         try:
             completeStudy = StudyInformation.query.filter(StudyInformation.id == studyId).first()
+            windowsCount = Window.query.with_entities(Window.id).filter(Window.csvId == studyId).group_by(Window.isotopeName).count()
         except SQLAlchemyError as e:
             raise BaseException(e.__str__())
 
-        return completeStudy
+        return completeStudy, windowsCount
 
 
     @staticmethod

@@ -30,11 +30,8 @@ def prepareBiodiCsvRows(biodiCsvFile):
                                         det=row["det"],
                                         pos=row["pos"],
                                         time=row["time"],
-                                        sampleCode=row["sampleCode"],
-                                        counts=row["counts"],
-                                        cpm=row["cpm"],
-                                        error=row["error"],
-                                        info=row["info"]))
+                                        sampleCode=row["sampleCode"]
+                                        ))
 
 
     return biodiCsvRows, protocolId
@@ -75,44 +72,57 @@ def prepareWindows(biodiCsvRows):
     try:
         windows = []
         for rowNum, row in enumerate(biodiCsvRows):
-            window = Window()
-            window.rowNum = rowNum
+            windowHolder = {}
             for key in (row.keys()):
                 if (key.find("Counts") != -1):
                     isotopeCounts = key.split(" ")
 
                     if (len(isotopeCounts) != 2):
-                        raise BaseException
+                        raise BaseException("Invalid counts key")
 
                     isotopeName = isotopeCounts[0]
-                    window.isotopeName = isotopeName
-                    window.counts = row.get(key)
+                    windowHolder.setdefault(isotopeName, Window())
+
+                    windowHolder[isotopeName].counts = row.get(key)
 
                 elif (key.find("Error %") != -1):
                     isotopeError = key.split(" ")
 
-                    if (len(isotopeError) != 2):
-                        raise BaseException
+                    if (len(isotopeError) != 3):
+                        raise BaseException("Invalid Error % key")
 
-                    window.error = row.get(key)
+                    isotopeName = isotopeError[0]
+                    windowHolder.setdefault(isotopeName, Window())
+
+                    windowHolder[isotopeName].error = row.get(key)
 
                 elif (key.find("CPM") != -1):
                     isotopeCPM = key.split(" ")
 
                     if (len(isotopeCPM) != 2):
-                        raise BaseException
+                        raise BaseException("Invalid CPM key")
 
-                    window.cpm = row.get(key)
+                    isotopeName = isotopeCPM[0]
+                    windowHolder.setdefault(isotopeName, Window())
+
+                    windowHolder[isotopeName].cpm = row.get(key)
 
                 elif (key.find("Info") != -1):
                     isotopeInfo = key.split(" ")
 
                     if (len(isotopeInfo) != 2):
-                        raise BaseException
+                        raise BaseException("Invalid Info key")
 
-                    window.info = row.get(key)
+                    isotopeName = isotopeInfo[0]
+                    windowHolder.setdefault(isotopeName, Window())
 
-            windows.append(window)
+                    windowHolder[isotopeName].info = row.get(key)
+
+            for isotopeWindow in windowHolder.items():
+                isotopeWindow[1].isotopeName = isotopeWindow[0]
+                isotopeWindow[1].rowNum = rowNum
+                windows.append(isotopeWindow[1])
+
 
     except Exception as e:
         raise e
@@ -152,20 +162,19 @@ def createStudy(biodiCsvRequestDict):
     try:
 
         with db.getDb().session.no_autoflush:
+            mouseOrgans = assignOrgansToMouse(biodiCsvRequestDict['mouseInfo'], biodiCsvRequestDict['organInfo'])
+            biodiCsvRows, protocolId = prepareBiodiCsvRows(biodiCsvRequestDict['biodiCsv']['file'])
+            mice = prepareMiceAndOrgans(mouseOrgans)
             windows = prepareWindows(biodiCsvRequestDict['biodiCsv']['file'])
-            print(windows)
-
-    #         mouseOrgans = assignOrgansToMouse(biodiCsvRequestDict['mouseInfo'], biodiCsvRequestDict['organInfo'])
-    #         biodiCsvRows, protocolId = prepareBiodiCsvRows(biodiCsvRequestDict['biodiCsv']['file'])
-    #         mice = prepareMiceAndOrgans(mouseOrgans)
-    #         study = prepareStudyInformation(biodiCsvRequestDict['studyInfo'],
-    #                                         biodiCsvRequestDict['gammaInfo'],
-    #                                         biodiCsvRequestDict['biodiCsv']['file'][0]['protocolId'],
-    #                                         biodiCsvRequestDict['biodiCsv']['file'][0]['measurementTime'])
-    #         study.biodiCsvRows = biodiCsvRows
-    #         study.mice = mice
+            study = prepareStudyInformation(biodiCsvRequestDict['studyInfo'],
+                                            biodiCsvRequestDict['gammaInfo'],
+                                            biodiCsvRequestDict['biodiCsv']['file'][0]['protocolId'],
+                                            biodiCsvRequestDict['biodiCsv']['file'][0]['measurementTime'])
+            study.biodiCsvRows = biodiCsvRows
+            study.windows = windows
+            study.mice = mice
     #
-    #         db.createStudy(study)
+            db.createStudy(study)
     except BaseException as e:
         raise e
     return None
@@ -179,21 +188,34 @@ def getMetas():
 
     return metas
 
+def getBiodiCsvRaw(studyId):
+
+    return None
+
 
 def getCompleteStudy(studyId):
     try:
+
+        completeStudy, windowsCount = db.getCompleteStudy(studyId)
         si = StringIO()
 
         fieldnames = [
             "Isotope", "Chelator", "Vector", "VectorType", "Tumor Model", "Mouse Strain", "Mouse Gender", "Cage", "Mouse ID", "Injection Date",
             "Injection Time", "Injected Activity (kBq)", "Organ", "OrganMass(g)", "Euthanasia Date", "Euthanasia Time", "TimePoint (h)",
-            "Count#", "Rack", "Vial", "Time", "Counted Time (s)", "Dead Time Factor", "IsotopeWin1", "Window1 (counts)",
-            "Window1 Corrected (counts)", "Window1 (CPM)", "Normalized Window1 (CPM)", "Normalized Window1 (Bq)"
-        ]
+            "Count#", "Rack", "Vial", "Time", "Counted Time (s)", "Dead Time Factor"]
+
+        for i in range(0, windowsCount):
+            currWinNum = str((i + 1))
+            fieldnames.append("IsotopeWin" + currWinNum)
+            fieldnames.append("Window" + currWinNum + " (counts)")
+            fieldnames.append("Window" + currWinNum + " corrected (counts)")
+            fieldnames.append("Window" + currWinNum + " (CPM)")
+            fieldnames.append("Normalized Window" + currWinNum + " (CPM)")
+            fieldnames.append("Normalized Window" + currWinNum + " (Bq)")
+
 
         cw = csv.DictWriter(si, fieldnames=fieldnames)
         cw.writeheader()
-        completeStudy = db.getCompleteStudy(studyId)
         currRow = 0
 
         for i, mouse in enumerate(completeStudy.mice):

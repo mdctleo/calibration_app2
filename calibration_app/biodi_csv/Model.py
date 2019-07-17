@@ -75,6 +75,7 @@ class StudyInformation(db.Model):
     createdOn = db.Column(STUDY_INFORMATION_C_CREATED_ON, db.TIMESTAMP, default=datetime.datetime.utcnow)
     biodiCsvRows = db.relationship('BiodiCsvRow', cascade="all, delete-orphan", backref=db.backref(STUDY_INFORMATION_T_NAME, lazy='joined'), lazy=True)
     mice = db.relationship('Mouse', cascade="all, delete-orphan", backref=db.backref(STUDY_INFORMATION_T_NAME, lazy='joined'), lazy=True)
+    windows = db.relationship('Window', cascade="all, delete-orphan", backref=db.backref(STUDY_INFORMATION_T_NAME, lazy='joined'), lazy=True)
 
 
 class Mouse(db.Model):
@@ -116,10 +117,10 @@ class BiodiCsvRow(db.Model):
     pos = db.Column(BIODI_CSV_ROWS_C_POS, db.Integer)
     time = db.Column(BIODI_CSV_ROWS_C_TIME, db.Float)
     sampleCode = db.Column(BIODI_CSV_ROWS_C_SAMPLE_CODE, db.String(45))
-    counts = db.Column(BIODI_CSV_ROWS_C_COUNTS, db.Float)
-    cpm = db.Column(BIODI_CSV_ROWS_C_CPM, db.Float)
-    error = db.Column(BIODI_CSV_ROWS_C_ERROR, db.Float)
-    info = db.Column(BIODI_CSV_ROWS_C_INFO, db.CHAR(1))
+    # counts = db.Column(BIODI_CSV_ROWS_C_COUNTS, db.Float)
+    # cpm = db.Column(BIODI_CSV_ROWS_C_CPM, db.Float)
+    # error = db.Column(BIODI_CSV_ROWS_C_ERROR, db.Float)
+    # info = db.Column(BIODI_CSV_ROWS_C_INFO, db.CHAR(1))
 
     # def __repr__(self):
     #     return '<BiodiCsvRow %r %r %r %r %r %r %r %r %r %r %r %r %r %r %r>' % \
@@ -142,6 +143,9 @@ class Window(db.Model):
     cpm = db.Column(WINDOWS_C_CPM, db.Float, nullable=False)
     error = db.Column(WINDOWS_C_ERROR, db.Float, nullable=False)
     info = db.Column(WINDOWS_C_INFO, db.CHAR(1))
+
+    def __repr__(self):
+        return '<Widnow %r %r %r %r>' % (self.id, self.csvId, self.rowNum, self.isotopeName)
 
 
 # class Window(db.Model):
