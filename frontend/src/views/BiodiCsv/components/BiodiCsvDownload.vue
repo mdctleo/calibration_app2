@@ -25,7 +25,11 @@
                     <el-button
                             size="mini"
                             type="primary"
-                            @click="handleDownload(scope.$index, scope.row)">Download</el-button>
+                            @click="handleDownload(scope.$index, scope.row)">Download Complete Study</el-button>
+                    <el-button
+                            size="mini"
+                            type="primary"
+                            @click="handleDownload(scope.$index, scope.row)">Download Raw Biodicsv</el-button>
                 </template>
             </el-table-column>
         </el-table>

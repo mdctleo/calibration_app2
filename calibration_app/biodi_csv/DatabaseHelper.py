@@ -42,11 +42,21 @@ class DatabaseHelper:
     def getCompleteStudy(studyId):
         try:
             completeStudy = StudyInformation.query.filter(StudyInformation.id == studyId).first()
-            windowsCount = Window.query.with_entities(Window.id).filter(Window.csvId == studyId).group_by(Window.isotopeName).count()
+            # windowsCount = Window.query.with_entities(Window.id).filter(Window.csvId == studyId).group_by(Window.isotopeName).count()
+            windows = Window.query.filter(Window.csvId == studyId).order_by(Window.rowNum).all()
         except SQLAlchemyError as e:
             raise BaseException(e.__str__())
 
-        return completeStudy, windowsCount
+        return completeStudy, windows
+
+    @staticmethod
+    def getBiodiCsvRaw(studyId):
+        try:
+            completeStudy = StudyInformation.query.filter(StudyInformation.id == studyId).first()
+        except SQLAlchemyError as e:
+            raise BaseException(e.__str__())
+
+        return completeStudy
 
 
     @staticmethod

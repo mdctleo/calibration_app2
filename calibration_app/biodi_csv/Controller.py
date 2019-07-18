@@ -189,14 +189,36 @@ def getMetas():
     return metas
 
 def getBiodiCsvRaw(studyId):
+    try:
+        completeStudy, windows = db.getCompleteStudy(studyId)
+        fieldnames = [
+            "Protocol ID", "Protocol name", " Measurement date & time", "Completion status", "Run ID",
+            "Rack", "Det", "Pos", "Time", "Sample code"
+        ]
+
+    except BaseException as e:
+        raise e
 
     return None
 
+def createCompleteStudyRow(biodiCsvRow, mouse, organ):
+
+    return None
+
+def createWindowsMap(windows):
+    windowsMap = {}
+    for window in windows:
+        windowsMap.setdefault(window.isotopeName, [])
+        windowsMap[window.isotopeName].append(window)
+
+    return windowsMap
 
 def getCompleteStudy(studyId):
     try:
 
-        completeStudy, windowsCount = db.getCompleteStudy(studyId)
+        completeStudy, windows = db.getCompleteStudy(studyId)
+        windowsMap = createWindowsMap(windows)
+        print(windowsMap)
         si = StringIO()
 
         fieldnames = [
@@ -204,7 +226,7 @@ def getCompleteStudy(studyId):
             "Injection Time", "Injected Activity (kBq)", "Organ", "OrganMass(g)", "Euthanasia Date", "Euthanasia Time", "TimePoint (h)",
             "Count#", "Rack", "Vial", "Time", "Counted Time (s)", "Dead Time Factor"]
 
-        for i in range(0, windowsCount):
+        for i, key in enumerate(windowsMap.keys()):
             currWinNum = str((i + 1))
             fieldnames.append("IsotopeWin" + currWinNum)
             fieldnames.append("Window" + currWinNum + " (counts)")
@@ -221,7 +243,8 @@ def getCompleteStudy(studyId):
         for i, mouse in enumerate(completeStudy.mice):
             for j, organ in enumerate(mouse.mouseOrgans):
                 biodiCsvRow = completeStudy.biodiCsvRows[currRow]
-                cw.writerow({
+                createCompleteStudyRow(biodiCsvRow, mouse, organ)
+                row = {
                     'Isotope': completeStudy.isotopeName,
                     'Chelator': completeStudy.chelatorName,
                     'Vector': completeStudy.vectorName,
@@ -233,25 +256,31 @@ def getCompleteStudy(studyId):
                     'Mouse ID': mouse.mouseId,
                     'Injection Date': mouse.injectionDate,
                     'Injection Time': mouse.injectionTime,
-                    'Injected Activity (kBq)': 134,
+                    'Injected Activity (kBq)': "PlaceHolder",
                     'Organ': organ.organName,
                     'OrganMass(g)': organ.organMass,
                     'Euthanasia Date': mouse.euthanizeDateTime.date(),
                     'Euthanasia Time': mouse.euthanizeDateTime.time(),
                     'TimePoint (h)': mouse.groupId,
-                    'Count#': biodiCsvRow.counts,
+                    'Count#': "PlaceHolder",
                     'Rack': biodiCsvRow.rack,
                     'Vial': j,
                     'Time': biodiCsvRow.measurementTime,
                     'Counted Time (s)': biodiCsvRow.time,
-                    'Dead Time Factor': biodiCsvRow.error,
-                    "IsotopeWin1": "PlaceHolder",
-                    "Window1 (counts)": "PlaceHolder",
-                    "Window1 Corrected (counts)": "PlaceHolder",
-                    "Window1 (CPM)":  "PlaceHolder",
-                    "Normalized Window1 (CPM)": "PlaceHolder",
-                    "Normalized Window1 (Bq)": "PlaceHolder",
-                })
+                    'Dead Time Factor': "PlaceHolder",
+                }
+
+                for k, key in enumerate(windowsMap.keys()):
+                    currWinNum = str((k + 1))
+                    row["IsotopeWin" + currWinNum] = key
+                    row["Window" + currWinNum + " (counts)"] = windowsMap[key][currRow].counts
+                    row["Window" + currWinNum + " corrected (counts)"] = "PlaceHolder"
+                    row["Window" + currWinNum + " (CPM)"] = windowsMap[key][currRow].cpm
+                    row["Normalized Window" + currWinNum + " (CPM)"] = "PlaceHolder"
+                    row["Normalized Window" + currWinNum + " (Bq)" ] = "PlaceHolder"
+
+
+                cw.writerow(row)
 
                 currRow = currRow + 1
 
@@ -283,7 +312,7 @@ def getCsv(csvId):
 
 
 
-@bp.route('/biodicsv', methods=['POST', 'GET'])
+@bp.route('/study', methods=['POST', 'GET'])
 def biodiCsv():
     if request.method == 'POST':
         try:
@@ -304,6 +333,22 @@ def biodiCsv():
     elif request.method == 'GET':
         try:
             result, studyName = getCompleteStudy(request.args.get('id'))
+        except BaseException as e:
+            result = StandardResponse(e.message)
+            response = StandardResponseSchema.dump(result)
+            return jsonify(response), 500
+
+        response = make_response(result)
+        response.headers["Content-Disposition"] = "attachment; filename=" + studyName
+        response.headers["Content-Type"] = "text/csv; charset=UTF-8"
+
+        return response, 200
+
+@bp.route('/biodicsv-raw')
+def biodiCsvRaw():
+    if request.method == 'GET':
+        try:
+            result, studyName = getBiodiCsvRaw(request.args.get('id'))
         except BaseException as e:
             result = StandardResponse(e.message)
             response = StandardResponseSchema.dump(result)
