@@ -8,7 +8,7 @@
                 @close="setError({error: null})">
         </el-alert>
         <el-row>
-            <BiodiCsvDownload :metas="metas" @download="handleDownload"></BiodiCsvDownload>
+            <BiodiCsvDownload :metas="metas" @download-complete="handleDownloadComplete" @download-raw="handleDownloadRaw"></BiodiCsvDownload>
         </el-row>
     </div>
 </template>
@@ -23,20 +23,26 @@
         computed: {
             ...mapGetters({
                 metas: 'biodiCsvDownload/metas',
-                biodiCsvToDownload: 'biodiCsvDownload/biodiCsvToDownload',
+                biodiCsvCompleteToDownload: 'biodiCsvDownload/biodiCsvCompleteToDownload',
+                biodiCsvRawToDownload: 'biodiCsvDownload/biodiCsvRawToDownload',
                 error: 'biodiCsvdownload/error',
                 loading: 'biodiCsvDownload/loading'
             })
         },
         methods: {
             ...mapActions({
-                'downloadBiodiCsv': types.DOWNLOAD_BIODI_CSV,
+                'downloadBiodiCsvComplete': types.DOWNLOAD_BIODI_CSV_COMPLETE,
+                'downloadBiodiCsvRaw': types.DOWNLOAD_BIODI_CSV_RAW,
                 'getBiodiCsvMetas': types.GET_BIODI_CSV_METAS,
                 'setError': types.SET_ERROR
             }),
 
-            handleDownload() {
-                this.downloadBiodiCsv({biodiCsvToDownload: this.biodiCsvToDownload})
+            handleDownloadComplete() {
+                this.downloadBiodiCsvComplete({biodiCsvCompleteToDownload: this.biodiCsvCompleteToDownload})
+            },
+
+            handleDownloadRaw() {
+                this.downloadBiodiCsvRaw({biodiCsvRawToDownload: this.biodiCsvRawToDownload})
             }
 
         },

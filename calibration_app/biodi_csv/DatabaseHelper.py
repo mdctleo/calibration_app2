@@ -99,3 +99,12 @@ class DatabaseHelper:
             raise BaseException(e.__str__())
 
         return vector
+
+    @staticmethod
+    def getProtocolName(protocolId):
+        try:
+            protocolName = Protocol.query.filter_by(id=protocolId).first().protocolName
+        except SQLAlchemyError as e:
+            raise BaseException(e.__str__())
+
+        return protocolName

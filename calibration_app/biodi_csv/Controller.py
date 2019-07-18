@@ -191,15 +191,53 @@ def getMetas():
 def getBiodiCsvRaw(studyId):
     try:
         completeStudy, windows = db.getCompleteStudy(studyId)
+        windowsMap = createWindowsMap(windows)
+        si = StringIO()
         fieldnames = [
-            "Protocol ID", "Protocol name", " Measurement date & time", "Completion status", "Run ID",
+            "Protocol ID", "Protocol name", "Measurement date & time", "Completion status", "Run ID",
             "Rack", "Det", "Pos", "Time", "Sample code"
         ]
+
+        for i, key in enumerate(windowsMap.keys()):
+            fieldnames.append(key + " Counts")
+            fieldnames.append(key + " Error %")
+            fieldnames.append(key + " CPM")
+            fieldnames.append(key + " Info")
+
+        cw = csv.DictWriter(si, fieldnames=fieldnames)
+        cw.writeheader()
+        currRow=0
+
+        for i, row in enumerate(completeStudy.biodiCsvRows):
+            row = {
+                "Protocol ID": completeStudy.protocolId,
+                "Protocol name": db.getProtocolName(completeStudy.protocolId),
+                "Measurement date & time": row.measurementTime,
+                "Completion status": row.completionStatus,
+                "Run ID": row.runId,
+                "Rack": row.rack,
+                "Det": row.det,
+                "Pos": row.pos,
+                "Time": row.time,
+                "Sample code": row.sampleCode
+            }
+
+            for i, key in enumerate(windowsMap.keys()):
+                row[key + " Counts"] = windowsMap[key][currRow].counts
+                row[key + " Error %"] = windowsMap[key][currRow].error
+                row[key + " CPM"] = windowsMap[key][currRow].cpm
+                row[key + " Info"] = windowsMap[key][currRow].info
+
+            cw.writerow(row)
+
+            currRow = currRow + 1
+
+        file = si.getvalue()
 
     except BaseException as e:
         raise e
 
-    return None
+    return file, completeStudy.studyName
 
 def createCompleteStudyRow(biodiCsvRow, mouse, organ):
 
@@ -218,7 +256,6 @@ def getCompleteStudy(studyId):
 
         completeStudy, windows = db.getCompleteStudy(studyId)
         windowsMap = createWindowsMap(windows)
-        print(windowsMap)
         si = StringIO()
 
         fieldnames = [
@@ -312,7 +349,7 @@ def getCsv(csvId):
 
 
 
-@bp.route('/study', methods=['POST', 'GET'])
+@bp.route('/biodicsv', methods=['POST', 'GET'])
 def biodiCsv():
     if request.method == 'POST':
         try:

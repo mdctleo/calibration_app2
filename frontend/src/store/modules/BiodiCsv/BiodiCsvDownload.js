@@ -1,25 +1,30 @@
-import {getBiodiCsv, getBiodiCsvMetas} from "../../../api/api";
+import {getBiodiCsvComplete, getBiodiCsvRaw, getBiodiCsvMetas} from "../../../api/api";
 const moment = require('moment');
 
 const defaultState = {
     metas: [],
-    biodiCsvToDownload : "",
+    biodiCsvCompleteToDownload : "",
+    biodiCsvRawToDownload: "",
     error: null,
     loading: false,
 };
 
 const actions = {
-    setBiodiCsvToDownload: (context, payload) => {
-      context.commit('SET_BIODI_CSV_TO_DOWNLOAD', payload)
+    setBiodiCsvCompleteToDownload: (context, payload) => {
+      context.commit('SET_BIODI_CSV_COMPLETE_TO_DOWNLOAD', payload)
+    },
+
+    setBiodiCsvRawToDownload: (context, payload) => {
+        context.commit('SET_BIODI_CSV_RAW_TO_DOWNLOAD', payload)
     },
 
     setError: (context, payload) => {
         context.commit('SET_ERROR', payload);
     },
 
-    downloadBiodiCsv: (context, payload) => {
+    downloadBiodiCsvComplete: (context, payload) => {
         context.commit('SET_LOADING', {loading: true});
-        getBiodiCsv(payload.biodiCsvToDownload)
+        getBiodiCsvComplete(payload.biodiCsvCompleteToDownload)
             .then((response) => {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
@@ -36,6 +41,28 @@ const actions = {
             .finally(() => {
                 context.commit('SET_LOADING', {loading: false});
             })
+    },
+
+    downloadBiodiCsvRaw: (context, payload) => {
+        context.commit('SET_LOADING', {loading: true})
+        getBiodiCsvRaw(payload.biodiCsvRawToDownload)
+            .then((response) => {
+                const url = window.URL.createObjectURL(new Blob([response.data]))
+                const link = document.createElement('a')
+                link.href = url
+                link.setAttribute('download', 'file.csv')
+                document.body.appendChild(link)
+                link.click()
+                link.parentNode.removeChild(link)
+            })
+            .catch((error) => {
+                console.log(error)
+                context.commit('SET_ERROR', {error: error.response.data.message})
+            })
+            .finally(() => {
+                context.commit('SET_LOADING', {loading: false})
+            })
+
     },
 
     getBiodiCsvMetas: (context) => {
@@ -72,15 +99,20 @@ const mutations = {
         return state.metas = payload.metas
     },
 
-    SET_BIODI_CSV_TO_DOWNLOAD: (state, payload) => {
-        return state.biodiCsvToDownload = payload.biodiCsvToDownload;
+    SET_BIODI_CSV_COMPLETE_TO_DOWNLOAD: (state, payload) => {
+        return state.biodiCsvCompleteToDownload = payload.biodiCsvCompleteToDownload
+    },
+
+    SET_BIODI_CSV_RAW_TO_DOWNLOAD: (state, payload) => {
+        return state.biodiCsvRawToDownload = payload.biodiCsvRawToDownload
     }
 };
 
 const getters = {
     error: state => state.error,
     loading: state => state.loading,
-    biodiCsvToDownload: state => state.biodiCsvToDownload,
+    biodiCsvCompleteToDownload: state => state.biodiCsvCompleteToDownload,
+    biodiCsvRawToDownload: state => state.biodiCsvRawToDownload,
     metas: state => state.metas
 };
 

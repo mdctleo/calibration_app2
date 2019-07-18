@@ -52,7 +52,7 @@ export const getBiodiCsvMetas = async () => {
     return await axios.get(endpoint);
 };
 
-export const getBiodiCsv = async (id) => {
+export const getBiodiCsvComplete = async (id) => {
     let endpoint = BASE_URL + "/biodicsv";
     return await axios.get(endpoint, {
         responseType: 'blob',
@@ -61,6 +61,16 @@ export const getBiodiCsv = async (id) => {
         }
     })
 };
+
+export const getBiodiCsvRaw = async (id) => {
+    let endpoint = BASE_URL + "/biodicsv-raw"
+    return await axios.get(endpoint, {
+        responseType: 'blob',
+        params: {
+            id: id
+        }
+    })
+}
 
 // Statistics
 
