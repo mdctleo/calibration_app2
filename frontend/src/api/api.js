@@ -72,6 +72,31 @@ export const getBiodiCsvRaw = async (id) => {
     })
 }
 
+export const getChelators = async () => {
+    let endpoint = BASE_URL + "/chelators"
+    return await axios.get(endpoint)
+}
+
+export const getVectors = async () => {
+    let endpoint = BASE_URL + "/vectors"
+    return await axios.get(endpoint)
+}
+
+export const getCellLines = async () => {
+    let endpoint = BASE_URL + "/cell-lines"
+    return await axios.get(endpoint)
+}
+
+export const getMouseStrains = async () => {
+    let endpoint = BASE_URL + "/mouse-strains"
+    return await axios.get(endpoint)
+}
+
+export const getTumorModels = async () => {
+    let endpoint = BASE_URL + "/tumor-models"
+    return await axios.get(endpoint)
+}
+
 // Statistics
 
 export const calculateEffect = async (statisticForm) => {

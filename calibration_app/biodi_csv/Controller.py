@@ -410,3 +410,25 @@ def biodiCsvMetas():
 
         response = StudyInformationMetaSchema(many=True).dump(result)
         return jsonify(response), 200
+
+@bp.route('/chelators', methods=['GET'])
+def chelators():
+
+    return None
+
+@bp.route('/vectors', methods=['GET'])
+def vectors():
+
+    return None
+
+@bp.route('/cell-lines', methods=['GET'])
+def cellLines():
+    return None
+
+@bp.route('/mouse-strains', methods=['GET'])
+def mouseStrains():
+    return None
+
+@bp.route('/tumor-models', methods=['GET'])
+def tumorModels():
+    return None

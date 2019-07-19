@@ -146,22 +146,3 @@ class Window(db.Model):
 
     def __repr__(self):
         return '<Widnow %r %r %r %r>' % (self.id, self.csvId, self.rowNum, self.isotopeName)
-
-
-# class Window(db.Model):
-#     __tablenme__ = WINDOWS_T_NAME
-#     id = db.Column(WINDOWS_C_ID, db.Integer, primary_key=True, autoincrement=True)
-#     rowNumber = db.Column(WINDOWS_C_ROW_NUM, db.Integer, nullable=False)
-#     csvId = db.Column(WINDOWS_C_CSV_ID, db.Integer, db.ForeignKey(STUDY_INFORMATION_T_NAME + '.' + STUDY_INFORMATION_C_ID), nullable=False)
-#     windowNum = db.Column(WINDOWS_C_WINDOW_NUM, db.SmallInteger, nullable=False)
-#     # counts = db.Column(WINDOWS_C_COUNTS, db.Integer, nullable=False)
-#     # correctedCounts = db.Column(WINDOWS_C_CORRECTED_COUNTS, db.Integer, nullable=False)
-#     # cpm = db.Column(WINDOWS_C_CPM, db.Integer, nullable=False)
-#
-#     def __init__(self, rowNumber, windowNum, isotope):
-#         self.rowNumber = rowNumber
-#         self.windowNum = windowNum
-#         self.isotope = isotope
-#         # self.counts = counts
-#         # self.correctedCounts = correctedCounts
-#         # self.cpm = cpm

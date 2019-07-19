@@ -32,16 +32,16 @@ const defaultState = {
 
     mice: [],
     availableOrgans: ["Lungs", "Liver", "Heart"],
-    biodiCsvs: null,
+    biodiCsvs: [],
     biodiCsvJson: null,
     loading: false,
     error: null,
     startValidation: false,
     mouseCsvFormat: "Mouse ID,Cage,Gender,Age,Group ID,Euthanasia Date,Euthanasia Time,Weight (g),Injection Date,Pre-Injection Time,Injection Time,Post-Injection Time,Pre-Injection MBq,Post-Injection MBq,Comments",
-    mouseCsvs: null,
+    mouseCsvs: [],
     mouseCsvJson: null,
     organCsvFormat: ",Group ID,\nTube ID,Mouse ID",
-    organCsvs: null,
+    organCsvs: [],
     organCsvJson: null
 };
 
@@ -208,7 +208,7 @@ const actions = {
         try {
             context.commit('SET_LOADING', {loading: true})
             // did not upload file
-            if (payload.mouseCsvs === null) {
+            if (payload.mouseCsvs.length === 0) {
                 context.commit('SET_ERROR', {error: "mouse csv not uploaded"})
                 return false
             }
@@ -307,7 +307,7 @@ const actions = {
     handleOrganCsvs: async (context, payload) => {
         try {
             context.commit('SET_LOADING', {loading: true});
-            if (payload.organCsvs === null) {
+            if (payload.organCsvs.length === 0) {
                 context.commit('SET_ERROR', {error: "organ csv not uploaded"});
                 return context.commit('SET_SELECTED_ORGANS', {selectedOrgans: []})
             }
@@ -377,18 +377,16 @@ const actions = {
     handleBiodiCsvs: async (context, payload) => {
         try {
             context.commit('SET_LOADING', {loading: true});
-            if (payload.biodiCsvs === null) {
+            if (payload.biodiCsvs.length === 0) {
                 context.commit('SET_ERROR', {error: "biodi csv not uploaded"})
                 return false
             }
             let biodiCsvFile = payload.biodiCsvs[0]
             let csvFile = await context.dispatch('readFile', biodiCsvFile.raw)
-            console.log(csvFile)
             let csvFileJson = await csv().fromString(csvFile)
             let rowValidated = true
             let indexHolder = 0
 
-            console.log(csvFileJson)
 
             if (csvFileJson.length === 0) {
                 context.commit('SET_ERROR', {error: "biodii csv empty"})
@@ -423,7 +421,6 @@ const actions = {
             }
 
 
-            console.log(csvFileJson)
 
             if (rowValidated) {
                 let fileFormat = {

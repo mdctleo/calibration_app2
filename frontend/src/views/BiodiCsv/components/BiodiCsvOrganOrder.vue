@@ -3,17 +3,8 @@
         <el-button type="primary" class="controls" @click="downloadOrganCsvFormat">Download Organ Csv</el-button>
         <BiodiCsvUploadForm tips="Upload your organ list"
                         @upload-file="handleUploadfile"
-                        @remove-file="handleRemovefile"></BiodiCsvUploadForm>
-<!--        <component-->
-<!--                v-for="organForm in selectedOrgans(-1)"-->
-<!--                :key="organForm.key"-->
-<!--                :is="organForm.type"-->
-<!--                v-bind="organForm"-->
-<!--                :index="index"-->
-<!--                @validated-one-organ-form="handleValidation"-->
-<!--                :availableOrgans="availableOrgans"-->
-<!--        >-->
-<!--        </component>-->
+                        @remove-file="handleRemovefile"
+                        :fileList="organCsvs"></BiodiCsvUploadForm>
     </div>
 </template>
 
@@ -25,30 +16,9 @@
     export default {
         name: "BiodiCsvOrganOrder",
         components: {BiodiCsvUploadForm, OrganForm},
-        data() {
-            return {
-                // organForms: [],
-                // index: 0,
-                // validatedOrganForms: 0,
-            }
+        props: {
+            organCsvs: Array
         },
-
-        computed: {
-          ...mapGetters({
-              // startValidation: 'biodiCsvUpload/startValidation',
-              organCsvs: 'biodiCsvUpload/organCsvs',
-              // selectedOrgans: 'biodiCsvUpload/selectedOrgans',
-              // availableOrgans: 'biodiCsvUpload/availableOrgans'
-          })
-        },
-
-        // watch: {
-        //   startValidation: function (val) {
-        //       if (val === true && this.selectedOrgans.length === 0) {
-        //           this.$emit('validated', false)
-        //       }
-        //   }
-        // },
 
         methods: {
             ...mapActions({
@@ -58,25 +28,11 @@
 
             handleUploadfile(fileList) {
                 this.setOrganCsvs({organCsvs: fileList})
-                // this.handleOrganCsv({organCsv: this.organCsv})
             },
 
             handleRemovefile() {
-                this.setOrganCsvs({organCsvs: null})
-                // this.handleOrganCsv({organCsv: null})
+                this.setOrganCsvs({organCsvs: []})
             },
-
-            // handleValidation(validated) {
-            //     if (validated === true) {
-            //         this.validatedOrganForms++
-            //         if (this.validatedOrganForms === this.selectedOrgans.length) {
-            //             this.$emit('validated', true)
-            //         }
-            //     } else {
-            //         this.validatedOrganForms = 0
-            //         this.$emit('validated', false)
-            //     }
-            // }
 
         }
     }

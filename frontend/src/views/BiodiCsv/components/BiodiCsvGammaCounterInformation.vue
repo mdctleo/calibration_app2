@@ -29,13 +29,13 @@
         </el-form>
         <el-divider class="divider"></el-divider>
         <h4>Upload your Mouse Csv</h4>
-        <BiodiCsvMouseInfo></BiodiCsvMouseInfo>
+        <BiodiCsvMouseInfo :mouseCsvs="mouseCsvs"></BiodiCsvMouseInfo>
         <el-divider class="divider"></el-divider>
         <h4>Upload your Organ Csv</h4>
-        <BiodiCsvOrganOrder></BiodiCsvOrganOrder>
+        <BiodiCsvOrganOrder :organCsvs="organCsvs"></BiodiCsvOrganOrder>
         <el-divider class="divider"></el-divider>
         <h4>Upload your Biodi Csv</h4>
-        <BiodiCsvUpload></BiodiCsvUpload>
+        <BiodiCsvUpload :biodiCsvs="biodiCsvs"></BiodiCsvUpload>
     </div>
 </template>
 
@@ -50,7 +50,6 @@
         name: "BiodiCsvGammaCounterInformation",
         components: {BiodiCsvOrganOrder, BiodiCsvUpload, BiodiCsvMouseInfo},
         props: {
-            bus: Object
         },
         data() {
             return {

@@ -3,9 +3,6 @@
         <el-steps :active="step" align-center class="stepper" finish-status="success">
             <el-step title="Step 1" description="Study Info"></el-step>
             <el-step title="Step 2" description="Gamma Counter Info"></el-step>
-<!--            <el-step title="Step 3" description="Mouse Info"></el-step>-->
-<!--            <el-step title="Step 4" description="Organ Order"></el-step>-->
-<!--            <el-step title="Step 5" description="Upload Csv"></el-step>-->
             <el-step title="Step 3" description="Review Info"></el-step>
         </el-steps>
         <el-alert
@@ -17,9 +14,6 @@
         </el-alert>
         <BiodiCsvStudyInformation @validated="moveNext" :bus="bus" v-if="step === 0"></BiodiCsvStudyInformation>
         <BiodiCsvGammaCounterInformation @validated="moveNext" :bus="bus" v-if="step === 1"></BiodiCsvGammaCounterInformation>
-<!--        <BiodiCsvMouseInfo @validated="moveNext" :bus="bus" v-if="step === 2"></BiodiCsvMouseInfo>-->
-<!--        <BiodiCsvTubeInformation @validated="moveNext" v-if="step === 3"></BiodiCsvTubeInformation>-->
-<!--        <BiodiCsvUpload @validated="moveNext" tips="Upload your raw Biodi Csv file" v-if="step === 4"></BiodiCsvUpload>-->
         <BiodiCsvReviewInformation v-if="step === 2"></BiodiCsvReviewInformation>
         <el-button @click="handleNext" class="next">Next</el-button>
         <el-button @click="handlePrevious" class="previous">Previous</el-button>

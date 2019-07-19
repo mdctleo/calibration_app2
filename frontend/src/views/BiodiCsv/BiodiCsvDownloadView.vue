@@ -25,7 +25,7 @@
                 metas: 'biodiCsvDownload/metas',
                 biodiCsvCompleteToDownload: 'biodiCsvDownload/biodiCsvCompleteToDownload',
                 biodiCsvRawToDownload: 'biodiCsvDownload/biodiCsvRawToDownload',
-                error: 'biodiCsvdownload/error',
+                error: 'biodiCsvDownload/error',
                 loading: 'biodiCsvDownload/loading'
             })
         },

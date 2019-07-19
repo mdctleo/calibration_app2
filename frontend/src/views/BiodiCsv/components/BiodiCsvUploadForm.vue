@@ -4,6 +4,7 @@
                 class="upload"
                 drag
                 action=""
+                :file-list="fileList"
                 :auto-upload="false"
                 :on-remove="handleRemove"
                 :on-change="handleUpload"
@@ -20,7 +21,8 @@
     export default {
         name: "BiodiCsvUpload",
         props: {
-          tips: String
+          tips: String,
+          fileList: Array
         },
         methods: {
             clearData() {

@@ -1,7 +1,8 @@
 <template>
     <BiodiCsvUploadForm tips="Upload your Biodi Csv File"
                         @upload-file="handleUploadfile"
-                        @remove-file="handleRemovefile"></BiodiCsvUploadForm>
+                        @remove-file="handleRemovefile"
+                        :fileList="biodiCsvs"></BiodiCsvUploadForm>
 </template>
 
 <script>
@@ -12,10 +13,8 @@
     export default {
         name: "BiodiCsvUpload",
         components: {BiodiCsvUploadForm},
-        computed: {
-            ...mapGetters({
-                biodiCsvs: 'biodiCsvUpload/biodiCsvs'
-            })
+        props: {
+            biodiCsvs: Array
         },
 
         methods: {
@@ -28,7 +27,7 @@
             },
 
             handleRemovefile() {
-                this.setBiodiCsvs({biodiCsvs: null})
+                this.setBiodiCsvs({biodiCsvs: []})
 
             },
         }

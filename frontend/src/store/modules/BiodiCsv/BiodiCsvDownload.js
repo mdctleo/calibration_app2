@@ -70,7 +70,6 @@ const actions = {
         getBiodiCsvMetas()
             .then((response) => {
                 let metas = response.data;
-                console.log(metas)
                 metas.forEach((meta) => {
                     meta.createdOn = moment(meta.createdOn).format('DD-MM-YYYY, h:mm:ss');
                 });
