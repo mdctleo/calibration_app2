@@ -37,3 +37,11 @@ export const SET_BIODI_CSVS = "biodiCsvUpload/setBiodiCsvs";
 export const HANDLE_BIODI_CSVS = "biodiCsvUpload/handleBiodiCsvs";
 
 export const POST_BIODI_CSV = "biodiCsvUpload/postBiodiCsv"
+
+export const GET_ISOTOPES = "biodiCsvUpload/getIsotopes"
+export const GET_CHELATORS = "biodiCsvUpload/getChelators"
+export const GET_VECTORS = "biodiCsvUpload/getVectors"
+export const GET_CELL_LINES = "biodiCsvUpload/getCellLines"
+export const GET_MOUSE_STRAINS = "biodiCsvUpload/getMouseStrains"
+export const GET_TUMOR_MODELS = "biodiCsvUpload/getTumorModels"
+export const GET_COUNTERS = "biodiCsvUpload/getCounters"

@@ -4,6 +4,23 @@ from marshmallow import Schema, fields, INCLUDE
 class ProtocolSchema(Schema):
     name = fields.Str(required=True, max_length=8)
 
+class ChelatorSchema(Schema):
+    name = fields.Str()
+
+class VectorSchema(Schema):
+    name = fields.Str()
+    type = fields.Str()
+
+class TumorModelSchema(Schema):
+    name = fields.Str()
+
+class MouseStrainSchema(Schema):
+    name = fields.Str()
+
+class CellLineSchema(Schema):
+    name = fields.Str()
+
+
 
 class StudyInformationMetaSchema(Schema):
     id = fields.Integer(required=True)

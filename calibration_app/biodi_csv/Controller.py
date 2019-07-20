@@ -5,7 +5,8 @@ import json
 from io import StringIO
 from calibration_app.biodi_csv.Model import MouseOrgan, BiodiCsvRow, StudyInformation, Mouse, Window
 from calibration_app.biodi_csv.DatabaseHelper import DatabaseHelper as db
-from calibration_app.biodi_csv.Schema import BiodiCsvRequestSchema, StudyInformationMetaSchema
+from calibration_app.biodi_csv.Schema import BiodiCsvRequestSchema, StudyInformationMetaSchema, ChelatorSchema, \
+    VectorSchema, CellLineSchema, MouseStrainSchema, TumorModelSchema
 from werkzeug.utils import secure_filename
 from flask import jsonify
 from response.response import StandardResponse, StandardResponseSchema
@@ -328,26 +329,45 @@ def getCompleteStudy(studyId):
 
     return file, completeStudy.studyName
 
-def getCsv(csvId):
+def getChelators():
     try:
-        fileName, csvRows = db.getBiodiCsv(csvId)
-        si = StringIO()
-        cw = csv.writer(si)
-        protocolName = csvRows[0][1]
-        count = protocolName + " Count"
-        cpm = protocolName + " CPM"
-        error = protocolName + " Error %"
-        info = protocolName + " Info"
-        cw.writerow(("Protocol ID", "Protocol Name", "Measurement date & time", "Completion status", "Run ID", "Rack",
-                     "Det", "Pos", "Time", "Sample code", count, cpm, error, info))
-        cw.writerows(csvRows)
-        file = si.getvalue()
-
+        result = db.getChelators()
     except BaseException as e:
         raise e
-    return file, fileName[0]
 
+    return result
 
+def getVectors():
+    try:
+        result = db.getVectors()
+    except BaseException as e:
+        raise e
+
+    return result
+
+def getCellLines():
+    try:
+        result = db.getCellLines()
+    except BaseException as e:
+        raise e
+
+    return result
+
+def getMouseStrains():
+    try:
+        result = db.getMouseStrains()
+    except BaseException as e:
+        raise e
+
+    return result
+
+def getTumorModels():
+    try:
+        result = db.getTumorModels()
+    except BaseException as e:
+        raise e
+
+    return result
 
 @bp.route('/biodicsv', methods=['POST', 'GET'])
 def biodiCsv():
@@ -413,22 +433,66 @@ def biodiCsvMetas():
 
 @bp.route('/chelators', methods=['GET'])
 def chelators():
+    if request.method == 'GET':
+        try:
+            result = getChelators()
+        except BaseException as e:
+            result = StandardResponse(e.message)
+            response = StandardResponseSchema.dump(result)
+            return jsonify(response), 500
 
-    return None
+        response = ChelatorSchema(many=True).dump(result)
+        return jsonify(response), 200
 
 @bp.route('/vectors', methods=['GET'])
 def vectors():
+    if request.method == 'GET':
+        try:
+            result = getVectors()
+        except BaseException as e:
+            result = StandardResponse(e.message)
+            response = StandardResponseSchema.dump(result)
+            return jsonify(response), 200
 
-    return None
+        response = VectorSchema(many=True, exclude=['type']).dump(result)
+        return jsonify(response), 200
 
 @bp.route('/cell-lines', methods=['GET'])
 def cellLines():
-    return None
+    if request.method == 'GET':
+        try:
+            result = getCellLines()
+        except BaseException as e:
+            result = StandardResponse(e.message)
+            response = StandardResponseSchema.dump(result)
+            return jsonify(response), 200
+
+        response = CellLineSchema(many=True).dump(result)
+        return jsonify(response), 200
 
 @bp.route('/mouse-strains', methods=['GET'])
 def mouseStrains():
-    return None
+    if request.method == 'GET':
+        try:
+            result = getMouseStrains()
+        except BaseException as e:
+            result = StandardResponse(e.message)
+            response = StandardResponseSchema.dump(result)
+            return jsonify(response), 200
+
+        response = MouseStrainSchema(many=True).dump(result)
+        return jsonify(response), 200
 
 @bp.route('/tumor-models', methods=['GET'])
 def tumorModels():
+    if request.method == 'GET':
+        try:
+            result = getTumorModels()
+        except BaseException as e:
+            result = StandardResponse(e.message)
+            response = StandardResponseSchema.dump(result)
+            return jsonify(response), 200
+
+        response = TumorModelSchema(many=True).dump(result)
+        return jsonify(response), 200
     return None

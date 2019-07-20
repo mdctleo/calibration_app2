@@ -37,8 +37,12 @@
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Radioisotope" prop="radioIsotope">
                         <el-select v-model="radioIsotope" placeholder="Please select the radio isotope">
-                            <el-option label="F-18" value="F-18"></el-option>
-                            <el-option label="F-18" value="F-18"></el-option>
+                           <el-option
+                               v-for="isotope in isotopes"
+                               :key="isotope.isotopeName"
+                               :label="isotope.isotopeName"
+                               :value="isotope.isotopeName"
+                               ></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
@@ -47,8 +51,12 @@
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Chelator" prop="chelator">
                         <el-select v-model="chelator" placeholder="Please select the chelator">
-                            <el-option label="Chelator1" value="chelator1"></el-option>
-                            <el-option label="Chelator2" value="chelator2"></el-option>
+                            <el-option
+                                v-for="chelator in chelators"
+                                :key="chelator.name"
+                                :label="chelator.name"
+                                :value="chelator.name"
+                                ></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
@@ -57,8 +65,12 @@
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Vector" prop="vector">
                         <el-select v-model="vector" placeholder="Please select the vector">
-                            <el-option label="vector1" value="vector1"></el-option>
-                            <el-option label="vector2" value="vector2"></el-option>
+                            <el-option
+                                v-for="vector in vectors"
+                                :key="vector.name"
+                                :label="vector.name"
+                                :value="vector.name"
+                            ></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
@@ -75,8 +87,12 @@
                     <el-form-item label="Cell Line" prop="cellLine">
                         <el-select v-model="cellLine"
                                    placeholder="Please select the cell line">
-                            <el-option label="cellLine1" value="cellLine1"></el-option>
-                            <el-option label="cellLine2" value="cellLine2"></el-option>
+                            <el-option
+                                v-for="cellLine in cellLines"
+                                :key="cellLine.name"
+                                :label="cellLine.name"
+                                :value="cellLine.name"
+                            ></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
@@ -86,8 +102,12 @@
                     <el-form-item label="Mouse Strain" prop="mouseStrain">
                         <el-select v-model="mouseStrain"
                                    placeholder="Please select a mouseStrain">
-                            <el-option label="mouseStrain1" value="mouseStrain1"></el-option>
-                            <el-option label="mouseStrain2" value="mouseStrain2"></el-option>
+                            <el-option
+                                v-for="mouseStrain in mouseStrains"
+                                :key="mouseStrain.name"
+                                :label="mouseStrain.name"
+                                :value="mouseStrain.name"
+                            ></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
@@ -97,8 +117,12 @@
                     <el-form-item label="Tumor Model" prop="tumorModel">
                         <el-select v-model="tumorModel"
                                    placeholder="Please select a tumor model">
-                            <el-option label="tumorModel1" value="tumorModel1"></el-option>
-                            <el-option label="tumorModel2" value="tumorModel2"></el-option>
+                            <el-option
+                                    v-for="tumorModel in tumorModels"
+                                    :key="tumorModel.name"
+                                    :label="tumorModel.name"
+                                    :value="tumorModel.name"
+                            ></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
@@ -196,7 +220,13 @@
                 getMouseStrain: 'biodiCsvUpload/mouseStrain',
                 getTumorModel: 'biodiCsvUpload/tumorModel',
                 getRadioPurity: 'biodiCsvUpload/radioPurity',
-                getComments: 'biodiCsvUpload/comments'
+                getComments: 'biodiCsvUpload/comments',
+                isotopes: 'biodiCsvUpload/isotopes',
+                chelators: 'biodiCsvUpload/chelators',
+                vectors: 'biodiCsvUpload/vectors',
+                cellLines: 'biodiCsvUpload/cellLines',
+                mouseStrains: 'biodiCsvUpload/mouseStrains',
+                tumorModels: 'biodiCsvUpload/tumorModels'
             }),
 
             studyForm: {
@@ -362,7 +392,13 @@
                 'setMouseStrain': types.SET_MOUSE_STRAIN,
                 'setTumorModel': types.SET_TUMOR_MODEL,
                 'setRadioPurity': types.SET_RADIO_PURITY,
-                'setComments': types.SET_COMMENTS
+                'setComments': types.SET_COMMENTS,
+                'getIsotopes': types.GET_ISOTOPES,
+                'getChelators': types.GET_CHELATORS,
+                'getVectors': types.GET_VECTORS,
+                'getCellLines': types.GET_CELL_LINES,
+                'getMouseStrains': types.GET_MOUSE_STRAINS,
+                'getTumorModels': types.GET_TUMOR_MODELS
             }),
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
@@ -376,6 +412,15 @@
             resetForm(formName) {
                 this.$refs[formName].resetFields();
             }
+        },
+
+        created() {
+            this.getIsotopes()
+            this.getChelators()
+            this.getVectors()
+            this.getCellLines()
+            this.getMouseStrains()
+            this.getTumorModels()
         }
 
     }

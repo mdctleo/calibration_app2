@@ -1,4 +1,12 @@
-import {postBiodiCsv} from "../../../api/api";
+import {
+    getCellLines,
+    getChelators,
+    getCounters, getIsotopes,
+    getMouseStrains,
+    getTumorModels,
+    getVectors,
+    postBiodiCsv
+} from "../../../api/api";
 
 const moment = require('moment');
 const csv = require('csvtojson');
@@ -42,7 +50,15 @@ const defaultState = {
     mouseCsvJson: null,
     organCsvFormat: ",Group ID,\nTube ID,Mouse ID",
     organCsvs: [],
-    organCsvJson: null
+    organCsvJson: null,
+
+    isotopes: [],
+    chelators: [],
+    vectors: [],
+    cellLines: [],
+    mouseStrains: [],
+    tumorModels: [],
+    counters: []
 };
 
 const actions = {
@@ -132,6 +148,104 @@ const actions = {
 
     setError: (context, payload) => {
         context.commit('SET_ERROR', payload)
+    },
+
+    getIsotopes: (context) => {
+        context.commit('SET_LOADING', {loading: true});
+        getIsotopes()
+            .then((response) => {
+                context.commit('SET_ISOTOPES', {isotopes: response.data})
+            })
+            .catch((error) => {
+                context.commit('SET_ERROR', {error: error.response.data.message})
+            })
+            .finally(() => {
+                context.commit('SET_LOADING', {loading: false});
+            });
+    },
+
+    getChelators: (context) => {
+        context.commit('SET_LOADING', {loading: true});
+        getChelators()
+            .then((response) => {
+                context.commit('SET_CHELATORS', {chelators: response.data})
+            })
+            .catch((error) => {
+                context.commit('SET_ERROR', {error: error.response.data.message})
+            })
+            .finally(() => {
+                context.commit('SET_LOADING', {loading: false});
+            });
+    },
+
+    getVectors: (context) => {
+        context.commit('SET_LOADING', {loading: true});
+        getVectors()
+            .then((response) => {
+                context.commit('SET_VECTORS', {vectors: response.data})
+            })
+            .catch((error) => {
+                context.commit('SET_ERROR', {error: error.response.data.message})
+            })
+            .finally(() => {
+                context.commit('SET_LOADING', {loading: false});
+            });
+    },
+
+    getCellLines: (context) => {
+        context.commit('SET_LOADING', {loading: true});
+        getCellLines()
+            .then((response) => {
+                context.commit('SET_CELL_LINES', {cellLines: response.data})
+            })
+            .catch((error) => {
+                context.commit('SET_ERROR', {error: error.response.data.message})
+            })
+            .finally(() => {
+                context.commit('SET_LOADING', {loading: false});
+            });
+    },
+
+    getMouseStrains: (context) => {
+        context.commit('SET_LOADING', {loading: true})
+        getMouseStrains()
+            .then((response) => {
+                context.commit('SET_MOUSE_STRAINS', {mouseStrains: response.data})
+            })
+            .catch((error) => {
+                context.commit('SET_ERROR', {error: error.response.data.message})
+            })
+            .finally(() => {
+                context.commit('SET_LOADING', {loading: false})
+            })
+    },
+
+    getTumorModels: (context) => {
+        context.commit('SET_LOADING', {loading: true})
+        getTumorModels()
+            .then((response) => {
+                context.commit('SET_TUMOR_MODELS', {tumorModels: response.data})
+            })
+            .catch((error) => {
+                context.commit('SET_ERROR', {error: error.response.data.message})
+            })
+            .finally(() => {
+                context.commit('SET_LOADING', {loading: false})
+            })
+    },
+
+    getCounters: (context) => {
+        context.commit('SET_LOADING', {loading: true})
+        getCounters()
+            .then((response) => {
+                context.commit('SET_COUNTERS', {counters: response.data})
+            })
+            .catch((error) => {
+                context.commit('SET_ERROR', {error: error.response.data.message})
+            })
+            .finally(() => {
+                context.commit('SET_LOADING', {loading: false})
+            })
     },
 
     downloadMouseCsvFormat: (context) => {
@@ -572,6 +686,34 @@ const mutations = {
 
     SET_BIODI_CSV_JSON: (state, payload) => {
         return state.biodiCsvJson = payload.biodiCsvJson
+    },
+
+    SET_ISOTOPES: (state, payload) => {
+        return state.isotopes = payload.isotopes
+    },
+
+    SET_CHELATORS: (state, payload) => {
+        return state.chelators = payload.chelators
+    },
+
+    SET_VECTORS: (state, payload) => {
+        return state.vectors = payload.vectors
+    },
+
+    SET_CELL_LINES: (state, payload) => {
+        return state.cellLines = payload.cellLines
+    },
+
+    SET_MOUSE_STRAINS: (state, payload) => {
+        return state.mouseStrains = payload.mouseStrains
+    },
+
+    SET_TUMOR_MODELS: (state, payload) => {
+        return state.tumorModels = payload.tumorModels
+    },
+
+    SET_COUNTERS: (state, payload) => {
+        return state.counters = payload.counters
     }
 };
 
@@ -613,7 +755,15 @@ const getters = {
     mouseCsvs: state => state.mouseCsvs,
     mouseCsvJson: state => state.mouseCsvJson,
     biodiCsvs: state => state.biodiCsvs,
-    biodiCsvJson: state => state.biodiCsvJson
+    biodiCsvJson: state => state.biodiCsvJson,
+
+    isotopes: state => state.isotopes,
+    chelators: state => state.chelators,
+    vectors: state => state.vectors,
+    cellLines: state => state.cellLines,
+    mouseStrains: state => state.mouseStrains,
+    tumorModels: state => state.tumorModels,
+    counters: state => state.counters
 };
 
 export default {
