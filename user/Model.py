@@ -1,22 +1,8 @@
-# from medphys import db
-# from constants.Constants import *
-#
-# class User(db.Model):
-#     __tablename__ = USERS_T_NAME
-#     username = db.Column(USERS_C_USERNAME, db.String(100), primary_key=True)
-#     password = db.Column(USERS_C_PASSWORD, db.String(200), nullable=False)
-#     isotope = db.relationship('Isotope', backref=USERS_T_NAME, lazy=True)
-#     calibrationFactor = db.relationship('CalibrationFactor', backref=USERS_T_NAME, lazy=True)
-#
-#     def __init__(self, username, password):
-#         self.username = username
-#         self.password = password
-#
-#     def __repr__(self):
-#         return '<User %r>' % self.username
+from sqlalchemy.exc import SQLAlchemyError
+from exceptions.Exceptions import *
 
-from app import db, login
-from constants.Constants import *
+from app import db
+from marshmallow import Schema, fields
 
 
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -37,6 +23,20 @@ class User(UserMixin,db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-@login.user_loader
-def load_user(id):
-    return User.query.get(int(id))
+class DatabaseHelper:
+
+    @staticmethod
+    def getUser(email):
+        try:
+            result = User.query.filter_by(email=email).first()
+        except SQLAlchemyError as e:
+            raise BaseException(e.__str__())
+
+        return result
+
+class UserSchema(Schema):
+    id = fields.Integer()
+    username = fields.Str()
+    email = fields.Str()
+    password = fields.Str()
+    token = fields.Str()

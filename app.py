@@ -19,7 +19,9 @@ from sqlalchemy import event
 # TODO: remove CORS, we dont really need it for production
 from flask_cors import CORS
 from flask_migrate import Migrate
-from flask_login import LoginManager
+from flask_jwt_extended import (
+    JWTManager
+)
 import os
 
 # ----------------------------------------------------------------------------#
@@ -30,11 +32,10 @@ import os
 app = Flask(__name__)
 app.config.from_object('config')
 # TODO: Adjust the allowed origins for better security?
-CORS(app)
+CORS(app, origins="http://localhost:8080", supports_credentials =True)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-login = LoginManager(app)
-login.login_view = 'login'
+jwt = JWTManager(app)
 
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
@@ -42,14 +43,15 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.execute("PRAGMA foreign_keys=ON")
     cursor.close()
 
-from routes import *
-from user import Model as userModel
+
 from calibration_app.isotope import bp as isotope_bp, Model as isotopeModel
 from calibration_app.calibration import bp as calibration_bp, Model as calibrationModel
 from calibration_app.counter import bp as counter_bp, Model as gammaCounterModel
 from calibration_app.biodi_csv import bp as csv_bp, Model as biodiCsvCompleteModel
 from statistics_app import bp as statistics_bp
+from user import bp as user_bp, Model as userModel
 
+app.register_blueprint(user_bp)
 app.register_blueprint(isotope_bp)
 app.register_blueprint(calibration_bp)
 app.register_blueprint(counter_bp)

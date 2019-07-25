@@ -69,6 +69,7 @@ const actions = {
         context.commit('SET_LOADING', {loading: true});
         getBiodiCsvMetas()
             .then((response) => {
+                console.log(response)
                 let metas = response.data;
                 metas.forEach((meta) => {
                     meta.createdOn = moment(meta.createdOn).format('DD-MM-YYYY, h:mm:ss');
@@ -76,6 +77,7 @@ const actions = {
                context.commit('SET_METAS', {metas: metas});
             })
             .catch((error) => {
+                console.log(error.response)
                 context.commit('SET_ERROR', {error: error.response.data.message});
             })
             .finally(() => {

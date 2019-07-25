@@ -117,16 +117,6 @@ class BiodiCsvRow(db.Model):
     pos = db.Column(BIODI_CSV_ROWS_C_POS, db.Integer)
     time = db.Column(BIODI_CSV_ROWS_C_TIME, db.Float)
     sampleCode = db.Column(BIODI_CSV_ROWS_C_SAMPLE_CODE, db.String(45))
-    # counts = db.Column(BIODI_CSV_ROWS_C_COUNTS, db.Float)
-    # cpm = db.Column(BIODI_CSV_ROWS_C_CPM, db.Float)
-    # error = db.Column(BIODI_CSV_ROWS_C_ERROR, db.Float)
-    # info = db.Column(BIODI_CSV_ROWS_C_INFO, db.CHAR(1))
-
-    # def __repr__(self):
-    #     return '<BiodiCsvRow %r %r %r %r %r %r %r %r %r %r %r %r %r %r %r>' % \
-    #            (self.id, self.csvId, self.rowNum, self.measurementTime, self.completionStatus,
-    #             self.runId, self.rack, self.det, self.pos, self.time, self.sampleCode, self.counts,
-    #             self.cpm, self.error, self.info)
 
     def __repr__(self):
         return '<BiodiCsvRow %r>' % \

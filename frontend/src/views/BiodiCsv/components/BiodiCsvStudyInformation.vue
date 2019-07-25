@@ -154,9 +154,6 @@
 
     export default {
         name: "BiodiCsvStudyInformation",
-        props: {
-            bus: Object
-        },
         data() {
             return {
                 rules: {

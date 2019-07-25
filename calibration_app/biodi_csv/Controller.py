@@ -1,19 +1,19 @@
+from flask_jwt_extended import jwt_required
+from flask_login import login_required
+
 from calibration_app.biodi_csv import bp
 from flask import request
 import csv
-import json
 from io import StringIO
 from calibration_app.biodi_csv.Model import MouseOrgan, BiodiCsvRow, StudyInformation, Mouse, Window
 from calibration_app.biodi_csv.DatabaseHelper import DatabaseHelper as db
 from calibration_app.biodi_csv.Schema import BiodiCsvRequestSchema, StudyInformationMetaSchema, ChelatorSchema, \
     VectorSchema, CellLineSchema, MouseStrainSchema, TumorModelSchema
-from werkzeug.utils import secure_filename
 from flask import jsonify
 from response.response import StandardResponse, StandardResponseSchema
 from exceptions.Exceptions import *
 from marshmallow import ValidationError
 from flask import make_response
-from flask import Response
 import datetime
 
 
@@ -266,6 +266,7 @@ def getCompleteStudy(studyId):
 
         for i, key in enumerate(windowsMap.keys()):
             currWinNum = str((i + 1))
+            fieldnames.append("Dead Time Factor" + currWinNum)
             fieldnames.append("IsotopeWin" + currWinNum)
             fieldnames.append("Window" + currWinNum + " (counts)")
             fieldnames.append("Window" + currWinNum + " corrected (counts)")
@@ -300,20 +301,22 @@ def getCompleteStudy(studyId):
                     'Euthanasia Date': mouse.euthanizeDateTime.date(),
                     'Euthanasia Time': mouse.euthanizeDateTime.time(),
                     'TimePoint (h)': mouse.groupId,
-                    'Count#': "PlaceHolder",
+                    'Count#': biodiCsvRow.det,
                     'Rack': biodiCsvRow.rack,
                     'Vial': j,
                     'Time': biodiCsvRow.measurementTime,
                     'Counted Time (s)': biodiCsvRow.time,
-                    'Dead Time Factor': "PlaceHolder",
                 }
 
                 for k, key in enumerate(windowsMap.keys()):
                     currWinNum = str((k + 1))
+                    deadTimeFactor = windowsMap[key][currRow].error
+                    cpm = windowsMap[key][currRow].cpm
+                    row['Dead Time Factor' + currWinNum] = deadTimeFactor
                     row["IsotopeWin" + currWinNum] = key
                     row["Window" + currWinNum + " (counts)"] = windowsMap[key][currRow].counts
-                    row["Window" + currWinNum + " corrected (counts)"] = "PlaceHolder"
-                    row["Window" + currWinNum + " (CPM)"] = windowsMap[key][currRow].cpm
+                    row["Window" + currWinNum + " corrected (counts)"] = cpm / deadTimeFactor
+                    row["Window" + currWinNum + " (CPM)"] = cpm
                     row["Normalized Window" + currWinNum + " (CPM)"] = "PlaceHolder"
                     row["Normalized Window" + currWinNum + " (Bq)" ] = "PlaceHolder"
 
@@ -418,8 +421,11 @@ def biodiCsvRaw():
         return response, 200
 
 
+
 @bp.route('/biodicsv-metas', methods=['GET'])
+@jwt_required
 def biodiCsvMetas():
+    print(request)
     if request.method == 'GET':
         try:
             result = getMetas()

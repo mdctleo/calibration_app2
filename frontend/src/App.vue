@@ -1,11 +1,7 @@
 <template>
     <div id="app">
-        <!--    <div id="nav">-->
-        <!--      <router-link to="/">Calibration</router-link> |-->
-        <!--      <router-link to="/csv">Csv</router-link>-->
-        <!--    </div>-->
         <el-container class="app-container">
-            <el-header id="header">Test</el-header>
+            <el-header id="header">Pre-Clinic</el-header>
             <el-container>
                 <el-aside id="nav" class="nav">
                     <el-menu class="menu"

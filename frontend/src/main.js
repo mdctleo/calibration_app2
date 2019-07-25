@@ -6,7 +6,13 @@ import 'element-ui/lib/theme-chalk/index.css';
 import locale from 'element-ui/lib/locale/lang/en'
 // import store from './store/Store'
 import store from './store/index'
+import Axios from 'axios'
 
+Vue.prototype.$http = Axios;
+const token = localStorage.getItem('token')
+if (token) {
+  Vue.prototype.$http.defaults.headers.common['Authorization'] = token
+}
 
 Vue.config.productionTip = false;
 Vue.use(ElementUI, {locale});

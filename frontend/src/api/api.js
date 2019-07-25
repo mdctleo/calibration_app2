@@ -49,7 +49,7 @@ export const postBiodiCsv = async (payload) => {
 
 export const getBiodiCsvMetas = async () => {
     let endpoint = BASE_URL + "/biodicsv-metas";
-    return await axios.get(endpoint);
+    return await axios.get(endpoint, {withCredentials: true});
 };
 
 export const getBiodiCsvComplete = async (id) => {
@@ -163,3 +163,12 @@ export const getPowerTable = async (statisticForm) => {
         }
     })
 };
+
+// User
+export const login = async (loginForm) => {
+    let endpoint = BASE_URL + "/login"
+    return await axios.post(endpoint, {
+        email: loginForm.email,
+        password: loginForm.password
+    })
+}
