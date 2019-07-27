@@ -1,3 +1,5 @@
+from flask_jwt_extended import jwt_required
+
 from calibration_app.calibration import bp
 from flask import request
 from calibration_app.calibration.Model import CalibrationFactor, CalibrationFactorSchema, CalibrationFactorGraphSchema, DatabaseHelper as db
@@ -107,6 +109,7 @@ def calibration():
 
 
 @bp.route('/calibrations', methods=['GET'])
+@jwt_required
 def calibrations():
     if request.method == 'GET':
         model = request.args.get('model')
@@ -114,6 +117,7 @@ def calibrations():
         return getCalibrationFactors(model, isotopeName)
 
 @bp.route('/calibrations/graph', methods=['GET'])
+@jwt_required
 def calibrationsGraph():
     if request.method == 'GET':
         model = request.args.get('model')

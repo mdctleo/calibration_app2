@@ -20,29 +20,17 @@ from sqlalchemy import event
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_jwt_extended import (
-    JWTManager
+    JWTManager,
 )
-import os
-
 # ----------------------------------------------------------------------------#
 # App Config.
 # ----------------------------------------------------------------------------#
 
-
 app = Flask(__name__)
 app.config.from_object('config')
-# TODO: Adjust the allowed origins for better security?
-CORS(app, origins="http://localhost:8080", supports_credentials =True)
+CORS(app, origins="http://localhost:8080", supports_credentials=True)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-jwt = JWTManager(app)
-
-@event.listens_for(Engine, "connect")
-def set_sqlite_pragma(dbapi_connection, connection_record):
-    cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA foreign_keys=ON")
-    cursor.close()
-
 
 from calibration_app.isotope import bp as isotope_bp, Model as isotopeModel
 from calibration_app.calibration import bp as calibration_bp, Model as calibrationModel
@@ -50,7 +38,9 @@ from calibration_app.counter import bp as counter_bp, Model as gammaCounterModel
 from calibration_app.biodi_csv import bp as csv_bp, Model as biodiCsvCompleteModel
 from statistics_app import bp as statistics_bp
 from user import bp as user_bp, Model as userModel
+from user.Controller import jwt
 
+jwt.init_app(app)
 app.register_blueprint(user_bp)
 app.register_blueprint(isotope_bp)
 app.register_blueprint(calibration_bp)
@@ -61,6 +51,18 @@ app.register_blueprint(statistics_bp)
 db.create_all()
 db.session.commit()
 app.app_context().push()
+
+
+# ----------------------------------------------------------------------------#
+# Log in stuff, I failed to modularize this
+# ----------------------------------------------------------------------------#
+
+@event.listens_for(Engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()
+
 
 @app.shell_context_processor
 def make_shell_context():

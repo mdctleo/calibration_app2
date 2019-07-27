@@ -49,7 +49,7 @@ export const postBiodiCsv = async (payload) => {
 
 export const getBiodiCsvMetas = async () => {
     let endpoint = BASE_URL + "/biodicsv-metas";
-    return await axios.get(endpoint, {withCredentials: true});
+    return await axios.get(endpoint);
 };
 
 export const getBiodiCsvComplete = async (id) => {
@@ -171,4 +171,9 @@ export const login = async (loginForm) => {
         email: loginForm.email,
         password: loginForm.password
     })
+}
+
+export const logout = async () => {
+    let endpoint = BASE_URL + "/logout"
+    return await axios.delete(endpoint)
 }

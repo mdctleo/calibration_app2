@@ -1,4 +1,4 @@
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_raw_jwt
 from flask_login import login_required
 
 from calibration_app.biodi_csv import bp
@@ -373,6 +373,7 @@ def getTumorModels():
     return result
 
 @bp.route('/biodicsv', methods=['POST', 'GET'])
+@jwt_required
 def biodiCsv():
     if request.method == 'POST':
         try:
@@ -405,6 +406,7 @@ def biodiCsv():
         return response, 200
 
 @bp.route('/biodicsv-raw')
+@jwt_required
 def biodiCsvRaw():
     if request.method == 'GET':
         try:
@@ -425,9 +427,9 @@ def biodiCsvRaw():
 @bp.route('/biodicsv-metas', methods=['GET'])
 @jwt_required
 def biodiCsvMetas():
-    print(request)
     if request.method == 'GET':
         try:
+            print(get_raw_jwt())
             result = getMetas()
         except BaseException as e:
             result = StandardResponse(e.message)
@@ -438,6 +440,7 @@ def biodiCsvMetas():
         return jsonify(response), 200
 
 @bp.route('/chelators', methods=['GET'])
+@jwt_required
 def chelators():
     if request.method == 'GET':
         try:
@@ -451,6 +454,7 @@ def chelators():
         return jsonify(response), 200
 
 @bp.route('/vectors', methods=['GET'])
+@jwt_required
 def vectors():
     if request.method == 'GET':
         try:
@@ -464,6 +468,7 @@ def vectors():
         return jsonify(response), 200
 
 @bp.route('/cell-lines', methods=['GET'])
+@jwt_required
 def cellLines():
     if request.method == 'GET':
         try:
@@ -477,6 +482,7 @@ def cellLines():
         return jsonify(response), 200
 
 @bp.route('/mouse-strains', methods=['GET'])
+@jwt_required
 def mouseStrains():
     if request.method == 'GET':
         try:
@@ -490,6 +496,7 @@ def mouseStrains():
         return jsonify(response), 200
 
 @bp.route('/tumor-models', methods=['GET'])
+@jwt_required
 def tumorModels():
     if request.method == 'GET':
         try:

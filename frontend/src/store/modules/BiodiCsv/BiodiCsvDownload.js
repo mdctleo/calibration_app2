@@ -35,7 +35,6 @@ const actions = {
                 link.parentNode.removeChild(link);
             })
             .catch((error) => {
-                console.log(error);
                 context.commit('SET_ERROR', {error: error.response.data.message});
             })
             .finally(() => {

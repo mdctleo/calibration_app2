@@ -49,6 +49,12 @@ export default new Router({
             path: '/power',
             name: 'Power',
             component: () => import('./views/Statistics/Power.vue')
+        },
+
+        {
+            path: '/logout',
+            name: 'Logout',
+            component: () => import('./views/Login/Logout.vue')
         }
     ]
 })

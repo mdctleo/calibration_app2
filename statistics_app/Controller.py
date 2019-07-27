@@ -1,3 +1,5 @@
+from flask_jwt_extended import jwt_required
+
 from app import app
 from flask import render_template, flash, redirect, url_for, redirect, request
 from statistics_app import bp
@@ -59,6 +61,7 @@ def calcPowerGraph(statisticFormDict):
 
 # TODO: Refactor this
 @bp.route('/effectCalc', methods=['GET'])
+@jwt_required
 def effectCalc():
     if request.method == 'GET':
         nobs = request.args.get('nobs')
@@ -85,6 +88,7 @@ def effectCalc():
 
 
 @bp.route('/nobsCalc', methods=['GET'])
+@jwt_required
 def nobsCalc():
     if request.method == 'GET':
         effect = request.args.get('effect')
@@ -112,6 +116,7 @@ def nobsCalc():
 
 
 @bp.route('/powerCalc', methods=['GET'])
+@jwt_required
 def powerCalc():
     if request.method == 'GET':
         effect = request.args.get('effect')
@@ -139,6 +144,7 @@ def powerCalc():
 
 
 @bp.route('/powerCalcGraph', methods=['GET'])
+@jwt_required
 def powerCalcGraph():
     if request.method == 'GET':
         effect = request.args.get('effect')
@@ -161,6 +167,7 @@ def powerCalcGraph():
     return response, 200
 
 @bp.route('/powerCalcTable', methods=['GET'])
+@jwt_required
 def powerCalcTable():
     if request.method == 'GET':
         effect = request.args.get('effect')

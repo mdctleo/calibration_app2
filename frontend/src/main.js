@@ -9,9 +9,10 @@ import store from './store/index'
 import Axios from 'axios'
 
 Vue.prototype.$http = Axios;
+Axios.defaults.withCredentials = true
 const token = localStorage.getItem('token')
 if (token) {
-  Vue.prototype.$http.defaults.headers.common['Authorization'] = token
+  Vue.prototype.$http.defaults.headers.common['Authorization'] = "Bearer " + token
 }
 
 Vue.config.productionTip = false;

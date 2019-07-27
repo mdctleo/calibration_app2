@@ -87,18 +87,21 @@
             ...mapActions({
                 'setEmail': types.SET_EMAIL,
                 'setPassword': types.SET_PASSWORD,
-                'login': types.LOGIN
+                'login': types.LOGIN,
+                'logout': types.LOGOUT
             }),
 
             handleLogin() {
                 this.login({loginForm: this.loginForm})
+            },
+
+            handleLogout() {
+                this.logout()
             }
         }
     }
 </script>
 
 <style scoped>
-    .form {
-        margin-top: 2%;
-    }
+
 </style>

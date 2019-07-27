@@ -3,7 +3,7 @@
         <el-container class="app-container">
             <el-header id="header">Pre-Clinic</el-header>
             <el-container>
-                <el-aside id="nav" class="nav">
+                <el-aside id="nav" class="nav" v-show="isLoggedIn">
                     <el-menu class="menu"
                              default-active="1"
                              :router="true">
@@ -31,7 +31,7 @@
                             <el-menu-item index="3-2" route="/nobs">Sample Size</el-menu-item>
                             <el-menu-item index="3-3" route="/power">Statistical Power</el-menu-item>
                         </el-submenu>
-                        <el-menu-item index="4">
+                        <el-menu-item index="4" route="/logout">
                             <template slot="title">
                                 <i class="el-icon-user-solid"></i>
                                 <span>Logout</span>
@@ -46,6 +46,14 @@
 </template>
 
 <script>
+    import {mapActions, mapGetters} from "vuex";
+    export default {
+        computed: {
+            ...mapGetters({
+                isLoggedIn: 'user/isLoggedIn'
+            })
+        }
+    }
 
 </script>
 
@@ -86,7 +94,7 @@
     }
 
     .view {
-        width: 85%;
+        width:100vw;
         height: 100%;
         min-height: 100vh;
         background-color: #efeff6;
