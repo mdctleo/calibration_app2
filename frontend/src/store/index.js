@@ -5,10 +5,12 @@ import statistics from './modules/Statistics/Statistics'
 import biodiCsvDownload from './modules/BiodiCsv/BiodiCsvDownload'
 import biodiCsvUpload from './modules/BiodiCsv/BiodiCsvUpload'
 import user from './modules/User/User'
+import createPersistedState from 'vuex-persistedstate'
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
+    plugins: [createPersistedState()],
     modules: {
         calibration: calibration,
         statistics: statistics,
