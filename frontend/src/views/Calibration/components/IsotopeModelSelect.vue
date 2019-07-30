@@ -1,6 +1,7 @@
 <template>
     <div>
-        <el-select v-model="selectedIsotope" clearable placeholder="Select Isotope" class="select">
+        <el-select v-model="selectedIsotope" clearable placeholder="Select Isotope" class="select"
+        @clear="handleIsotopeClear()">
             <el-option
                     v-for="item in isotopes"
                     :key="item.isotopeName"
@@ -8,7 +9,7 @@
                     :value="item.isotopeName">
             </el-option>
         </el-select>
-        <el-select v-model="selectedCounter" clearable placeholder="Select Model" class="select">
+        <el-select v-model="selectedCounter" clearable placeholder="Select Model" class="select" @clear="handleCounterClear()">
             <el-option
                     v-for="item in counters"
                     :key="item.model"
@@ -54,6 +55,16 @@
                         selectedCounter: value
                     })
                 }
+            }
+        },
+
+        methods: {
+            handleIsotopeClear() {
+                this.selectedIsotope = null;
+            },
+
+            handleCounterClear() {
+                this.selectedCounter = null;
             }
         }
     }

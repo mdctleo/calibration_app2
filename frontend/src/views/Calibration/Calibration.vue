@@ -42,25 +42,25 @@
         },
         computed: {
             ...mapGetters({
-                selectedCounter: 'selectedCounter',
-                selectedIsotope: 'selectedIsotope',
-                counters: 'counters',
-                isotopes: 'isotopes',
-                calibrationFactors: 'calibrationFactors',
-                calibrationGraph: 'calibrationGraph',
-                loading: 'calibrationLoading',
-                error: 'calibrationError'
+                selectedCounter: 'calibration/selectedCounter',
+                selectedIsotope: 'calibration/selectedIsotope',
+                counters: 'calibration/counters',
+                isotopes: 'calibration/isotopes',
+                calibrationFactors: 'calibration/calibrationFactors',
+                calibrationGraph: 'calibration/calibrationGraph',
+                loading: 'calibration/loading',
+                error: 'calibration/error'
             })
         },
 
         methods: {
-            ...mapActions([
-                types.GET_CALIBRATION_FACTORS,
-                types.GET_CALIBRATION_FACTORS_GRAPH,
-                types.GET_COUNTERS,
-                types.GET_ISOTOPES,
-                types.SET_ERROR
-            ]),
+            ...mapActions({
+                'getCalibrationFactors': types.GET_CALIBRATION_FACTORS,
+                'getCalibrationFactorsGraph': types.GET_CALIBRATION_FACTORS_GRAPH,
+                'getCounters': types.GET_COUNTERS,
+                'getIsotopes': types.GET_ISOTOPES,
+                'setError': types.SET_ERROR
+            }),
             getCalibrationFactors() {
                 this.$store.dispatch({
                     type: types.GET_CALIBRATION_FACTORS,

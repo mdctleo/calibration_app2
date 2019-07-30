@@ -1,63 +1,40 @@
 <template>
-    <div>
-        <el-upload
-                class="upload"
-                drag
-                action=""
-                :auto-upload="false"
-                :on-remove="handleRemove"
-                :on-change="handleUpload"
-                multiple
-                ref="upload">
-            <i class="el-icon-upload"></i>
-            <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
-            <div class="el-upload__tip" slot="tip">Drag your BioDi files here</div>
-        </el-upload>
-        <el-button type="success" class="upload-submit" @click="$emit('submit')">Submit</el-button>
-    </div>
+    <BiodiCsvUploadForm tips="Upload your Biodi Csv File"
+                        @upload-file="handleUploadfile"
+                        @remove-file="handleRemovefile"
+                        :fileList="biodiCsvs"></BiodiCsvUploadForm>
 </template>
 
 <script>
-    import store from '../../../store/Store.js'
-    import * as type from '../../../store/Types'
+    import BiodiCsvUploadForm from "./BiodiCsvUploadForm";
+    import * as types from "../../../store/modules/BiodiCsv/BiodiCsvUploadTypes"
+    import {mapActions, mapGetters} from "vuex";
 
     export default {
         name: "BiodiCsvUpload",
+        components: {BiodiCsvUploadForm},
+        props: {
+            biodiCsvs: Array
+        },
+
         methods: {
+            ...mapActions({
+                'setBiodiCsvs': types.SET_BIODI_CSVS,
+            }),
 
-            clearData() {
-                store.dispatch({
-                    type: type.setFiles,
-                    files: []
-                });
-                this.$refs.upload.clearFiles();
+            handleUploadfile(fileList) {
+                this.setBiodiCsvs({biodiCsvs: fileList})
             },
 
-            handleRemove(file, fileList) {
-                store.dispatch({
-                    type: type.setFiles,
-                    files: fileList
-                });
+            handleRemovefile() {
+                this.setBiodiCsvs({biodiCsvs: []})
 
-            },
-            handleUpload(file, fileList) {
-                store.dispatch({
-                    type: type.setFiles,
-                    files: fileList
-                });
             },
         }
+
     }
-
-
 </script>
 
 <style scoped>
-    .upload {
-        margin-top: 10px;
-    }
-    .upload-submit {
-        margin-top: 10px;
-    }
 
 </style>

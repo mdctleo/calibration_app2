@@ -11,13 +11,13 @@
             </el-table-column>
             <el-table-column
                     class="el-table-column"
-                    property="fileName"
-                    label="file name">
+                    property="studyName"
+                    label="Study Name">
             </el-table-column>
             <el-table-column
                     class="el-table-column"
-                    property="createdBy"
-                    label="created By">
+                    property="researcherName"
+                    label="Researcher">
             </el-table-column>
             <el-table-column
                     label="Operations">
@@ -25,7 +25,11 @@
                     <el-button
                             size="mini"
                             type="primary"
-                            @click="handleDownload(scope.$index, scope.row); $emit('download')">Download</el-button>
+                            @click="handleDownloadComplete(scope.$index, scope.row)">Download Complete</el-button>
+                    <el-button
+                            size="mini"
+                            type="primary"
+                            @click="handleDownloadRaw(scope.$index, scope.row)">Download Raw</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -33,30 +37,27 @@
 </template>
 
 <script>
-    import store from '../../../store/Store.js'
-    import * as type from '../../../store/Types'
+    import {mapActions} from 'vuex';
+    import * as types from '../../../store/modules/BiodiCsv/BiodiCsvDownloadTypes.js'
     export default {
         name: "BiodiCsvDownload",
         props: {
             metas: Array
         },
-        computed: {
-          biodiCsvToDownload: {
-              get () {
-                  return store.state.biodiCsvToDownload
-              },
-              set (id) {
-                  store.dispatch({
-                      type: type.setBiodiCsvToDownload,
-                      biodiCsvToDownload: id
-                  })
-              }
-          }
-        },
 
         methods: {
-            handleDownload(index, row) {
-                this.biodiCsvToDownload = row.id
+            ...mapActions({
+                'setBiodiCsvCompleteToDownload': types.SET_BIODI_CSV_COMPLETE_TO_DOWNLOAD,
+                'setBiodiCsvRawToDownload': types.SET_BIODI_CSV_RAW_TO_DOWNLOAD
+            }),
+            handleDownloadComplete(index, row) {
+                this.setBiodiCsvCompleteToDownload({biodiCsvCompleteToDownload: row.id});
+                this.$emit('download-complete');
+            },
+
+            handleDownloadRaw(index, row) {
+                this.setBiodiCsvRawToDownload({biodiCsvRawToDownload: row.id})
+                this.$emit('download-raw')
             }
         }
     }

@@ -1,9 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Calibration from "./views/Calibration/Calibration";
 import Login from "./views/Login/Login";
-import DashBoard from "./views/Dashboard/Dashboard";
-
+import store from "./store/index"
 
 Vue.use(Router);
 
@@ -17,20 +15,28 @@ export default new Router({
         {
             path: '/dashboard',
             name: 'Dashboard',
-            component: () => import(/* webpackChunkName: "about" */ './views/Dashboard/Dashboard.vue')
+            component: () => import(/* webpackChunkName: "about" */ './views/Dashboard/Dashboard.vue'),
+            // beforeEnter: (to, from, next) => {
+            //     if (!store.getters['user/isLoggedIn']) {
+            //         next()
+            //     }
+            // }
         },
         {
             path: '/calibration',
-            name: 'calibration',
+            name: 'Calibration',
             component: () => import(/* webpackChunkName: "about" */ './views/Calibration/Calibration.vue')
         },
         {
-            path: '/biodicsv',
-            name: 'BiodiCsv',
-            // route level code-splitting
-            // this generates a separate chunk (about.[hash].js) for this route
-            // which is lazy-loaded when the route is visited.
-            component: () => import(/* webpackChunkName: "about" */ './views/BiodiCsv/BiodiCsv.vue')
+            path: '/biodicsv/download',
+            name: 'BiodiCsvDownload',
+            component: () => import(/* webpackChunkName: "about" */ './views/BiodiCsv/BiodiCsvDownloadView.vue')
+
+        },
+        {
+            path: '/biodicsv/upload',
+            name: 'BiodiCsvUpload',
+            component: () => import('./views/BiodiCsv/BiodiCsvUploadView.vue')
         },
         {
             path: '/effect',
@@ -48,6 +54,13 @@ export default new Router({
             path: '/power',
             name: 'Power',
             component: () => import('./views/Statistics/Power.vue')
+        },
+
+        {
+            path: '/logout',
+            name: 'Logout',
+            component: () => import('./views/Login/Logout.vue')
         }
     ]
 })
+

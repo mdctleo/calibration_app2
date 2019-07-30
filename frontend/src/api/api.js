@@ -36,10 +36,14 @@ export const getCalibrationFactorsGraph = async (model, isotope) => {
 
 // BiodiCsv
 
-export const postBiodiCsvFiles = async (filesJson) => {
+export const postBiodiCsv = async (payload) => {
     let endpoint = BASE_URL + "/biodicsv";
     return await axios.post(endpoint, {
-        files: filesJson
+        biodiCsv: payload.biodiCsv,
+        studyInfo: payload.studyInfo,
+        gammaInfo: payload.gammaInfo,
+        mouseInfo: payload.mouseInfo,
+        organInfo: payload.organInfo
     })
 };
 
@@ -48,7 +52,7 @@ export const getBiodiCsvMetas = async () => {
     return await axios.get(endpoint);
 };
 
-export const getBiodiCsv = async (id) => {
+export const getBiodiCsvComplete = async (id) => {
     let endpoint = BASE_URL + "/biodicsv";
     return await axios.get(endpoint, {
         responseType: 'blob',
@@ -57,6 +61,41 @@ export const getBiodiCsv = async (id) => {
         }
     })
 };
+
+export const getBiodiCsvRaw = async (id) => {
+    let endpoint = BASE_URL + "/biodicsv-raw"
+    return await axios.get(endpoint, {
+        responseType: 'blob',
+        params: {
+            id: id
+        }
+    })
+}
+
+export const getChelators = async () => {
+    let endpoint = BASE_URL + "/chelators"
+    return await axios.get(endpoint)
+}
+
+export const getVectors = async () => {
+    let endpoint = BASE_URL + "/vectors"
+    return await axios.get(endpoint)
+}
+
+export const getCellLines = async () => {
+    let endpoint = BASE_URL + "/cell-lines"
+    return await axios.get(endpoint)
+}
+
+export const getMouseStrains = async () => {
+    let endpoint = BASE_URL + "/mouse-strains"
+    return await axios.get(endpoint)
+}
+
+export const getTumorModels = async () => {
+    let endpoint = BASE_URL + "/tumor-models"
+    return await axios.get(endpoint)
+}
 
 // Statistics
 
@@ -124,3 +163,17 @@ export const getPowerTable = async (statisticForm) => {
         }
     })
 };
+
+// User
+export const login = async (loginForm) => {
+    let endpoint = BASE_URL + "/login"
+    return await axios.post(endpoint, {
+        email: loginForm.email,
+        password: loginForm.password
+    })
+}
+
+export const logout = async () => {
+    let endpoint = BASE_URL + "/logout"
+    return await axios.delete(endpoint)
+}

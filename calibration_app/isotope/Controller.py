@@ -1,3 +1,5 @@
+from flask_jwt_extended import jwt_required
+
 from calibration_app.isotope import bp
 from flask import request
 from calibration_app.isotope.Model import Isotope, IsotopeSchema, DatabaseHelper as db
@@ -87,6 +89,7 @@ def deleteIsotope(name):
 
 @bp.route('/isotope', methods=['POST'], defaults={'name': None})
 @bp.route('/isotope/<name>', methods=['GET', 'PUT', 'DELETE'])
+@jwt_required
 def isotope(name):
     if request.method == 'GET':
         return getIsotope(name)
@@ -115,6 +118,7 @@ def isotope(name):
 
 
 @bp.route('/isotopes', methods=['GET'])
+@jwt_required
 def isotopes():
     if request.method == 'GET':
         return getIsotopes()

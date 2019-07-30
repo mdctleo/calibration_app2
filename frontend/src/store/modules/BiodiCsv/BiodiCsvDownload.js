@@ -1,22 +1,30 @@
-import {getBiodiCsv, getBiodiCsvMetas} from "../../../api/api";
+import {getBiodiCsvComplete, getBiodiCsvRaw, getBiodiCsvMetas} from "../../../api/api";
 const moment = require('moment');
 
 const defaultState = {
     metas: [],
-    biodiCsvToDownload : null,
+    biodiCsvCompleteToDownload : "",
+    biodiCsvRawToDownload: "",
     error: null,
     loading: false,
 };
 
 const actions = {
-    setBiodiCsvToDownload: (context, payload) => {
-      context.commit('SET_BIODI_CSV_TO_DOWNLOAD', {biodiCsvToDownload: payload.biodiCsvToDownload})
+    setBiodiCsvCompleteToDownload: (context, payload) => {
+      context.commit('SET_BIODI_CSV_COMPLETE_TO_DOWNLOAD', payload)
     },
 
+    setBiodiCsvRawToDownload: (context, payload) => {
+        context.commit('SET_BIODI_CSV_RAW_TO_DOWNLOAD', payload)
+    },
 
-    downloadBiodiCsv: (context, payload) => {
+    setError: (context, payload) => {
+        context.commit('SET_ERROR', payload);
+    },
+
+    downloadBiodiCsvComplete: (context, payload) => {
         context.commit('SET_LOADING', {loading: true});
-        getBiodiCsv(payload.biodiCsvToDownload)
+        getBiodiCsvComplete(payload.biodiCsvCompleteToDownload)
             .then((response) => {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
@@ -34,17 +42,41 @@ const actions = {
             })
     },
 
+    downloadBiodiCsvRaw: (context, payload) => {
+        context.commit('SET_LOADING', {loading: true})
+        getBiodiCsvRaw(payload.biodiCsvRawToDownload)
+            .then((response) => {
+                const url = window.URL.createObjectURL(new Blob([response.data]))
+                const link = document.createElement('a')
+                link.href = url
+                link.setAttribute('download', 'file.csv')
+                document.body.appendChild(link)
+                link.click()
+                link.parentNode.removeChild(link)
+            })
+            .catch((error) => {
+                console.log(error)
+                context.commit('SET_ERROR', {error: error.response.data.message})
+            })
+            .finally(() => {
+                context.commit('SET_LOADING', {loading: false})
+            })
+
+    },
+
     getBiodiCsvMetas: (context) => {
         context.commit('SET_LOADING', {loading: true});
         getBiodiCsvMetas()
             .then((response) => {
+                console.log(response)
                 let metas = response.data;
-                metas.data.forEach((meta) => {
+                metas.forEach((meta) => {
                     meta.createdOn = moment(meta.createdOn).format('DD-MM-YYYY, h:mm:ss');
                 });
                context.commit('SET_METAS', {metas: metas});
             })
             .catch((error) => {
+                console.log(error.response)
                 context.commit('SET_ERROR', {error: error.response.data.message});
             })
             .finally(() => {
@@ -67,15 +99,20 @@ const mutations = {
         return state.metas = payload.metas
     },
 
-    SET_BIODI_CSV_TO_DOWNLOAD: (state, payload) => {
-        return state.biodiCsvToDownload = payload.biodiCsvToDownload;
+    SET_BIODI_CSV_COMPLETE_TO_DOWNLOAD: (state, payload) => {
+        return state.biodiCsvCompleteToDownload = payload.biodiCsvCompleteToDownload
+    },
+
+    SET_BIODI_CSV_RAW_TO_DOWNLOAD: (state, payload) => {
+        return state.biodiCsvRawToDownload = payload.biodiCsvRawToDownload
     }
 };
 
 const getters = {
-    biodiCsvDownloadError: state => state.error,
-    biodiCsvDownloadLoading: state => state.loading,
-    biodiCsvToDownload: state => state.biodiCsvToDownload,
+    error: state => state.error,
+    loading: state => state.loading,
+    biodiCsvCompleteToDownload: state => state.biodiCsvCompleteToDownload,
+    biodiCsvRawToDownload: state => state.biodiCsvRawToDownload,
     metas: state => state.metas
 };
 
@@ -84,4 +121,5 @@ export default {
     getters,
     actions,
     mutations,
+    namespaced: true
 };

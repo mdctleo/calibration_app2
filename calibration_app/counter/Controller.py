@@ -1,3 +1,5 @@
+from flask_jwt_extended import jwt_required
+
 from calibration_app.counter import bp
 from flask import request
 from calibration_app.counter.Model import GammaCounter, GammaCounterSchema, DatabaseHelper as db
@@ -35,6 +37,7 @@ def createCounter(counterDict):
 
 
 @bp.route('/counter', methods=['POST'])
+@jwt_required
 # @bp.route('/isotope/<name>', methods=['GET', 'PUT', 'DELETE'])
 def counter():
     # if request.method == 'GET':
@@ -63,6 +66,7 @@ def counter():
 
 
 @bp.route('/counters', methods=['GET'])
+@jwt_required
 def counters():
     if request.method == 'GET':
         return getCounters()

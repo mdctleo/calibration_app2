@@ -5,13 +5,13 @@ python==3.7
 flask==1.0.2
 Flask-SQLAlchemy==2.4.0
 Flask-WTF==0.14.2
-flask-login=0.4.1
 WTForms==2.2.1
 coverage==4.5.3
 marshmallow==3.0.0rc5
 statsmodels==0.9.0
 flask-cors==3.0.7
 Flask-Migrate==2.4.0
+flask-jwt-extended==3.20.0
 # ecdsa
 # paramiko
 # pycrypto

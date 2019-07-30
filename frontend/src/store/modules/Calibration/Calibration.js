@@ -142,8 +142,8 @@ const getters = {
     isotopes: state => state.isotopes,
     calibrationFactors: state => state.calibrationFactors,
     calibrationGraph: state => state.calibrationGraph,
-    calibrationLoading: state => state.loading,
-    calibrationError: state => state.error
+    loading: state => state.loading,
+    error: state => state.error
 };
 
 
@@ -152,4 +152,5 @@ export default {
     getters,
     actions,
     mutations,
+    namespaced: true
 };

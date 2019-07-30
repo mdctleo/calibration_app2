@@ -5,31 +5,45 @@
                 :title="error"
                 type="error"
                 show-icon
-                @close="error = null">
+                @close="setError({error: null})">
         </el-alert>
         <el-row>
-            <BiodiCsvDownload :metas="this.metas" @download="this.downloadBiodiCsv()"></BiodiCsvDownload>
+            <BiodiCsvDownload :metas="metas" @download-complete="handleDownloadComplete" @download-raw="handleDownloadRaw"></BiodiCsvDownload>
         </el-row>
     </div>
 </template>
 
 <script>
     import {mapActions, mapGetters} from 'vuex';
-    import * as types from '../../store/modules/BiodiCsv/types.js'
+    import * as types from '../../store/modules/BiodiCsv/BiodiCsvDownloadTypes.js'
+    import BiodiCsvDownload from "./components/BiodiCsvDownload";
     export default {
-        name: "BiodiCsvDownload",
+        name: "BiodiCsvDownloadView",
+        components: {BiodiCsvDownload},
         computed: {
             ...mapGetters({
-                metas: 'metas',
-                error: 'biodiCsvDownloadError',
-                loading: 'biodiCsvDownloadLoading'
+                metas: 'biodiCsvDownload/metas',
+                biodiCsvCompleteToDownload: 'biodiCsvDownload/biodiCsvCompleteToDownload',
+                biodiCsvRawToDownload: 'biodiCsvDownload/biodiCsvRawToDownload',
+                error: 'biodiCsvDownload/error',
+                loading: 'biodiCsvDownload/loading'
             })
         },
         methods: {
-            ...mapActions([
-                types.DOWNLOAD_BIODI_CSV,
-                types.GET_BIODI_CSV_METAS
-            ])
+            ...mapActions({
+                'downloadBiodiCsvComplete': types.DOWNLOAD_BIODI_CSV_COMPLETE,
+                'downloadBiodiCsvRaw': types.DOWNLOAD_BIODI_CSV_RAW,
+                'getBiodiCsvMetas': types.GET_BIODI_CSV_METAS,
+                'setError': types.SET_ERROR
+            }),
+
+            handleDownloadComplete() {
+                this.downloadBiodiCsvComplete({biodiCsvCompleteToDownload: this.biodiCsvCompleteToDownload})
+            },
+
+            handleDownloadRaw() {
+                this.downloadBiodiCsvRaw({biodiCsvRawToDownload: this.biodiCsvRawToDownload})
+            }
 
         },
 

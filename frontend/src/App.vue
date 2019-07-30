@@ -1,13 +1,9 @@
 <template>
     <div id="app">
-        <!--    <div id="nav">-->
-        <!--      <router-link to="/">Calibration</router-link> |-->
-        <!--      <router-link to="/csv">Csv</router-link>-->
-        <!--    </div>-->
         <el-container class="app-container">
-            <el-header id="header">Test</el-header>
+            <el-header id="header">Pre-Clinic</el-header>
             <el-container>
-                <el-aside id="nav" class="nav">
+                <el-aside id="nav" class="nav" v-show="isLoggedIn">
                     <el-menu class="menu"
                              default-active="1"
                              :router="true">
@@ -23,7 +19,8 @@
                                 <span>Biodi</span>
                             </template>
                             <el-menu-item index="2-1" route="/calibration">Calibration Factors</el-menu-item>
-                            <el-menu-item index="2-2" route="/biodicsv">Biodi CSV</el-menu-item>
+                            <el-menu-item index="2-2" route="/biodicsv/upload">Biodi CSV Upload</el-menu-item>
+                            <el-menu-item index="2-3" route="/biodicsv/download">Biodi CSV Download</el-menu-item>
                         </el-submenu>
                         <el-submenu index="3" route="/statistics">
                             <template slot="title">
@@ -34,7 +31,7 @@
                             <el-menu-item index="3-2" route="/nobs">Sample Size</el-menu-item>
                             <el-menu-item index="3-3" route="/power">Statistical Power</el-menu-item>
                         </el-submenu>
-                        <el-menu-item index="4">
+                        <el-menu-item index="4" route="/logout">
                             <template slot="title">
                                 <i class="el-icon-user-solid"></i>
                                 <span>Logout</span>
@@ -49,6 +46,14 @@
 </template>
 
 <script>
+    import {mapActions, mapGetters} from "vuex";
+    export default {
+        computed: {
+            ...mapGetters({
+                isLoggedIn: 'user/isLoggedIn'
+            })
+        }
+    }
 
 </script>
 
@@ -80,7 +85,6 @@
         height: 100%;
         min-height: 100vh;
         width: 15% !important;
-        background-color: #C2EFF4 !important;
     }
 
     .menu {
@@ -90,7 +94,7 @@
     }
 
     .view {
-        width: 85%;
+        width:100vw;
         height: 100%;
         min-height: 100vh;
         background-color: #efeff6;

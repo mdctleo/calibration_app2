@@ -1,5 +1,5 @@
 <template>
-    <h1>This is Dashboard</h1>
+    <span>This is Dashboard</span>
 </template>
 
 <script>
