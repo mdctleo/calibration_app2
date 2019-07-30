@@ -30,7 +30,7 @@ const actions = {
                 localStorage.setItem('token', token)
                 Vue.prototype.$http.defaults.headers.common['Authorization'] = "Bearer " + token
                 context.commit('SET_IS_LOGGED_IN', {isLoggedIn: true})
-                router.push("/dashboard")
+                router.push({name: 'Dashboard'})
 
             })
             .catch((error) => {

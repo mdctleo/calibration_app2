@@ -15,6 +15,14 @@ if (token) {
   Vue.prototype.$http.defaults.headers.common['Authorization'] = "Bearer " + token
 }
 
+router.beforeEach((to, from, next) => {
+  if (to.path !== '/' && !store.getters['user/isLoggedIn']) {
+    next('/')
+  } else {
+    next()
+  }
+})
+
 Vue.config.productionTip = false;
 Vue.use(ElementUI, {locale});
 new Vue({

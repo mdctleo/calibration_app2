@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Login from "./views/Login/Login";
-
+import store from "./store/index"
 
 Vue.use(Router);
 
@@ -15,7 +15,12 @@ export default new Router({
         {
             path: '/dashboard',
             name: 'Dashboard',
-            component: () => import(/* webpackChunkName: "about" */ './views/Dashboard/Dashboard.vue')
+            component: () => import(/* webpackChunkName: "about" */ './views/Dashboard/Dashboard.vue'),
+            // beforeEnter: (to, from, next) => {
+            //     if (!store.getters['user/isLoggedIn']) {
+            //         next()
+            //     }
+            // }
         },
         {
             path: '/calibration',
@@ -23,15 +28,15 @@ export default new Router({
             component: () => import(/* webpackChunkName: "about" */ './views/Calibration/Calibration.vue')
         },
         {
-          path: '/biodicsv/download',
-          name: 'BiodiCsvDownload',
+            path: '/biodicsv/download',
+            name: 'BiodiCsvDownload',
             component: () => import(/* webpackChunkName: "about" */ './views/BiodiCsv/BiodiCsvDownloadView.vue')
 
         },
         {
-          path: '/biodicsv/upload',
-          name: 'BiodiCsvUpload',
-          component: () => import('./views/BiodiCsv/BiodiCsvUploadView.vue')
+            path: '/biodicsv/upload',
+            name: 'BiodiCsvUpload',
+            component: () => import('./views/BiodiCsv/BiodiCsvUploadView.vue')
         },
         {
             path: '/effect',
@@ -58,3 +63,4 @@ export default new Router({
         }
     ]
 })
+
