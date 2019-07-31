@@ -15,7 +15,7 @@
 
 <script>
     import {mapActions, mapGetters} from 'vuex';
-    import * as types from '../../store/modules/BiodiCsv/BiodiCsvDownloadTypes.js'
+    import * as types from '../../store/modules/BiodiCsvDownload/BiodiCsvDownloadTypes.js'
     import BiodiCsvDownload from "./components/BiodiCsvDownload";
     export default {
         name: "BiodiCsvDownloadView",

@@ -7,7 +7,7 @@
 
 <script>
     import BiodiCsvUploadForm from "./BiodiCsvUploadForm";
-    import * as types from "../../../store/modules/BiodiCsv/BiodiCsvUploadTypes"
+    import * as types from "../../../store/modules/BiodiCsvUpload/BiodiCsvUploadTypes"
     import {mapActions, mapGetters} from "vuex";
 
     export default {

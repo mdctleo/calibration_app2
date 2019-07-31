@@ -5,4 +5,5 @@ export const GET_ISOTOPES = 'calibration/getIsotopes';
 export const GET_COUNTERS = 'calibration/getCounters';
 export const GET_CALIBRATION_FACTORS = 'calibration/getCalibrationFactors';
 export const GET_CALIBRATION_FACTORS_GRAPH = 'calibration/getCalibrationFactorsGraph';
+export const RESET_STATE = 'calibration/resetState'
 

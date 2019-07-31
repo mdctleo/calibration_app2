@@ -1,19 +1,26 @@
 import {calculateEffect, calculateNobs, calculatePower, getPowerGraph, getPowerTable} from "../../../api/api";
 
-const defaultState = {
-    input0: "",
-    input1: "",
-    alpha: "",
-    test: "",
-    alternative: "",
-    result: "",
-    loading: false,
-    error: null,
-    powerGraph: {},
-    powerTable: []
-};
+const getDefaultState = () => {
+    return {
+        input0: "",
+        input1: "",
+        alpha: "",
+        test: "",
+        alternative: "",
+        result: "",
+        loading: false,
+        error: null,
+        powerGraph: {},
+        powerTable: []
+    }
+}
+
+const state = getDefaultState()
 
 const actions = {
+    resetState: (context) => {
+        context.commit('RESET_STATE')
+    },
     setInput0: (context, payload) => {
         context.commit('SET_INPUT_0', payload);
     },
@@ -50,7 +57,7 @@ const actions = {
                 context.commit('SET_RESULT', {result: response.data.result})
             })
             .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.message})
+                context.commit('SET_ERROR', {error: error.response.data.msg})
             })
             .finally(() => {
                 context.commit('SET_LOADING', {loading: false})
@@ -64,7 +71,7 @@ const actions = {
                 context.commit('SET_RESULT', {result: response.data.result})
             })
             .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.message})
+                context.commit('SET_ERROR', {error: error.response.data.msg})
             })
             .finally(() => {
                 context.commit('SET_LOADING', {loading: false})
@@ -78,7 +85,7 @@ const actions = {
                 context.commit('SET_RESULT', {result: response.data.result})
             })
             .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.message})
+                context.commit('SET_ERROR', {error: error.response.data.msg})
             })
             .finally(() => {
                 context.commit('SET_LOADING', {loading: false})
@@ -92,7 +99,7 @@ const actions = {
                 context.commit('SET_POWER_GRAPH', {powerGraph: response.data});
             })
             .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.message})
+                context.commit('SET_ERROR', {error: error.response.data.msg})
             })
             .finally(() => {
                 context.commit('SET_LOADING', {loading: false})
@@ -106,7 +113,7 @@ const actions = {
                 context.commit('SET_POWER_TABLE', {powerTable: response.data});
             })
             .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.message})
+                context.commit('SET_ERROR', {error: error.response.data.msg})
             })
             .finally(() => {
                 context.commit('SET_LOADING', {loading: false})
@@ -115,6 +122,10 @@ const actions = {
 };
 
 const mutations = {
+    RESET_STATE: (state) => {
+        return Object.assign(state, getDefaultState())
+    },
+
     SET_INPUT_0: (state, payload) => {
         return state.input0 = payload.input0;
     },
@@ -171,7 +182,7 @@ const getters = {
 };
 
 export default {
-    state: defaultState,
+    state: state,
     getters,
     actions,
     mutations,

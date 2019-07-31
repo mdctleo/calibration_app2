@@ -49,8 +49,7 @@ def login():
             response = StandardResponseSchema().dump(result)
             return jsonify(response), 400
         except InvalidCredentialException as e:
-            result = StandardResponseSchema(e.message)
-            response = StandardResponseSchema.dump(result)
+            response = BaseExceptionSchema().dump(e)
             return jsonify(response), 401
         except BaseException as e:
             result = StandardResponse(e.message)

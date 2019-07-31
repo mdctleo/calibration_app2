@@ -29,7 +29,7 @@
     import BiodiCsvTubeInformation from './components/BiodiCsvOrganOrder'
     import Vue from "vue";
     import {mapActions, mapGetters} from "vuex";
-    import * as types from '../../store/modules/BiodiCsv/BiodiCsvUploadTypes.js'
+    import * as types from '../../store/modules/BiodiCsvUpload/BiodiCsvUploadTypes.js'
 
     export default {
         name: "BiodiCsvUploadView",

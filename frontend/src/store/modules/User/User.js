@@ -1,16 +1,28 @@
 import {login, logout} from "../../../api/api";
 import router from "../../../router.js"
 import Vue from 'vue'
-const defaultState = {
-    loginForm: {
-        email: "",
-        password: ""
-    },
-    error: null,
-    isLoggedIn: false
+import {RESET_STATE as RESET_BIODI_CSV_UPLOAD_STATE} from "../BiodiCsvUpload/BiodiCsvUploadTypes"
+import {RESET_STATE as RESET_BIODI_CSV_DOWNLOAD_STATE} from "../BiodiCsvDownload/BiodiCsvDownloadTypes"
+import {RESET_STATE as RESET_CALIBRATION_STATE} from "../Calibration/types"
+import {RESET_STATE as RESET_STATISTICS_STATE} from "../Statistics/types"
+import {RESET_STATE as RESET_USER_STATE} from "../User/types"
+
+const getDefaultState = () => {
+    return {
+        loginForm: {
+            email: "",
+            password: ""
+        },
+        error: null,
+        isLoggedIn: false
+    }
 }
+const state = getDefaultState()
 
 const actions = {
+    resetState: (context) => {
+        context.commit('RESET_STATE')
+    },
     setEmail: (context, payload) => {
         context.commit('SET_EMAIL', payload)
     },
@@ -34,7 +46,6 @@ const actions = {
 
             })
             .catch((error) => {
-                console.log(error)
                 context.commit('SET_ERROR', {error: error.response.data.msg})
             })
     },
@@ -42,7 +53,17 @@ const actions = {
     logout: (context, payload) => {
         logout()
             .then((response) => {
-                context.commit('SET_IS_LOGGED_IN', {isLoggedIn: false})
+                let promiseArr = [
+                    context.dispatch(RESET_BIODI_CSV_UPLOAD_STATE, null, {root: true}),
+                    context.dispatch(RESET_BIODI_CSV_DOWNLOAD_STATE, null, {root: true}),
+                    context.dispatch(RESET_CALIBRATION_STATE, null, {root: true}),
+                    context.dispatch(RESET_STATISTICS_STATE, null, {root: true}),
+                    context.dispatch(RESET_USER_STATE, null, {root: true})
+                ]
+
+                return Promise.all(promiseArr)
+            })
+            .then(() => {
                 router.push({name: 'Login'})
             })
             .catch((error) => {
@@ -53,6 +74,9 @@ const actions = {
 }
 
 const mutations = {
+    RESET_STATE: (state) => {
+        return Object.assign(state, getDefaultState())
+    },
     SET_EMAIL: (state, payload) => {
         return state.loginForm.email = payload.email
     },
@@ -80,7 +104,7 @@ const getters = {
 
 
 export default {
-    state: defaultState,
+    state: state,
     getters,
     actions,
     mutations,

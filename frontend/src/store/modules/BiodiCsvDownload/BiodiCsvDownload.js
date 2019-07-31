@@ -1,15 +1,23 @@
 import {getBiodiCsvComplete, getBiodiCsvRaw, getBiodiCsvMetas} from "../../../api/api";
-const moment = require('moment');
+const moment = require('moment/moment');
 
-const defaultState = {
-    metas: [],
-    biodiCsvCompleteToDownload : "",
-    biodiCsvRawToDownload: "",
-    error: null,
-    loading: false,
-};
+const getDefaultState = () => {
+    return {
+        metas: [],
+        biodiCsvCompleteToDownload: "",
+        biodiCsvRawToDownload: "",
+        error: null,
+        loading: false,
+    }
+}
+
+const state = getDefaultState()
 
 const actions = {
+    resetState: (context) => {
+        context.commit('RESET_STATE')
+    },
+
     setBiodiCsvCompleteToDownload: (context, payload) => {
       context.commit('SET_BIODI_CSV_COMPLETE_TO_DOWNLOAD', payload)
     },
@@ -35,7 +43,7 @@ const actions = {
                 link.parentNode.removeChild(link);
             })
             .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.message});
+                context.commit('SET_ERROR', {error: error.response.data.msg});
             })
             .finally(() => {
                 context.commit('SET_LOADING', {loading: false});
@@ -56,7 +64,7 @@ const actions = {
             })
             .catch((error) => {
                 console.log(error)
-                context.commit('SET_ERROR', {error: error.response.data.message})
+                context.commit('SET_ERROR', {error: error.response.data.msg})
             })
             .finally(() => {
                 context.commit('SET_LOADING', {loading: false})
@@ -68,7 +76,7 @@ const actions = {
         context.commit('SET_LOADING', {loading: true});
         getBiodiCsvMetas()
             .then((response) => {
-                console.log(response)
+                console.log('Got to fulfill')
                 let metas = response.data;
                 metas.forEach((meta) => {
                     meta.createdOn = moment(meta.createdOn).format('DD-MM-YYYY, h:mm:ss');
@@ -76,8 +84,8 @@ const actions = {
                context.commit('SET_METAS', {metas: metas});
             })
             .catch((error) => {
-                console.log(error.response)
-                context.commit('SET_ERROR', {error: error.response.data.message});
+                console.log('Got to error')
+                context.commit('SET_ERROR', {error: error.response.data.msg});
             })
             .finally(() => {
                 context.commit('SET_LOADING', {loading: false});
@@ -87,6 +95,9 @@ const actions = {
 };
 
 const mutations = {
+    RESET_STATE: (state) => {
+        return Object.assign(state, getDefaultState())
+    },
     SET_LOADING: (state, payload) => {
         return state.loading = payload.loading
     },
@@ -117,7 +128,7 @@ const getters = {
 };
 
 export default {
-    state: defaultState,
+    state: state,
     getters,
     actions,
     mutations,

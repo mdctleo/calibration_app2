@@ -38,7 +38,7 @@
 
 <script>
     import {mapActions} from 'vuex';
-    import * as types from '../../../store/modules/BiodiCsv/BiodiCsvDownloadTypes.js'
+    import * as types from '../../../store/modules/BiodiCsvDownload/BiodiCsvDownloadTypes.js'
     export default {
         name: "BiodiCsvDownload",
         props: {

@@ -4,7 +4,7 @@
 
 <script>
     import {mapActions, mapGetters} from "vuex";
-    import * as types from "../../../store/modules/BiodiCsv/BiodiCsvUploadTypes"
+    import * as types from "../../../store/modules/BiodiCsvUpload/BiodiCsvUploadTypes"
 
     export default {
         name: "BiodiCsvReviewInformation",

@@ -437,7 +437,7 @@ def biodiCsvMetas():
             return jsonify(response), 500
 
         response = StudyInformationMetaSchema(many=True).dump(result)
-        return jsonify(response), 200
+        return make_response(jsonify(response), 401)
 
 @bp.route('/chelators', methods=['GET'])
 @jwt_required

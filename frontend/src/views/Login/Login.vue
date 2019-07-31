@@ -1,5 +1,12 @@
 <template>
     <div class="form">
+        <el-alert
+                v-show="error"
+                :title="error"
+                type="error"
+                show-icon
+                @close="setError({error: null})">
+        </el-alert>
         <el-form :model="loginForm" ref="form" :rules="rules" label-width="120px" label-position="top">
             <el-row>
                 <el-col :span="12" :offset="6">
@@ -18,7 +25,7 @@
             </el-row>
             <el-row>
                 <el-col :span="12" :offset="6">
-                    <el-button type="success"@click="handleLogin">Login</el-button>
+                    <el-button type="success"@click="handleLogin('form')">Login</el-button>
                 </el-col>
             </el-row>
         </el-form>
@@ -50,7 +57,8 @@
             ...mapGetters({
                 getLoginForm: 'user/loginForm',
                 getEmail: 'user/email',
-                getPassword: 'user/password'
+                getPassword: 'user/password',
+                error: 'user/error'
             }),
 
             loginForm: {
@@ -88,11 +96,19 @@
                 'setEmail': types.SET_EMAIL,
                 'setPassword': types.SET_PASSWORD,
                 'login': types.LOGIN,
-                'logout': types.LOGOUT
+                'logout': types.LOGOUT,
+                'setError': types.SET_ERROR
             }),
 
-            handleLogin() {
-                this.login({loginForm: this.loginForm})
+            handleLogin(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        this.login({loginForm: this.loginForm})
+                    } else {
+                        console.log('error submit!!')
+                        return false
+                    }
+                })
             },
 
             handleLogout() {

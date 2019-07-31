@@ -10,3 +10,4 @@ export const CALCULATE_NOBS = "statistics/calculateNobs";
 export const CALCULATE_POWER = "statistics/calculatePower";
 export const GET_POWER_GRAPH = "statistics/getPowerGraph";
 export const GET_POWER_TABLE = "statistics/getPowerTable";
+export const RESET_STATE = "statistics/resetState"

@@ -1,19 +1,25 @@
 import {getCounters, getIsotopes, getCalibrationFactorsGraph, getCalibrationFactors} from "../../../api/api";
 const moment = require('moment/moment');
 
+const getDefaultState = () => {
+    return {
+        selectedCounter: null,
+        selectedIsotope: null,
+        counters: [],
+        isotopes: [],
+        calibrationFactores: [],
+        calibrationGraph: {},
+        loading: false,
+        error: null
+    }
+}
 
-const defaultState = {
-    selectedCounter: null,
-    selectedIsotope: null,
-    counters: [],
-    isotopes: [],
-    calibrationFactors: [],
-    calibrationGraph: {},
-    loading: false,
-    error: null
-};
+const defaultState = getDefaultState()
 
 const actions = {
+    resetState: (context) => {
+        context.commit('RESET_STATE')
+    },
     setSelectedCounter: (context, payload) => {
         context.commit('SET_SELECTED_COUNTER', payload)
     },
@@ -34,7 +40,7 @@ const actions = {
               context.commit('SET_COUNTERS', {counters: response.data})
           })
           .catch((error) => {
-              context.commit('SET_ERROR', {error: error.response.data.message})
+              context.commit('SET_ERROR', {error: error.response.data.msg})
           })
           .finally(() => {
               context.commit('SET_LOADING', {loading: false});
@@ -48,7 +54,7 @@ const actions = {
               context.commit('SET_ISOTOPES', {isotopes: response.data})
           })
           .catch((error) => {
-              context.commit('SET_ERROR', {error: error.response.data.message})
+              context.commit('SET_ERROR', {error: error.response.data.msg})
           })
           .finally(() => {
               context.commit('SET_LOADING', {loading: false});
@@ -68,7 +74,7 @@ const actions = {
 
           })
           .catch((error) => {
-              context.commit('SET_ERROR', {error: error.response.data.message})
+              context.commit('SET_ERROR', {error: error.response.data.msg})
           })
           .finally(() => {
               context.commit('SET_LOADING', {loading: false});
@@ -91,7 +97,7 @@ const actions = {
                 context.commit('SET_CALIBRATION_GRAPH', {calibrationGraph: graph});
             })
             .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.message})
+                context.commit('SET_ERROR', {error: error.response.data.msg})
             })
             .finally(() => {
                 context.commit('SET_LOADING', {loading: false});
@@ -101,6 +107,9 @@ const actions = {
 
 const mutations = {
     // sate setters
+    RESET_STATE: (state) => {
+        return Object.assign(state, getDefaultState())
+    },
     SET_SELECTED_COUNTER:  (state, payload) => {
         return state.selectedCounter = payload.selectedCounter;
     },

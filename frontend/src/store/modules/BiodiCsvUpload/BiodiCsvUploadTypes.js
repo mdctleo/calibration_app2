@@ -45,3 +45,5 @@ export const GET_CELL_LINES = "biodiCsvUpload/getCellLines"
 export const GET_MOUSE_STRAINS = "biodiCsvUpload/getMouseStrains"
 export const GET_TUMOR_MODELS = "biodiCsvUpload/getTumorModels"
 export const GET_COUNTERS = "biodiCsvUpload/getCounters"
+
+export const RESET_STATE = "biodiCsvUpload/resetState"

@@ -11,57 +11,65 @@ import {
 const moment = require('moment');
 const csv = require('csvtojson');
 
-const defaultState = {
-    studyForm: {
-        studyName: "",
-        studyDate: "",
-        researcherName: "",
-        piName: "",
-        radioIsotope: "",
-        chelator: "",
-        vector: "",
-        target: "",
-        cellLine: "",
-        mouseStrain: "",
-        tumorModel: "",
-        radioPurity: "",
-        comments: "",
-    },
+const getDefaultState = () => {
+    return {
+        studyForm: {
+            studyName: "",
+            studyDate: "",
+            researcherName: "",
+            piName: "",
+            radioIsotope: "",
+            chelator: "",
+            vector: "",
+            target: "",
+            cellLine: "",
+            mouseStrain: "",
+            tumorModel: "",
+            radioPurity: "",
+            comments: "",
+        },
 
-    gammaForm: {
-        gammaCounter: "",
-        gammaCounterRunTimeOffset: "",
-        gammaCounterRunComments: "",
-    },
+        gammaForm: {
+            gammaCounter: "",
+            gammaCounterRunTimeOffset: "",
+            gammaCounterRunComments: "",
+        },
 
-    organForm: {
-        selectedOrgans: []
-    },
+        organForm: {
+            selectedOrgans: []
+        },
 
-    mice: [],
-    availableOrgans: ["Lungs", "Liver", "Heart"],
-    biodiCsvs: [],
-    biodiCsvJson: null,
-    loading: false,
-    error: null,
-    startValidation: false,
-    mouseCsvFormat: "Mouse ID,Cage,Gender,Age,Group ID,Euthanasia Date,Euthanasia Time,Weight (g),Injection Date,Pre-Injection Time,Injection Time,Post-Injection Time,Pre-Injection MBq,Post-Injection MBq,Comments",
-    mouseCsvs: [],
-    mouseCsvJson: null,
-    organCsvFormat: ",Group ID,\nTube ID,Mouse ID",
-    organCsvs: [],
-    organCsvJson: null,
+        mice: [],
+        availableOrgans: ["Lungs", "Liver", "Heart"],
+        biodiCsvs: [],
+        biodiCsvJson: null,
+        loading: false,
+        error: null,
+        startValidation: false,
+        mouseCsvFormat: "Mouse ID,Cage,Gender,Age,Group ID,Euthanasia Date,Euthanasia Time,Weight (g),Injection Date,Pre-Injection Time,Injection Time,Post-Injection Time,Pre-Injection MBq,Post-Injection MBq,Comments",
+        mouseCsvs: [],
+        mouseCsvJson: null,
+        organCsvFormat: ",Group ID,\nTube ID,Mouse ID",
+        organCsvs: [],
+        organCsvJson: null,
 
-    isotopes: [],
-    chelators: [],
-    vectors: [],
-    cellLines: [],
-    mouseStrains: [],
-    tumorModels: [],
-    counters: []
-};
+        isotopes: [],
+        chelators: [],
+        vectors: [],
+        cellLines: [],
+        mouseStrains: [],
+        tumorModels: [],
+        counters: []
+    }
+}
+
+const state = getDefaultState()
 
 const actions = {
+    resetState: (context, payload) => {
+        context.commit('RESET_STATE')
+    },
+
     setStartValidation: (context, payload) => {
         context.commit('SET_START_VALIDATION', payload)
     },
@@ -157,7 +165,7 @@ const actions = {
                 context.commit('SET_ISOTOPES', {isotopes: response.data})
             })
             .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.message})
+                context.commit('SET_ERROR', {error: error.response.data.msg})
             })
             .finally(() => {
                 context.commit('SET_LOADING', {loading: false});
@@ -171,7 +179,7 @@ const actions = {
                 context.commit('SET_CHELATORS', {chelators: response.data})
             })
             .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.message})
+                context.commit('SET_ERROR', {error: error.response.data.msg})
             })
             .finally(() => {
                 context.commit('SET_LOADING', {loading: false});
@@ -185,7 +193,7 @@ const actions = {
                 context.commit('SET_VECTORS', {vectors: response.data})
             })
             .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.message})
+                context.commit('SET_ERROR', {error: error.response.data.msg})
             })
             .finally(() => {
                 context.commit('SET_LOADING', {loading: false});
@@ -199,7 +207,7 @@ const actions = {
                 context.commit('SET_CELL_LINES', {cellLines: response.data})
             })
             .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.message})
+                context.commit('SET_ERROR', {error: error.response.data.msg})
             })
             .finally(() => {
                 context.commit('SET_LOADING', {loading: false});
@@ -213,7 +221,7 @@ const actions = {
                 context.commit('SET_MOUSE_STRAINS', {mouseStrains: response.data})
             })
             .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.message})
+                context.commit('SET_ERROR', {error: error.response.data.msg})
             })
             .finally(() => {
                 context.commit('SET_LOADING', {loading: false})
@@ -227,7 +235,7 @@ const actions = {
                 context.commit('SET_TUMOR_MODELS', {tumorModels: response.data})
             })
             .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.message})
+                context.commit('SET_ERROR', {error: error.response.data.msg})
             })
             .finally(() => {
                 context.commit('SET_LOADING', {loading: false})
@@ -241,7 +249,7 @@ const actions = {
                 context.commit('SET_COUNTERS', {counters: response.data})
             })
             .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.message})
+                context.commit('SET_ERROR', {error: error.response.data.msg})
             })
             .finally(() => {
                 context.commit('SET_LOADING', {loading: false})
@@ -362,7 +370,7 @@ const actions = {
                 return false
             }
         } catch (err) {
-            context.commit('SET_ERROR', {error: err.message})
+            context.commit('SET_ERROR', {error: err.msg})
             return false
         } finally {
             context.commit('SET_LOADING', {loading: false})
@@ -452,7 +460,7 @@ const actions = {
             }
 
         } catch (err) {
-            context.commit('SET_ERROR', {error: err.message});
+            context.commit('SET_ERROR', {error: err.msg});
             return false;
         } finally {
             context.commit('SET_LOADING', {loading: false});
@@ -477,12 +485,6 @@ const actions = {
             return false
         } else if (row['Time'] === "") {
             return false
-        // } else if (row['Counts'] === "") {
-        //     return false
-        // } else if (row['CPM'] === "") {
-        //     return false
-        // } else if (row['Error %'] === "") {
-        //     return false
         } else {
             return true
         }
@@ -509,24 +511,7 @@ const actions = {
 
 
             for (let i = 0; i < csvFileJson.length; i++) {
-                // indexHolder = i
                 let row = csvFileJson[i]
-                // let protocolName = csvRow['Protocol name'];
-                // let oldCountKey = protocolName + ' Counts';
-                // let oldCPMKey = protocolName + ' CPM';
-                // let oldErrorKey = protocolName + ' Error %';
-                // let oldInfoKey = protocolName + ' Info';
-                //
-                // csvRow['Counts'] = csvRow[oldCountKey];
-                // csvRow['CPM'] = csvRow[oldCPMKey];
-                // csvRow['Error %'] = csvRow[oldErrorKey];
-                // csvRow['Info'] = csvRow[oldInfoKey];
-                //
-                // delete csvRow[oldCountKey];
-                // delete csvRow[oldCPMKey];
-                // delete csvRow[oldErrorKey];
-                // delete csvRow[oldInfoKey];
-                // delete csvRow['Protocol name'];
 
                 rowValidated = await context.dispatch('validateBiodiCsvs', row)
                 if (!rowValidated) {
@@ -576,6 +561,9 @@ const actions = {
 };
 
 const mutations = {
+    RESET_STATE: (state) => {
+        return Object.assign(state, getDefaultState())
+    },
     SET_START_VALIDATION: (state, payload) => {
         return state.startValidation = payload.startValidation
     },
@@ -767,7 +755,7 @@ const getters = {
 };
 
 export default {
-    state: defaultState,
+    state: state,
     getters,
     actions,
     mutations,

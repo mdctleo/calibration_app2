@@ -41,7 +41,7 @@
 
 <script>
     import {mapActions, mapGetters} from "vuex";
-    import * as types from '../../../store/modules/BiodiCsv/BiodiCsvUploadTypes.js'
+    import * as types from '../../../store/modules/BiodiCsvUpload/BiodiCsvUploadTypes.js'
     import BiodiCsvMouseInfo from "./BiodiCsvMouseInfo";
     import BiodiCsvUpload from "./BiodiCsvUpload";
     import BiodiCsvOrganOrder from "./BiodiCsvOrganOrder";
