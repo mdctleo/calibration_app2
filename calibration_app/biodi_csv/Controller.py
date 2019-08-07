@@ -15,6 +15,8 @@ from exceptions.Exceptions import *
 from marshmallow import ValidationError
 from flask import make_response
 import datetime
+import numpy as np
+import pandas as pd
 
 
 def prepareBiodiCsvRows(biodiCsvFile):
@@ -310,14 +312,13 @@ def getCompleteStudy(studyId):
 
                 for k, key in enumerate(windowsMap.keys()):
                     currWinNum = str((k + 1))
-                    deadTimeFactor = windowsMap[key][currRow].error
                     cpm = windowsMap[key][currRow].cpm
-                    row['Dead Time Factor' + currWinNum] = deadTimeFactor
+                    row['Dead Time Factor' + currWinNum] = "PlaceHolder"
                     row["IsotopeWin" + currWinNum] = key
                     row["Window" + currWinNum + " (counts)"] = windowsMap[key][currRow].counts
-                    row["Window" + currWinNum + " corrected (counts)"] = cpm / deadTimeFactor
+                    row["Window" + currWinNum + " corrected (counts)"] = windowsMap[key][currRow].counts
                     row["Window" + currWinNum + " (CPM)"] = cpm
-                    row["Normalized Window" + currWinNum + " (CPM)"] = "PlaceHolder"
+                    row["Normalized Window" + currWinNum + " (CPM)"] =  "PlaceHolder"
                     row["Normalized Window" + currWinNum + " (Bq)" ] = "PlaceHolder"
 
 
@@ -371,6 +372,13 @@ def getTumorModels():
         raise e
 
     return result
+
+def parseExcel(buffer):
+    try:
+        pd.DataFrame(buffer)
+    except Exception as e:
+        raise e
+
 
 @bp.route('/biodicsv', methods=['POST', 'GET'])
 @jwt_required
@@ -429,7 +437,6 @@ def biodiCsvRaw():
 def biodiCsvMetas():
     if request.method == 'GET':
         try:
-            print(get_raw_jwt())
             result = getMetas()
         except BaseException as e:
             result = StandardResponse(e.message)
@@ -437,7 +444,7 @@ def biodiCsvMetas():
             return jsonify(response), 500
 
         response = StudyInformationMetaSchema(many=True).dump(result)
-        return make_response(jsonify(response), 401)
+        return make_response(jsonify(response), 200)
 
 @bp.route('/chelators', methods=['GET'])
 @jwt_required
@@ -509,3 +516,13 @@ def tumorModels():
         response = TumorModelSchema(many=True).dump(result)
         return jsonify(response), 200
     return None
+
+@bp.route('/biodicsv-test', methods=['POST'])
+@jwt_required
+def biodiCsvTest():
+    if request.method =='POST':
+        print('Got here')
+        print(request.form)
+        print(request.form['file'])
+        parseExcel(request.form['file'])
+        return "Success", 200

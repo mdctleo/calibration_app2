@@ -44,10 +44,6 @@ class BiodiCsvRowSchema(Schema):
     pos = fields.Int(data_key='Pos')
     time = fields.Float(data_key='Time')
     sampleCode = fields.Str(data_key='Sample code', max_length=45)
-    # counts = fields.Float(data_key='Counts')
-    # cpm = fields.Float(data_key='CPM')
-    # error = fields.Float(data_key='Error %')
-    # info = fields.Str(data_key='Info', max_length=1)
 
 
 class BiodiCsvFileSchema(Schema):

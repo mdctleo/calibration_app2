@@ -49,75 +49,69 @@ const actions = {
         context.commit('SET_ERROR', payload)
     },
 
-    calculateEffect: (context, payload) => {
-        context.commit('SET_LOADING', {loading: true});
-        calculateEffect(payload.statisticForm)
-            .then((response) => {
-                console.log(response);
-                context.commit('SET_RESULT', {result: response.data.result})
-            })
-            .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.msg})
-            })
-            .finally(() => {
-                context.commit('SET_LOADING', {loading: false})
-            })
+    calculateEffect: async (context, payload) => {
+        try {
+            context.commit('SET_LOADING', {loading: true})
+            let response = await calculateEffect(payload.statisticForm)
+            let result = response.data.result
+            context.commit('SET_RESULT', {result: result})
+        } catch (error) {
+            context.commit('SET_ERROR', {error: error.response.data.msg})
+        } finally {
+            context.commit('SET_LOADING', {loading: false})
+        }
     },
 
-    calculateNobs: (context, payload) => {
-        context.commit('SET_LOADING', {loading: true});
-        calculateNobs(payload.statisticForm)
-            .then((response) => {
-                context.commit('SET_RESULT', {result: response.data.result})
-            })
-            .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.msg})
-            })
-            .finally(() => {
-                context.commit('SET_LOADING', {loading: false})
-            })
+    calculateNobs: async (context, payload) => {
+        try {
+            context.commit('SET_LOADING', {loading: true})
+            let response = await calculateNobs(payload.statisticForm)
+            let result = response.data.result
+            context.commit('SET_RESULT', {result: result})
+        } catch (error) {
+            context.commit('SET_ERROR', {error: error.response.data.msg})
+        } finally {
+            context.commit('SET_LOADING', {loading: false})
+        }
     },
 
-    calculatePower: (context, payload) => {
-        context.commit('SET_LOADING', {loading: true});
-        calculatePower(payload.statisticForm)
-            .then((response) => {
-                context.commit('SET_RESULT', {result: response.data.result})
-            })
-            .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.msg})
-            })
-            .finally(() => {
-                context.commit('SET_LOADING', {loading: false})
-            })
+    calculatePower: async (context, payload) => {
+        try {
+            context.commit('SET_LOADING', {loading: true})
+            let response = await calculatePower(payload.statisticForm)
+            let result = response.data.result
+            context.commit('SET_RESULT', {result: result})
+        } catch (error) {
+            context.commit('SET_ERROR', {error: error.response.data.msg})
+        } finally {
+            context.commit('SET_LOADING', {loading: false})
+        }
     },
 
-    getPowerGraph: (context, payload) => {
-        context.commit('SET_LOADING', {loading: true});
-        getPowerGraph(payload.statisticForm)
-            .then((response) => {
-                context.commit('SET_POWER_GRAPH', {powerGraph: response.data});
-            })
-            .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.msg})
-            })
-            .finally(() => {
-                context.commit('SET_LOADING', {loading: false})
-            })
+    getPowerGraph: async (context, payload) => {
+        try {
+            context.commit('SET_LOADING', {loading: true})
+            let response = await getPowerGraph(payload.statisticForm)
+            let graph = response.data
+            context.commit('SET_POWER_GRAPH', {powerGraph: graph});
+        } catch (error) {
+            context.commit('SET_ERROR', {error: error.response.data.msg})
+        } finally {
+            context.commit('SET_LOADING', {loading: false})
+        }
     },
 
-    getPowerTable: (context, payload) => {
-        context.commit('SET_LOADING', {loading: true});
-        getPowerTable(payload.statisticForm)
-            .then((response) => {
-                context.commit('SET_POWER_TABLE', {powerTable: response.data});
-            })
-            .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.msg})
-            })
-            .finally(() => {
-                context.commit('SET_LOADING', {loading: false})
-            })
+    getPowerTable: async (context, payload) => {
+        try {
+            context.commit('SET_LOADING', {loading: true})
+            let response = await getPowerTable(payload.statisticForm)
+            let table = response.data
+            context.commit('SET_POWER_TABLE', {powerTable: table});
+        } catch (error) {
+            context.commit('SET_ERROR', {error: error.response.data.msg})
+        } finally {
+            context.commit('SET_LOADING', {loading: false})
+        }
     }
 };
 

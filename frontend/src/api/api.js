@@ -35,6 +35,16 @@ export const getCalibrationFactorsGraph = async (model, isotope) => {
 };
 
 // BiodiCsv
+export const postBiodiCsvTest = async (payload) => {
+    let endpoint = BASE_URL + "/biodicsv-test"
+    let formData = new FormData()
+    formData.append("file", payload.file)
+    return await axios.post(endpoint, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+}
 
 export const postBiodiCsv = async (payload) => {
     let endpoint = BASE_URL + "/biodicsv";

@@ -30,66 +30,59 @@ const actions = {
         context.commit('SET_ERROR', payload);
     },
 
-    downloadBiodiCsvComplete: (context, payload) => {
-        context.commit('SET_LOADING', {loading: true});
-        getBiodiCsvComplete(payload.biodiCsvCompleteToDownload)
-            .then((response) => {
-                const url = window.URL.createObjectURL(new Blob([response.data]));
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', 'file.csv');
-                document.body.appendChild(link);
-                link.click();
-                link.parentNode.removeChild(link);
-            })
-            .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.msg});
-            })
-            .finally(() => {
-                context.commit('SET_LOADING', {loading: false});
-            })
+    downloadBiodiCsvComplete: async (context, payload) => {
+        try {
+            context.commit('SET_LOADING', {loading: true})
+            let response = await getBiodiCsvComplete(payload.biodiCsvCompleteToDownload)
+            const url = window.URL.createObjectURL(new Blob([response.data]))
+            const link = document.createElement('a')
+            link.href = url;
+            link.setAttribute('download', 'file.csv')
+            document.body.appendChild(link)
+            link.click()
+            link.parentNode.removeChild(link)
+        } catch (error) {
+            context.commit('SET_ERROR', {error: error.response.data.msg})
+        } finally {
+            context.commit('SET_LOADING', {loading: false})
+        }
     },
 
     downloadBiodiCsvRaw: (context, payload) => {
-        context.commit('SET_LOADING', {loading: true})
-        getBiodiCsvRaw(payload.biodiCsvRawToDownload)
-            .then((response) => {
-                const url = window.URL.createObjectURL(new Blob([response.data]))
-                const link = document.createElement('a')
-                link.href = url
-                link.setAttribute('download', 'file.csv')
-                document.body.appendChild(link)
-                link.click()
-                link.parentNode.removeChild(link)
-            })
-            .catch((error) => {
-                console.log(error)
-                context.commit('SET_ERROR', {error: error.response.data.msg})
-            })
-            .finally(() => {
-                context.commit('SET_LOADING', {loading: false})
-            })
-
+        try {
+            context.commit('SET_LOADING', {loading: true})
+            let response = getBiodiCsvRaw(payload.biodiCsvRawToDownload)
+            const url = window.URL.createObjectURL(new Blob([response.data]))
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download', 'file.csv')
+            document.body.appendChild(link)
+            link.click()
+            link.parentNode.removeChild(link)
+        } catch (error) {
+            console.log(error)
+            context.commit('SET_ERROR', {error: error.response.data.msg})
+        } finally {
+            context.commit('SET_LOADING', {loading: false})
+        }
     },
 
-    getBiodiCsvMetas: (context) => {
-        context.commit('SET_LOADING', {loading: true});
-        getBiodiCsvMetas()
-            .then((response) => {
-                console.log('Got to fulfill')
-                let metas = response.data;
-                metas.forEach((meta) => {
-                    meta.createdOn = moment(meta.createdOn).format('DD-MM-YYYY, h:mm:ss');
-                });
-               context.commit('SET_METAS', {metas: metas});
-            })
-            .catch((error) => {
-                console.log('Got to error')
-                context.commit('SET_ERROR', {error: error.response.data.msg});
-            })
-            .finally(() => {
-                context.commit('SET_LOADING', {loading: false});
-            })
+    getBiodiCsvMetas: async (context) => {
+        try {
+            context.commit('SET_LOADING', {loading: true});
+            let response = await getBiodiCsvMetas()
+            let metas = response.data
+            console.log('got to fulfilled')
+            metas.forEach((meta) => {
+                meta.createdOn = moment(meta.createdOn).format('DD-MM-YYYY, h:mm:ss');
+            });
+            context.commit('SET_METAS', {metas: metas});
+        } catch (error) {
+            console.log('Got to error')
+            context.commit('SET_ERROR', {error: error.response.data.msg});
+        } finally {
+            context.commit('SET_LOADING', {loading: false})
+        }
     }
 
 };

@@ -35,8 +35,10 @@ export const SET_SELECTED_ORGAN = "biodiCsvUpload/setSelectedOrgan";
 
 export const SET_BIODI_CSVS = "biodiCsvUpload/setBiodiCsvs";
 export const HANDLE_BIODI_CSVS = "biodiCsvUpload/handleBiodiCsvs";
+export const HANDLE_HIDEX_BIODI_CSVS = "biodiCsvUpload/handleHidexBiodiCsvs"
 
 export const POST_BIODI_CSV = "biodiCsvUpload/postBiodiCsv"
+export const POST_BIODI_CSV_TEST = "biodiCsvUpload/postBiodiCsvTest"
 
 export const GET_ISOTOPES = "biodiCsvUpload/getIsotopes"
 export const GET_CHELATORS = "biodiCsvUpload/getChelators"

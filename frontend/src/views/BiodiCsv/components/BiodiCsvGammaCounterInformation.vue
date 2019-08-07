@@ -6,8 +6,12 @@
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Gamma Counter ID" prop="gammaCounter">
                         <el-select v-model="gammaCounter" placeholder="Please select the gamma counter">
-                            <el-option label="gammaCounter1" value="gammaCounter1"></el-option>
-                            <el-option label="gammaCounter2" value="gammaCounter2"></el-option>
+                            <el-option
+                                    v-for="gammaCounter in gammaCounters"
+                                    :key="gammaCounter.model"
+                                    :label="gammaCounter.model"
+                                    :value="gammaCounter.model"
+                            ></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
@@ -76,6 +80,7 @@
                 getGammaCounterRunDateTime: 'biodiCsvUpload/gammaCounterRunDateTime',
                 getGammaCounterRunTimeOffset: 'biodiCsvUpload/gammaCounterRunTimeOffset',
                 getGammaCounterRunComments: 'biodiCsvUpload/gammaCounterRunComments',
+                gammaCounters: 'biodiCsvUpload/gammaCounters',
                 mouseCsvs: 'biodiCsvUpload/mouseCsvs',
                 biodiCsvs: 'biodiCsvUpload/biodiCsvs',
                 organCsvs: 'biodiCsvUpload/organCsvs'
@@ -138,18 +143,28 @@
                         this.$refs['form'].validate(),
                         this.handleMouseCsvs({mouseCsvs: this.mouseCsvs}),
                         this.handleOrganCsvs({organCsvs: this.organCsvs}),
-                        this.handleBiodiCsvs({biodiCsvs: this.biodiCsvs}),
+                        this.handleBiodiCsvs({biodiCsvs: this.biodiCsvs})
                     ]
+
+                    // if (this.gammaCounter === 'Hidex') {
+                    //     validationArr.push(this.handleHidexBiodiCsvs({biodiCsvs: this.biodiCsvs}))
+                    // } else {
+                    //     validationArr.push(this.handleBiodiCsvs({biodiCsvs: this.biodiCsvs}))
+                    // }
 
                     Promise.all(validationArr)
                         .then((result) => {
                             let formValid = result[0]
-                            let mouseCsvValid = result[1]
-                            let organCsvValid = result[2]
-                            let biodiCsvValid = result[3]
+                            let mouseCsvValid = true
+                            let organCsvValid = true
+                            // let biodiCsvValid = result[3]
+                            console.log("Finished promise all")
+                            let biodiCsvValid = true
                             if (formValid && mouseCsvValid && organCsvValid && biodiCsvValid) {
+                                console.log("emittint validated")
                                 this.$emit('validated', true)
                             } else {
+                                console.log("emitted invalid")
                                 this.$emit('validated', false)
                             }
                         })
@@ -166,9 +181,11 @@
                 'setGammaCounterRunDateTime': types.SET_GAMMA_COUNTER_RUN_DATE_TIME,
                 'setGammaCounterRunTimeOffset': types.SET_GAMMA_COUNTER_RUN_TIME_OFFSET,
                 'setGammaCounterRunComments': types.SET_GAMMA_COUNTER_RUN_COMMENTS,
+                'handleHidexBiodiCsvs': types.HANDLE_HIDEX_BIODI_CSVS,
                 'handleBiodiCsvs': types.HANDLE_BIODI_CSVS,
                 'handleOrganCsvs': types.HANDLE_ORGAN_CSVS,
                 'handleMouseCsvs': types.HANDLE_MOUSE_CSVS,
+                'getCounters': types.GET_COUNTERS
             }),
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
@@ -179,6 +196,10 @@
                     }
                 });
             }
+        },
+
+        created() {
+            this.getCounters()
         }
     }
 </script>

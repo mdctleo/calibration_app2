@@ -1,5 +1,5 @@
 <template>
-    <div class="form">
+    <div class="form" v-loading="loading">
         <el-alert
                 v-show="error"
                 :title="error"
@@ -58,7 +58,8 @@
                 getLoginForm: 'user/loginForm',
                 getEmail: 'user/email',
                 getPassword: 'user/password',
-                error: 'user/error'
+                error: 'user/error',
+                loading: 'user/loading'
             }),
 
             loginForm: {

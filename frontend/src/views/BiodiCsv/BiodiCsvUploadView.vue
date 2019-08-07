@@ -16,7 +16,7 @@
         <BiodiCsvGammaCounterInformation @validated="moveNext" :bus="bus" v-if="step === 1"></BiodiCsvGammaCounterInformation>
         <BiodiCsvReviewInformation v-if="step === 2"></BiodiCsvReviewInformation>
         <el-button @click="handleNext" class="next">Next</el-button>
-        <el-button @click="handlePrevious" class="previous">Previous</el-button>
+        <el-button @click="handlePrevious" class="previous" v-if="this.step !== 0">Previous</el-button>
     </div>
 </template>
 

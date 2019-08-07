@@ -14,6 +14,7 @@ const getDefaultState = () => {
             password: ""
         },
         error: null,
+        loading: false,
         isLoggedIn: false
     }
 }
@@ -35,22 +36,24 @@ const actions = {
         context.commit('SET_ERROR', payload)
     },
 
-    login: (context, payload) => {
-        login(payload.loginForm)
-            .then((response) => {
-                let token = response.data.token
-                localStorage.setItem('token', token)
-                Vue.prototype.$http.defaults.headers.common['Authorization'] = "Bearer " + token
-                context.commit('SET_IS_LOGGED_IN', {isLoggedIn: true})
-                router.push({name: 'Dashboard'})
-
-            })
-            .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.msg})
-            })
+    login: async (context, payload) => {
+        try {
+            context.commit('SET_LOADING', {loading: true})
+            let response = await login(payload.loginForm)
+            let token = response.data.token
+            localStorage.setItem('token', token)
+            Vue.prototype.$http.defaults.headers.common['Authorization'] = "Bearer " + token
+            context.commit('SET_IS_LOGGED_IN', {isLoggedIn: true})
+            router.push({name: 'Dashboard'})
+        } catch (error) {
+            context.commit('SET_ERROR', {error: error.response.data.msg})
+        } finally {
+            context.commit('SET_LOADING', {loading: false})
+        }
     },
 
-    logout: (context, payload) => {
+    logout: async (context, payload) => {
+        context.commit('SET_LOADING', {loading: true})
         logout()
             .then((response) => {
                 let promiseArr = [
@@ -69,6 +72,9 @@ const actions = {
             .catch((error) => {
                 console.log(error.response.data.message)
                 context.commit('SET_ERROR', {error: error.response.data.msg})
+            })
+            .finally(() => {
+                context.commit('SET_LOADING', {loading: false})
             })
     }
 }
@@ -91,6 +97,10 @@ const mutations = {
 
     SET_IS_LOGGED_IN: (state, payload) => {
         return state.isLoggedIn = payload.isLoggedIn
+    },
+
+    SET_LOADING: (state, payload) => {
+        return state.loading = payload.loading
     }
 }
 
@@ -99,7 +109,8 @@ const getters = {
     email: state => state.loginForm.email,
     password: state => state.loginForm.password,
     error: state => state.error,
-    isLoggedIn: state => state.isLoggedIn
+    isLoggedIn: state => state.isLoggedIn,
+    loading: state => state.loading
 }
 
 

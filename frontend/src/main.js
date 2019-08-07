@@ -43,11 +43,9 @@ new Vue({
 // response interceptor for 401
 Vue.prototype.$http.interceptors.response.use(
     (response) => {
-      console.log('intercepted it on fulfilled')
       return response
     },
     (error) => {
-      console.log('intercepted it on error')
       if (error.response.status === 401) {
         let promiseArr = [
           store.dispatch(RESET_BIODI_CSV_UPLOAD_STATE, null, {root: true}),
@@ -62,7 +60,9 @@ Vue.prototype.$http.interceptors.response.use(
               router.push('/')
             })
             .catch((error) => {
-
+                console.log(error)
             })
       }
+
+      throw error
     })

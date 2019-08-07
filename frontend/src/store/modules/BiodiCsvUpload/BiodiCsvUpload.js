@@ -1,15 +1,18 @@
 import {
     getCellLines,
     getChelators,
-    getCounters, getIsotopes,
+    getCounters,
+    getIsotopes,
     getMouseStrains,
     getTumorModels,
     getVectors,
-    postBiodiCsv
+    postBiodiCsv,
+    postBiodiCsvTest
 } from "../../../api/api";
 
 const moment = require('moment');
 const csv = require('csvtojson');
+
 
 const getDefaultState = () => {
     return {
@@ -42,6 +45,7 @@ const getDefaultState = () => {
         mice: [],
         availableOrgans: ["Lungs", "Liver", "Heart"],
         biodiCsvs: [],
+        biodiCsvFile: null,
         biodiCsvJson: null,
         loading: false,
         error: null,
@@ -53,13 +57,13 @@ const getDefaultState = () => {
         organCsvs: [],
         organCsvJson: null,
 
+        gammaCounters: [],
         isotopes: [],
         chelators: [],
         vectors: [],
         cellLines: [],
         mouseStrains: [],
         tumorModels: [],
-        counters: []
     }
 }
 
@@ -246,7 +250,7 @@ const actions = {
         context.commit('SET_LOADING', {loading: true})
         getCounters()
             .then((response) => {
-                context.commit('SET_COUNTERS', {counters: response.data})
+                context.commit('SET_GAMMA_COUNTERS', {gammaCounters: response.data})
             })
             .catch((error) => {
                 context.commit('SET_ERROR', {error: error.response.data.msg})
@@ -285,11 +289,11 @@ const actions = {
                 reject("Something went wrong");
             };
 
-            fileReader.onload = () => {
+            fileReader.onload = (e) => {
                 resolve(fileReader.result);
             };
 
-            fileReader.readAsText(file)
+            fileReader.readAsArrayBuffer(file)
         })
     },
 
@@ -467,11 +471,27 @@ const actions = {
         }
     },
 
+   validateHidexBiodiCsvs: (context, row) => {
+     if (row['Rack'] === "") {
+         return false
+     } else if (row['Vial'] === "") {
+         return false
+     } else if (row['Time'] === "") {
+         return false
+     } else if (row['Counted time (s)'] === "") {
+         return false
+     } else if (row['Dead time factor'] === "") {
+         return false
+     } else {
+         return true
+     }
+   },
+
+
     validateBiodiCsvs: (context, row) => {
         if (row['Protocol ID'] === "") {
             return false
         } else if (row['Measurement date & time'] === "" || !moment(row['Measurement date & time'], "YYYY-MM-DD HH:mm:ss", true).isValid()) {
-            console.log("measurement date & time validation failed")
             return false
         } else if (row['Completion status'] === "") {
             return false
@@ -492,49 +512,16 @@ const actions = {
 
     handleBiodiCsvs: async (context, payload) => {
         try {
-            context.commit('SET_LOADING', {loading: true});
+            context.commit('SET_LOADING', {loading: true})
             if (payload.biodiCsvs.length === 0) {
                 context.commit('SET_ERROR', {error: "biodi csv not uploaded"})
                 return false
             }
+
             let biodiCsvFile = payload.biodiCsvs[0]
-            let csvFile = await context.dispatch('readFile', biodiCsvFile.raw)
-            let csvFileJson = await csv().fromString(csvFile)
-            let rowValidated = true
-            let indexHolder = 0
-
-
-            if (csvFileJson.length === 0) {
-                context.commit('SET_ERROR', {error: "biodii csv empty"})
-                return false
-            }
-
-
-            for (let i = 0; i < csvFileJson.length; i++) {
-                let row = csvFileJson[i]
-
-                rowValidated = await context.dispatch('validateBiodiCsvs', row)
-                if (!rowValidated) {
-                    break
-                }
-            }
-
-
-
-            if (rowValidated) {
-                let fileFormat = {
-                    fileName: biodiCsvFile.name,
-                    file: csvFileJson
-                };
-
-                context.commit('SET_BIODI_CSV_JSON', {biodiCsvJson: fileFormat})
-                return true
-            } else {
-                context.commit('SET_ERROR', {error: "There is an error in biodi csv on row " + (indexHolder + 2)})
-                return false
-
-            }
-
+            let csvFile =  await context.dispatch('readFile', biodiCsvFile.raw)
+            context.commit('SET_BIODI_CSV_FILE', {biodiCsvFile: csvFile})
+            return true
         } catch (error) {
             context.commit('SET_ERROR', {error: error.response.data.message})
             return false
@@ -542,6 +529,60 @@ const actions = {
             context.commit('SET_LOADING', {loading: false});
         }
     },
+
+
+    // handleBiodiCsvs: async (context, payload) => {
+    //     try {
+    //         context.commit('SET_LOADING', {loading: true});
+    //         if (payload.biodiCsvs.length === 0) {
+    //             context.commit('SET_ERROR', {error: "biodi csv not uploaded"})
+    //             return false
+    //         }
+    //         let biodiCsvFile = payload.biodiCsvs[0]
+    //         let csvFile = await context.dispatch('readFile', biodiCsvFile.raw)
+    //         let csvFileJson = await csv().fromString(csvFile)
+    //         let rowValidated = true
+    //         let indexHolder = 0
+    //
+    //
+    //         if (csvFileJson.length === 0) {
+    //             context.commit('SET_ERROR', {error: "biodii csv empty"})
+    //             return false
+    //         }
+    //
+    //
+    //         for (let i = 0; i < csvFileJson.length; i++) {
+    //             let row = csvFileJson[i]
+    //             rowValidated = await context.dispatch('validateBiodiCsvs', row)
+    //
+    //             if (!rowValidated) {
+    //                 break
+    //             }
+    //         }
+    //
+    //
+    //
+    //         if (rowValidated) {
+    //             let fileFormat = {
+    //                 fileName: biodiCsvFile.name,
+    //                 file: csvFileJson
+    //             };
+    //
+    //             context.commit('SET_BIODI_CSV_JSON', {biodiCsvJson: fileFormat})
+    //             return true
+    //         } else {
+    //             context.commit('SET_ERROR', {error: "There is an error in biodi csv on row " + (indexHolder + 2)})
+    //             return false
+    //
+    //         }
+    //
+    //     } catch (error) {
+    //         context.commit('SET_ERROR', {error: error.response.data.message})
+    //         return false
+    //     } finally {
+    //         context.commit('SET_LOADING', {loading: false});
+    //     }
+    // },
 
     postBiodiCsv(context, payload) {
         context.commit('SET_LOADING', {loading: true})
@@ -555,9 +596,18 @@ const actions = {
             .finally(() => {
                 context.commit('SET_LOADING', {loading: false})
             })
+    },
+
+    postBiodiCsvTest(context, payload) {
+        try {
+            context.commit('SET_LOADING', {loading: true})
+            let result = postBiodiCsvTest(payload)
+        } catch (error) {
+            context.commit('SET_ERROR', {error: error.response.data.message})
+        } finally {
+            context.commit('SET_LOADING', {loading: false})
+        }
     }
-
-
 };
 
 const mutations = {
@@ -700,8 +750,12 @@ const mutations = {
         return state.tumorModels = payload.tumorModels
     },
 
-    SET_COUNTERS: (state, payload) => {
-        return state.counters = payload.counters
+    SET_GAMMA_COUNTERS: (state, payload) => {
+        return state.gammaCounters = payload.gammaCounters
+    },
+
+    SET_BIODI_CSV_FILE: (state, payload) => {
+        return state.biodiCsvFile = payload.biodiCsvFile
     }
 };
 
@@ -743,6 +797,7 @@ const getters = {
     mouseCsvs: state => state.mouseCsvs,
     mouseCsvJson: state => state.mouseCsvJson,
     biodiCsvs: state => state.biodiCsvs,
+    biodiCsvFile: state => state.biodiCsvFile,
     biodiCsvJson: state => state.biodiCsvJson,
 
     isotopes: state => state.isotopes,
@@ -751,7 +806,7 @@ const getters = {
     cellLines: state => state.cellLines,
     mouseStrains: state => state.mouseStrains,
     tumorModels: state => state.tumorModels,
-    counters: state => state.counters
+    gammaCounters: state => state.gammaCounters
 };
 
 export default {
