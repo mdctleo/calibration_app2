@@ -37,13 +37,17 @@ export const getCalibrationFactorsGraph = async (model, isotope) => {
 // BiodiCsv
 export const postBiodiCsvTest = async (payload) => {
     let endpoint = BASE_URL + "/biodicsv-test"
-    let formData = new FormData()
-    formData.append("file", payload.file)
-    return await axios.post(endpoint, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
+    let data = new FormData()
+    console.log(payload.file)
+    data.append("file", new Blob([payload.file], {type: payload.file.type}))
+    console.log(data)
+    return await axios({
+        method: 'post',
+        url: endpoint,
+        data: data,
+        config: { headers: {'Content-Type': 'multipart/form-data'}}
     })
+
 }
 
 export const postBiodiCsv = async (payload) => {

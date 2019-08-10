@@ -15,6 +15,7 @@ from exceptions.Exceptions import *
 from marshmallow import ValidationError
 from flask import make_response
 import datetime
+import io
 import numpy as np
 import pandas as pd
 
@@ -373,9 +374,51 @@ def getTumorModels():
 
     return result
 
-def parseExcel(buffer):
+def createStudyHidex(df):
+
+    return None
+
+
+def formatStudy(df, startRow):
     try:
-        pd.DataFrame(buffer)
+        # prepare data
+        df = df.truncate(before=startRow, copy=False)
+        # become slicing is [closed : open]
+        lastColumnIndex = df.head(1).size
+        columns = df.head(1).to_numpy()[0]
+        columnsAfterTags = columns[lastColumnIndex:]
+        columnsToDelete = []
+
+        for colName in columnsAfterTags:
+            columnsToDelete.append(colName)
+
+        df.drop(columnsToDelete, axis=1, inplace=True)
+        # rename the columns
+        df.columns = columns
+        # get rid off extra row that is now the column
+        df = df.truncate(before=(startRow + 1), copy=False)
+
+        return df
+    except Exception as e:
+        raise e
+
+def parseExcel(file):
+    try:
+        df = pd.read_excel(file)
+        startRow = -1
+        for row in df.itertuples():
+            if (row[1] == 'Results'):
+                startRow = row[0] + 1
+                break
+
+
+        if (startRow == -1):
+            # TODO: Create an exception for this
+            print("Throw an exception here")
+
+        df = formatStudy(df, startRow)
+        createStudyHidex(df)
+
     except Exception as e:
         raise e
 
@@ -522,7 +565,7 @@ def tumorModels():
 def biodiCsvTest():
     if request.method =='POST':
         print('Got here')
-        print(request.form)
-        print(request.form['file'])
-        parseExcel(request.form['file'])
+        print(request.files)
+        file = request.files['file']
+        parseExcel(file)
         return "Success", 200

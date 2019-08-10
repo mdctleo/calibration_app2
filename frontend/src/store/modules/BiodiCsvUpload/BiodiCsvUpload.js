@@ -519,10 +519,11 @@ const actions = {
             }
 
             let biodiCsvFile = payload.biodiCsvs[0]
-            let csvFile =  await context.dispatch('readFile', biodiCsvFile.raw)
-            context.commit('SET_BIODI_CSV_FILE', {biodiCsvFile: csvFile})
+            // let csvFile =  await context.dispatch('readFile', biodiCsvFile.raw)
+            context.commit('SET_BIODI_CSV_FILE', {biodiCsvFile: biodiCsvFile.raw})
             return true
         } catch (error) {
+            console.log(error)
             context.commit('SET_ERROR', {error: error.response.data.message})
             return false
         } finally {
