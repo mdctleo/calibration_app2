@@ -131,7 +131,7 @@ class Window(db.Model):
     isotopeName = db.Column(WINDOWS_C_ISOTOPE, db.ForeignKey(ISOTOPE_T_NAME + '.' + ISOTOPE_C_ISOTOPE_NAME), nullable=False)
     counts = db.Column(WINDOWS_C_COUNTS, db.Float, nullable=False)
     cpm = db.Column(WINDOWS_C_CPM, db.Float, nullable=False)
-    error = db.Column(WINDOWS_C_ERROR, db.Float, nullable=False)
+    error = db.Column(WINDOWS_C_ERROR, db.Float)
     info = db.Column(WINDOWS_C_INFO, db.CHAR(1))
 
     def __repr__(self):

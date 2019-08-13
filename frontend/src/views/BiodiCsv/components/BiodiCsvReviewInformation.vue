@@ -13,6 +13,8 @@
                 studyForm: "biodiCsvUpload/studyForm",
                 gammaForm: "biodiCsvUpload/gammaForm",
                 biodiCsvs: "biodiCsvUpload/biodiCsvs",
+                mouseCsvs: "biodiCsvUpload/mouseCsvs",
+                organCsvs: "biodiCsvUpload/organCsvs",
                 biodiCsvFile: "biodiCsvUpload/biodiCsvFile",
                 mouseCsvJson: "biodiCsvUpload/mouseCsvJson",
                 organCsvJson: "biodiCsvUpload/organCsvJson",
@@ -28,7 +30,9 @@
 
             handleSubmit() {
                 console.log(this.biodiCsvFile)
-                this.postBiodiCsvTest({file: this.biodiCsvFile})
+                this.postBiodiCsvTest({biodiCsv: this.biodiCsvFile,
+                                       mouseCsv: this.mouseCsvs[0].raw,
+                                       organCsv: this.organCsvs[0].raw })
                 // this.postBiodiCsv({
                 //     biodiCsv: this.biodiCsvJson,
                 //     studyInfo: this.studyForm,
