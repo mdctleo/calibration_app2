@@ -2,6 +2,8 @@ import io
 import numpy as np
 from calibration_app.biodi_csv.Model import MouseOrgan, BiodiCsvRow, StudyInformation, Mouse, Window
 from calibration_app.biodi_csv.DatabaseHelper import DatabaseHelper as db
+from calibration_app.biodi_csv.MouseParser import *
+from calibration_app.biodi_csv.StudyInfoParser import *
 from exceptions.Exceptions import *
 import pandas as pd
 
@@ -40,10 +42,12 @@ def prepareHidexWindow(row, rowNum):
 
     return windows
 
-def prepareHidexBiodiCsvRows(biodiCsvRowsDict):
+def prepareHidexBiodiCsvRows(df):
     try:
         windows = []
         biodiCsvRows = []
+        biodiCsvRowsDict = df.to_dict('records')
+        measurementTime = biodiCsvRowsDict[0]['Time']
         for i, row in enumerate(biodiCsvRowsDict):
             rowNum = i + 1
             biodiCsvRows.append(BiodiCsvRow(
@@ -57,27 +61,7 @@ def prepareHidexBiodiCsvRows(biodiCsvRowsDict):
     except BaseException as e:
         raise e
 
-    return biodiCsvRows, windows
-
-def prepareHidexStudyInformation():
-
-    return None
-
-
-
-def createHidexStudy(df):
-    try:
-        with db.getDb().session.no_autoflush:
-            biodiCsvRowsDict = df.to_dict('records')
-            print(biodiCsvRowsDict)
-            biodiCsvRows, windows = prepareHidexBiodiCsvRows(biodiCsvRowsDict)
-            print(biodiCsvRows)
-            print(windows)
-
-    except BaseException as e:
-        raise e
-
-    return None
+    return biodiCsvRows, windows, measurementTime
 
 def formatStudy(df, startRow):
     try:
@@ -117,7 +101,25 @@ def parseHidexExcel(file):
             print("Throw an exception here")
 
         df = formatStudy(df, startRow)
-        createHidexStudy(df)
 
+    except Exception as e:
+        raise e
+
+    return df
+
+
+def handleHidexStudy(file, studyInfo, gammaInfo, mouseInfo, organInfo):
+    try:
+        with db.getDb().session.no_autoflush:
+            df = parseHidexExcel(file)
+            mouseOrgans = assignOrgansToMouse(mouseInfo, organInfo)
+            biodiCsvRows, windows, measurementTime = prepareHidexBiodiCsvRows(df)
+            mice = prepareMiceAndOrgans(mouseOrgans)
+            study = prepareStudyInformation(studyInfo, gammaInfo, None, measurementTime)
+            study.biodiCsvRows = biodiCsvRows
+            study.windows = windows
+            study.mice = mice
+
+            db.createStudy(study)
     except Exception as e:
         raise e

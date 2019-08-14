@@ -30,9 +30,13 @@
 
             handleSubmit() {
                 console.log(this.biodiCsvFile)
-                this.postBiodiCsvTest({biodiCsv: this.biodiCsvFile,
-                                       mouseCsv: this.mouseCsvs[0].raw,
-                                       organCsv: this.organCsvs[0].raw })
+                console.log(this.mouseCsvJson)
+                console.log(this.organCsvJson)
+                this.postBiodiCsvTest({studyInfo: this.studyForm,
+                                       gammaInfo: this.gammaForm,
+                                       biodiCsv: this.biodiCsvFile,
+                                       mouseInfo: this.mouseCsvJson,
+                                       organInfo: this.organCsvJson })
                 // this.postBiodiCsv({
                 //     biodiCsv: this.biodiCsvJson,
                 //     studyInfo: this.studyForm,

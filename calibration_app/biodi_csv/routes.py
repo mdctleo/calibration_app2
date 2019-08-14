@@ -9,6 +9,9 @@ from response.response import StandardResponse, StandardResponseSchema
 from flask import make_response
 from calibration_app.biodi_csv.Controller import *
 from calibration_app.biodi_csv.HidexParser import *
+from calibration_app.biodi_csv.MouseParser import *
+import pandas as pd
+import json
 
 
 @bp.route('/biodicsv', methods=['POST', 'GET'])
@@ -152,11 +155,21 @@ def tumorModels():
 @jwt_required
 def biodiCsvTest():
     if request.method =='POST':
+        print(request)
         print(request.files)
-        hidex = request.files['hidex']
-        mouseCsv = request.files['mouseCsv']
-        OrganCsv = request.files['organCsv']
-        print(mouseCsv)
-        print(OrganCsv)
-        parseHidexExcel(hidex)
+        print(request.get_json())
+        # studyInfo = json.load(request.files['studyInfo'])
+        # gammaInfo = json.load(request.files['gammaInfo'])
+        mouseInfo = pd.read_json(request.files['mouseInfo'])
+        organInfo = json.load(request.files['organInfo'])
+        biodiFile = request.files['biodiFile']
+        print(mouseInfo)
+
+        # if gammaInfo['gammaCounter'] == "Hidex":
+        #     handleHidexStudy(biodiFile,studyInfo, gammaInfo, mouseInfo, organInfo)
+
+        # print(request.files)
+        # hidex = request.files['hidex']
+        # mouseCsv = request.files['mouseCsv']
+        # organCsv = request.files['organCsv']
         return "Success", 200

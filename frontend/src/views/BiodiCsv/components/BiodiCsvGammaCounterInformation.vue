@@ -146,19 +146,13 @@
                         this.handleBiodiCsvs({biodiCsvs: this.biodiCsvs})
                     ]
 
-                    // if (this.gammaCounter === 'Hidex') {
-                    //     validationArr.push(this.handleHidexBiodiCsvs({biodiCsvs: this.biodiCsvs}))
-                    // } else {
-                    //     validationArr.push(this.handleBiodiCsvs({biodiCsvs: this.biodiCsvs}))
-                    // }
 
                     Promise.all(validationArr)
                         .then((result) => {
                             let formValid = result[0]
-                            let mouseCsvValid = true
-                            let organCsvValid = true
+                            let mouseCsvValid = result[1]
+                            let organCsvValid = result[2]
                             // let biodiCsvValid = result[3]
-                            console.log("Finished promise all")
                             let biodiCsvValid = true
                             if (formValid && mouseCsvValid && organCsvValid && biodiCsvValid) {
                                 console.log("emittint validated")

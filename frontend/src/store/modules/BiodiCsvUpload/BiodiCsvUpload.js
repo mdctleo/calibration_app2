@@ -293,7 +293,7 @@ const actions = {
                 resolve(fileReader.result);
             };
 
-            fileReader.readAsArrayBuffer(file)
+            fileReader.readAsText(file)
         })
     },
 
@@ -470,22 +470,6 @@ const actions = {
             context.commit('SET_LOADING', {loading: false});
         }
     },
-
-   validateHidexBiodiCsvs: (context, row) => {
-     if (row['Rack'] === "") {
-         return false
-     } else if (row['Vial'] === "") {
-         return false
-     } else if (row['Time'] === "") {
-         return false
-     } else if (row['Counted time (s)'] === "") {
-         return false
-     } else if (row['Dead time factor'] === "") {
-         return false
-     } else {
-         return true
-     }
-   },
 
 
     validateBiodiCsvs: (context, row) => {
