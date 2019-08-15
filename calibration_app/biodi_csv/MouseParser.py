@@ -1,8 +1,7 @@
 from calibration_app.biodi_csv.Model import MouseOrgan, Mouse
 from exceptions.Exceptions import *
 from datetime import datetime
-from datetime import date
-from datetime import time
+
 
 def assignOrgansToMouse(mouseInfo, organInfo):
     mouseOrgans = []

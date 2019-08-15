@@ -71,7 +71,7 @@ class StudyInformation(db.Model):
     gammaCounter = db.Column(STUDY_INFORMATION_C_GAMMA_COUNTER, db.String(8), db.ForeignKey(GAMMA_COUNTERS_T_NAME + '.' + GAMMA_COUNTERS_C_MODEL), nullable=False)
     runDateTime = db.Column(STUDY_INFORMATION_C_RUN_DATE_TIME, db.DateTime, nullable=False)
     gammaRunComments = db.Column(STUDY_INFORMATION_C_GAMMA_RUN_COMMENTS, db.Text)
-    protocolId = db.Column(STUDY_INFORMATION_C_PROTOCOL_ID, db.Integer, db.ForeignKey(PROTOCOL_T_NAME + '.' + PROTOCOL_C_ID), nullable=False)
+    protocolId = db.Column(STUDY_INFORMATION_C_PROTOCOL_ID, db.Integer, db.ForeignKey(PROTOCOL_T_NAME + '.' + PROTOCOL_C_ID))
     createdOn = db.Column(STUDY_INFORMATION_C_CREATED_ON, db.TIMESTAMP, default=datetime.datetime.utcnow)
     biodiCsvRows = db.relationship('BiodiCsvRow', cascade="all, delete-orphan", backref=db.backref(STUDY_INFORMATION_T_NAME, lazy='joined'), lazy=True)
     mice = db.relationship('Mouse', cascade="all, delete-orphan", backref=db.backref(STUDY_INFORMATION_T_NAME, lazy='joined'), lazy=True)

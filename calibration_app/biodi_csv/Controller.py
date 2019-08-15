@@ -5,172 +5,6 @@ from calibration_app.biodi_csv.DatabaseHelper import DatabaseHelper as db
 from exceptions.Exceptions import *
 import datetime
 
-
-def prepareBiodiCsvRows(biodiCsvFile):
-    biodiCsvRows = []
-    protocolId = biodiCsvFile[0]['protocolId']
-    for i, row in enumerate(biodiCsvFile):
-        rowNum = i + 1
-        biodiCsvRows.append(BiodiCsvRow(
-                                        rowNum=rowNum,
-                                        measurementTime=row["measurementTime"],
-                                        completionStatus=row["completionStatus"],
-                                        runId=row["runId"],
-                                        rack=row["rack"],
-                                        det=row["det"],
-                                        pos=row["pos"],
-                                        time=row["time"],
-                                        sampleCode=row["sampleCode"]
-                                        ))
-
-
-    return biodiCsvRows, protocolId
-
-
-def prepareStudyInformation(studyInfo, gammaInfo, protocolId, measurementTime):
-        return StudyInformation(studyName=studyInfo['studyName'],
-                                studyDate=studyInfo['studyDate'],
-                                researcherName=studyInfo['researcherName'],
-                                piName=studyInfo['piName'],
-                                isotopeName=studyInfo['radioIsotope'],
-                                chelatorName=studyInfo['chelator'],
-                                vectorName=studyInfo['vector'],
-                                target=studyInfo['target'],
-                                cellLineName=studyInfo['cellLine'],
-                                mouseStrainName=studyInfo['mouseStrain'],
-                                tumorModelName=studyInfo['tumorModel'],
-                                radioPurity=studyInfo['radioPurity'],
-                                comments=studyInfo['comments'],
-                                gammaCounter=gammaInfo['gammaCounter'],
-                                runDateTime=measurementTime,
-                                gammaRunComments=gammaInfo['gammaCounterRunComments'],
-                                protocolId=protocolId
-                                )
-
-def assignOrgansToMouse(mouseInfo, organInfo):
-    mouseOrgans = []
-    for i, organObject in enumerate(organInfo):
-        for i, mouseObject in enumerate(mouseInfo):
-            if (mouseObject['mouseId'] == organObject['mouseId']):
-                mouseObject['organs'] = organObject['organs']
-                mouseOrgans.append(mouseObject)
-                break
-
-    return mouseOrgans
-
-def prepareWindows(biodiCsvRows):
-    try:
-        windows = []
-        for rowNum, row in enumerate(biodiCsvRows):
-            rowNum = rowNum + 1
-            windowHolder = {}
-            for key in (row.keys()):
-                if (key.find("Counts") != -1):
-                    isotopeCounts = key.split(" ")
-
-                    if (len(isotopeCounts) != 2):
-                        raise BaseException("Invalid counts key")
-
-                    isotopeName = isotopeCounts[0]
-                    windowHolder.setdefault(isotopeName, Window())
-
-                    windowHolder[isotopeName].counts = row.get(key)
-
-                elif (key.find("Error %") != -1):
-                    isotopeError = key.split(" ")
-
-                    if (len(isotopeError) != 3):
-                        raise BaseException("Invalid Error % key")
-
-                    isotopeName = isotopeError[0]
-                    windowHolder.setdefault(isotopeName, Window())
-
-                    windowHolder[isotopeName].error = row.get(key)
-
-                elif (key.find("CPM") != -1):
-                    isotopeCPM = key.split(" ")
-
-                    if (len(isotopeCPM) != 2):
-                        raise BaseException("Invalid CPM key")
-
-                    isotopeName = isotopeCPM[0]
-                    windowHolder.setdefault(isotopeName, Window())
-
-                    windowHolder[isotopeName].cpm = row.get(key)
-
-                elif (key.find("Info") != -1):
-                    isotopeInfo = key.split(" ")
-
-                    if (len(isotopeInfo) != 2):
-                        raise BaseException("Invalid Info key")
-
-                    isotopeName = isotopeInfo[0]
-                    windowHolder.setdefault(isotopeName, Window())
-
-                    windowHolder[isotopeName].info = row.get(key)
-
-            for isotopeWindow in windowHolder.items():
-                isotopeWindow[1].isotopeName = isotopeWindow[0]
-                isotopeWindow[1].rowNum = rowNum
-                windows.append(isotopeWindow[1])
-
-
-    except Exception as e:
-        raise e
-
-    return windows
-
-def prepareMiceAndOrgans(mouseOrgans):
-    mice = []
-    for mouse in mouseOrgans:
-        mouseHolder = Mouse(
-            mouseId=mouse['mouseId'],
-            groupId=mouse['groupId'],
-            euthanizeDateTime=datetime.datetime.combine(mouse['euthanasiaDate'],
-                                                        mouse['euthanasiaTime']),
-            gender=mouse['gender'],
-            cage=mouse['cage'],
-            age=mouse['age'],
-            injectionDate=mouse['injectionDate'],
-            preInjectionTime=mouse['preInjectionTime'],
-            injectionTime=mouse['injectionTime'],
-            postInjectionTime=mouse['postInjectionTime'],
-            preInjectionActivity=mouse['preInjectionActivity'],
-            postInjectionActivity=mouse['postInjectionActivity']
-        )
-        for organ in mouse['organs']:
-            mouseHolder.mouseOrgans.append(
-                MouseOrgan(
-                    organName=organ['organ'],
-                    organMass=organ['organMass']
-                )
-            )
-        mice.append(mouseHolder)
-
-    return mice
-
-def createStudy(biodiCsvRequestDict):
-    try:
-
-        with db.getDb().session.no_autoflush:
-            mouseOrgans = assignOrgansToMouse(biodiCsvRequestDict['mouseInfo'], biodiCsvRequestDict['organInfo'])
-            biodiCsvRows, protocolId = prepareBiodiCsvRows(biodiCsvRequestDict['biodiCsv']['file'])
-            mice = prepareMiceAndOrgans(mouseOrgans)
-            windows = prepareWindows(biodiCsvRequestDict['biodiCsv']['file'])
-            study = prepareStudyInformation(biodiCsvRequestDict['studyInfo'],
-                                            biodiCsvRequestDict['gammaInfo'],
-                                            biodiCsvRequestDict['biodiCsv']['file'][0]['protocolId'],
-                                            biodiCsvRequestDict['biodiCsv']['file'][0]['measurementTime'])
-            study.biodiCsvRows = biodiCsvRows
-            study.windows = windows
-            study.mice = mice
-    #
-            db.createStudy(study)
-    except BaseException as e:
-        raise e
-    return None
-
-
 def getMetas():
     try:
         metas = db.getBiodiCsvMetas()
@@ -230,10 +64,6 @@ def getBiodiCsvRaw(studyId):
 
     return file, completeStudy.studyName
 
-def createCompleteStudyRow(biodiCsvRow, mouse, organ):
-
-    return None
-
 def createWindowsMap(windows):
     windowsMap = {}
     for window in windows:
@@ -272,7 +102,6 @@ def getCompleteStudy(studyId):
         for i, mouse in enumerate(completeStudy.mice):
             for j, organ in enumerate(mouse.mouseOrgans):
                 biodiCsvRow = completeStudy.biodiCsvRows[currRow]
-                createCompleteStudyRow(biodiCsvRow, mouse, organ)
                 row = {
                     'Isotope': completeStudy.isotopeName,
                     'Chelator': completeStudy.chelatorName,

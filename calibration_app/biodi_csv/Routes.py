@@ -10,6 +10,7 @@ from flask import make_response
 from calibration_app.biodi_csv.Controller import *
 from calibration_app.biodi_csv.HidexParser import *
 from calibration_app.biodi_csv.MouseParser import *
+from calibration_app.biodi_csv.PEParser import *
 import pandas as pd
 import json
 
@@ -155,18 +156,16 @@ def tumorModels():
 @jwt_required
 def biodiCsvTest():
     if request.method =='POST':
-        print(request)
-        print(request.files)
-        print(request.get_json())
         studyInfo = json.load(request.files['studyInfo'])
         gammaInfo = json.load(request.files['gammaInfo'])
         mouseInfo = json.load(request.files['mouseInfo'])
         organInfo = json.load(request.files['organInfo'])
         biodiFile = request.files['biodiFile']
-        print(mouseInfo)
 
         if gammaInfo['gammaCounter'] == "Hidex":
             handleHidexStudy(biodiFile,studyInfo, gammaInfo, mouseInfo, organInfo)
+        elif gammaInfo['gammaCounter'] == "PE":
+            handlePEStudy(biodiFile, studyInfo, gammaInfo, mouseInfo, organInfo)
 
         # print(request.files)
         # hidex = request.files['hidex']

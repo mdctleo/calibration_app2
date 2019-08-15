@@ -47,7 +47,7 @@ def prepareHidexBiodiCsvRows(df):
         windows = []
         biodiCsvRows = []
         biodiCsvRowsDict = df.to_dict('records')
-        measurementTime = biodiCsvRowsDict[0]['Time']
+        measurementTime = biodiCsvRowsDict[0]['Time'].to_pydatetime()
         for i, row in enumerate(biodiCsvRowsDict):
             rowNum = i + 1
             biodiCsvRows.append(BiodiCsvRow(
