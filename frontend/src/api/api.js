@@ -38,9 +38,8 @@ export const getCalibrationFactorsGraph = async (model, isotope) => {
 export const postBiodiCsvTest = async (payload) => {
     let endpoint = BASE_URL + "/biodicsv-test"
     let data = new FormData()
-    console.log(payload.studyInfo)
-    console.log(payload.mouseInfo)
-    console.log(payload.organInfo)
+    let mouseInfo = JSON.stringify(payload.mouseInfo)
+    console.log(mouseInfo)
     data.append("studyInfo", new Blob([JSON.stringify(payload.studyInfo)], {type: 'application/json'}))
     data.append("gammaInfo", new Blob([JSON.stringify(payload.gammaInfo)], {type: 'application/json'}))
     data.append("biodiFile", new Blob([payload.biodiCsv], {type: payload.biodiCsv.type}))

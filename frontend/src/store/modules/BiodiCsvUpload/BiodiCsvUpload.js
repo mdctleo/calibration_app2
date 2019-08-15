@@ -308,17 +308,17 @@ const actions = {
             return {status: false, error: "Group ID validation failed"}
         } else if (row['Euthanasia Date'] === "" || !moment(row['Euthanasia Date'], "YYYY-MM-DD", true).isValid()) {
             return {status: false, error: "Euthanasia Date validation failed"}
-        } else if (row['Euthanasia Time'] === "" || !moment(row['Euthanasia Time'], "HH:mm", true).isValid()) {
+        } else if (row['Euthanasia Time'] === "" || !moment(row['Euthanasia Time'], "HH:mm:ss", true).isValid()) {
             return {status: false, error: "Euthanasia Time validation failed"}
         } else if (row['Weight (g)'] === "") {
             return {status: false, error: "Weight validation failed"}
         } else if (row['Injection Date'] === "" || !moment(row['Injection Date'], "YYYY-MM-DD", true).isValid()) {
             return {status: false, error: "Injection Date validation failed"}
-        } else if (row['Pre-Injection Time'] === "" || !moment(row['Pre-Injection Time'], "HH:mm", true).isValid()) {
+        } else if (row['Pre-Injection Time'] === "" || !moment(row['Pre-Injection Time'], "HH:mm:ss", true).isValid()) {
             return {status: false, error: "Pre-Injection Time validation failed"}
-        } else if (row['Injection Time'] === "" || !moment(row['Injection Time'], "HH:mm", true).isValid()) {
+        } else if (row['Injection Time'] === "" || !moment(row['Injection Time'], "HH:mm:ss", true).isValid()) {
             return {status: false, error: "Injection Time validation failed"}
-        } else if (row['Post-Injection Time'] === "" || !moment(row['Post-Injection Time'], "HH:mm", true).isValid()) {
+        } else if (row['Post-Injection Time'] === "" || !moment(row['Post-Injection Time'], "HH:mm:ss", true).isValid()) {
             return {status: false, error: "Post-Injection Time validation failed"}
         } else if (row['Pre-Injection MBq'] === "") {
             return {status: false, error: "Pre-Injection MBq validation failed"}
@@ -347,6 +347,7 @@ const actions = {
                 return false
             }
             let csvFileJson = await csv().fromString(csvFile)
+            console.log(csvFileJson)
             let indexHolder = 0
             let rowValidated = true
 

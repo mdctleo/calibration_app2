@@ -1,5 +1,5 @@
 from calibration_app.biodi_csv.Model import StudyInformation
-
+import pandas as pd
 def prepareStudyInformation(studyInfo, gammaInfo, protocolId, measurementTime):
     return StudyInformation(studyName=studyInfo['studyName'],
                             studyDate=studyInfo['studyDate'],
@@ -15,7 +15,7 @@ def prepareStudyInformation(studyInfo, gammaInfo, protocolId, measurementTime):
                             radioPurity=studyInfo['radioPurity'],
                             comments=studyInfo['comments'],
                             gammaCounter=gammaInfo['gammaCounter'],
-                            runDateTime=measurementTime,
+                            runDateTime= pd.to_datetime(measurementTime),
                             gammaRunComments=gammaInfo['gammaCounterRunComments'],
                             protocolId=protocolId
                             )

@@ -1,7 +1,8 @@
 from calibration_app.biodi_csv.Model import MouseOrgan, Mouse
 from exceptions.Exceptions import *
-import datetime
-
+from datetime import datetime
+from datetime import date
+from datetime import time
 
 def assignOrgansToMouse(mouseInfo, organInfo):
     mouseOrgans = []
@@ -20,15 +21,14 @@ def prepareMiceAndOrgans(mouseOrgans):
         mouseHolder = Mouse(
             mouseId=mouse['Mouse ID'],
             groupId=mouse['Group ID'],
-            euthanizeDateTime=datetime.datetime.combine(mouse['Euthanasia Date'],
-                                                        mouse['Euthanasia Time']),
+            euthanizeDateTime=datetime.strptime(mouse['Euthanasia Date'] + ' ' + mouse['Euthanasia Time'], '%Y-%m-%d %H:%M:%S'),
             gender=mouse['Gender'],
             cage=mouse['Cage'],
             age=mouse['Age'],
-            injectionDate=mouse['Injection Date'],
-            preInjectionTime=mouse['Pre-Injection Time'],
-            injectionTime=mouse['Injection Time'],
-            postInjectionTime=mouse['Post-Injection Time'],
+            injectionDate=datetime.strptime(mouse['Injection Date'], '%Y-%m-%d').date(),
+            preInjectionTime=datetime.strptime(mouse['Pre-Injection Time'], '%H:%M:%S').time(),
+            injectionTime=datetime.strptime(mouse['Injection Time'], '%H:%M:%S').time(),
+            postInjectionTime=datetime.strptime(mouse['Post-Injection Time'], '%H:%M:%S').time(),
             preInjectionActivity=mouse['Pre-Injection MBq'],
             postInjectionActivity=mouse['Post-Injection MBq']
         )
