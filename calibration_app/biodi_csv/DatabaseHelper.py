@@ -1,6 +1,8 @@
 from app import db
 from calibration_app.biodi_csv.Model import StudyInformation, Vector, Organ, BiodiCsvRow, Protocol, Window, Chelator, CellLine, MouseStrain, TumorModel
 from sqlalchemy.exc import *
+
+from calibration_app.isotope.Model import Isotope
 from exceptions.Exceptions import *
 
 class DatabaseHelper:
@@ -41,12 +43,15 @@ class DatabaseHelper:
     @staticmethod
     def getCompleteStudy(studyId):
         try:
-            completeStudy = StudyInformation.query.filter(StudyInformation.id == studyId).first()
-            # windowsCount = Window.query.with_entities(Window.id).filter(Window.csvId == studyId).group_by(Window.isotopeName).count()
+            completeStudy = StudyInformation.query \
+                .join(Isotope, Isotope.isotopeName == StudyInformation.isotopeName) \
+                .filter(StudyInformation.id == studyId)\
+                .first()
             windows = Window.query.filter(Window.csvId == studyId).order_by(Window.rowNum).all()
         except SQLAlchemyError as e:
             raise BaseException(e.__str__())
 
+        print(completeStudy)
         return completeStudy, windows
 
     @staticmethod

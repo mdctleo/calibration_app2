@@ -3,7 +3,8 @@ from io import StringIO
 from calibration_app.biodi_csv.Model import MouseOrgan, BiodiCsvRow, StudyInformation, Mouse, Window
 from calibration_app.biodi_csv.DatabaseHelper import DatabaseHelper as db
 from exceptions.Exceptions import *
-import datetime
+from methods.decay import calculateDecay
+from datetime import datetime
 
 def getMetas():
     try:
@@ -80,7 +81,8 @@ def getCompleteStudy(studyId):
         si = StringIO()
 
         fieldnames = [
-            "Isotope", "Chelator", "Vector", "VectorType", "Tumor Model", "Mouse Strain", "Mouse Gender", "Cage", "Mouse ID", "Injection Date",
+            "Isotope", "Chelator", "Vector", "Target", "VectorType", "Tumor Model", "Mouse Strain", "Mouse Gender", "Cage", "Mouse ID", "Injection Date",
+            "Pre-injection (MBq)", "Pre-injection Time", "Post-injection (MBq)", "Post-injection Time", "Injection Time", "Injected Activity (kBq)",
             "Injection Time", "Injected Activity (kBq)", "Organ", "OrganMass(g)", "Euthanasia Date", "Euthanasia Time", "TimePoint (h)",
             "Count#", "Rack", "Vial", "Time", "Counted Time (s)", "Dead Time Factor"]
 
@@ -102,10 +104,21 @@ def getCompleteStudy(studyId):
         for i, mouse in enumerate(completeStudy.mice):
             for j, organ in enumerate(mouse.mouseOrgans):
                 biodiCsvRow = completeStudy.biodiCsvRows[currRow]
+
+                preInjectionTime = datetime.combine(mouse.injectionDate, mouse.preInjectionTime)
+                postInjectionTime = datetime.combine(mouse.injectionDate, mouse.postInjectionTime)
+                injectionTime = datetime.combine(mouse.injectionDate, mouse.injectionTime)
+                preInjectedActivity = calculateDecay(mouse.preInjectionActivity, preInjectionTime, injectionTime, 110)
+                postInjectedActivity = calculateDecay(mouse.postInjectionActivity, injectionTime, postInjectionTime, 110)
+                injectedActivity = preInjectedActivity - postInjectedActivity
+
+                n
+
                 row = {
                     'Isotope': completeStudy.isotopeName,
                     'Chelator': completeStudy.chelatorName,
                     'Vector': completeStudy.vectorName,
+                    'Target': completeStudy.target,
                     'VectorType': db.getVector(completeStudy.vectorName).type,
                     'Tumor Model': completeStudy.tumorModelName,
                     'Mouse Strain': completeStudy.mouseStrainName,
@@ -113,8 +126,12 @@ def getCompleteStudy(studyId):
                     'Cage': mouse.cage,
                     'Mouse ID': mouse.mouseId,
                     'Injection Date': mouse.injectionDate,
+                    'Pre-injection (MBq)': mouse.preInjectionActivity,
+                    'Pre-injection Time': mouse.preInjectionTime,
+                    'Post-injection (MBq)': mouse.postInjectionActivity,
+                    'Post-injection Time': mouse.postInjectionTime,
                     'Injection Time': mouse.injectionTime,
-                    'Injected Activity (kBq)': "PlaceHolder",
+                    'Injected Activity (kBq)': injectedActivity,
                     'Organ': organ.organName,
                     'OrganMass(g)': organ.organMass,
                     'Euthanasia Date': mouse.euthanizeDateTime.date(),
@@ -135,8 +152,12 @@ def getCompleteStudy(studyId):
                     row["Window" + currWinNum + " (counts)"] = windowsMap[key][currRow].counts
                     row["Window" + currWinNum + " corrected (counts)"] = windowsMap[key][currRow].counts
                     row["Window" + currWinNum + " (CPM)"] = cpm
-                    row["Normalized Window" + currWinNum + " (CPM)"] =  "PlaceHolder"
+                    row["Normalized Window" + currWinNum + " (CPM)"] =  windowsMap[key][currRow].cpm
                     row["Normalized Window" + currWinNum + " (Bq)" ] = "PlaceHolder"
+
+
+
+
 
 
                 cw.writerow(row)

@@ -7,7 +7,7 @@ from calibration_app.biodi_csv.StudyInfoParser import *
 from exceptions.Exceptions import *
 import pandas as pd
 
-def prepareHidexWindow(row, rowNum):
+def prepareHidexWindow(row, rowNum, studyIsotope):
     try:
         windows = []
         windowHolder = {}
@@ -34,9 +34,10 @@ def prepareHidexWindow(row, rowNum):
                 windowHolder[isotopeName].cpm = row.get(key)
 
         for isotopeWindow in windowHolder.items():
-            isotopeWindow[1].isotopeName = isotopeWindow[0]
-            isotopeWindow[1].rowNum = rowNum
-            windows.append(isotopeWindow[1])
+            if studyIsotope == '225Ac':
+                isotopeWindow[1].isotopeName = isotopeWindow[0]
+                isotopeWindow[1].rowNum = rowNum
+                windows.append(isotopeWindow[1])
     except Exception as e:
         raise e
 

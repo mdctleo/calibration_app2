@@ -6,7 +6,7 @@ from exceptions.Exceptions import *
 import numpy as np
 import pandas as pd
 
-def preparePEWindow(row, rowNum):
+def preparePEWindow(row, rowNum, studyIsotope):
     try:
         windows = []
         windowHolder = {}
@@ -56,7 +56,7 @@ def preparePEWindow(row, rowNum):
                 windowHolder[isotopeName].info = row.get(key)
 
         for isotopeWindow in windowHolder.items():
-            isotopeWindow[1].isotopeName = isotopeNameReplace(isotopeWindow[0])
+            isotopeWindow[1].isotopeName = isotopeNameReplace(isotopeWindow[0], studyIsotope)
             isotopeWindow[1].rowNum = rowNum
             windows.append(isotopeWindow[1])
 
@@ -66,17 +66,33 @@ def preparePEWindow(row, rowNum):
 
     return windows
 
-def isotopeNameReplace(isotopeName):
+def isotopeNameReplace(isotopeName, studyIsotope):
     try:
-        elementNumberArr = isotopeName.split("-")
-        replacement = elementNumberArr[1] + elementNumberArr[0]
+        if studyIsotope != '225Ac':
+            elementNumberArr = isotopeName.split("-")
+            replacement = elementNumberArr[1] + elementNumberArr[0]
+        else:
+            windowIsotopeName = isotopeName.split("_")[0]
+
+            firstOccurenceNumber = -1
+            for i, c in enumerate(windowIsotopeName):
+                if c.isnumeric():
+                    firstOccurenceNumber = i
+                    break
+
+            replacement = windowIsotopeName[firstOccurenceNumber: len(windowIsotopeName)] \
+                          + windowIsotopeName[0: firstOccurenceNumber]
+
+            print(replacement)
+
+
     except Exception as e:
         raise e
 
     return replacement
 
 
-def preparePEBiodiCsvRows(df):
+def preparePEBiodiCsvRows(df, studyIsotope):
     try:
         biodiCsvFile = df.to_dict('records')
         print(biodiCsvFile)
@@ -97,7 +113,7 @@ def preparePEBiodiCsvRows(df):
                 time=row["Time"],
                 sampleCode=row["Sample code"]
             ))
-            windows.extend(preparePEWindow(row, rowNum))
+            windows.extend(preparePEWindow(row, rowNum, studyIsotope))
     except BaseException as e:
         raise e
 
@@ -117,7 +133,7 @@ def handlePEStudy(file, studyInfo, gammaInfo, mouseInfo, organInfo):
         with db.getDb().session.no_autoflush:
             df = parsePECsv(file)
             mouseOrgans = assignOrgansToMouse(mouseInfo, organInfo)
-            biodiCsvRows, windows, protocolId, measurementTime = preparePEBiodiCsvRows(df)
+            biodiCsvRows, windows, protocolId, measurementTime = preparePEBiodiCsvRows(df, studyInfo['radioIsotope'])
             mice = prepareMiceAndOrgans(mouseOrgans)
             study = prepareStudyInformation(studyInfo, gammaInfo, protocolId, measurementTime)
             study.biodiCsvRows = biodiCsvRows
