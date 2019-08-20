@@ -9,3 +9,21 @@ def calculateDecay(activity, tref, t2, halfLife):
 
     return activityDecayed
 
+'''
+Args:
+    cpm (int): normalized cpm
+    halfLife (float): half-life of study's isotope
+    tref (datetime): injection time of mouse
+    t (datetime): measurement time of the first tube
+    calibrationFactor (float): most recent calibration factor of the isotope on the study's gamma counter
+    
+Returns:
+    mouseActivity (float): calibrated activity of mouse
+
+'''
+
+def calculateCalibratedMouseActivity(cpm, halfLife, tref, t, calibrationFactor):
+    deltaT = t - tref
+    deltaT = deltaT.total_seconds() / 60.0
+    mouseActivity = cpm * exp((log(2) / halfLife) * deltaT) * calibrationFactor
+    return mouseActivity

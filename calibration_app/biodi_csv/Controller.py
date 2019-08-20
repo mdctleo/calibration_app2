@@ -3,7 +3,7 @@ from io import StringIO
 from calibration_app.biodi_csv.Model import MouseOrgan, BiodiCsvRow, StudyInformation, Mouse, Window
 from calibration_app.biodi_csv.DatabaseHelper import DatabaseHelper as db
 from exceptions.Exceptions import *
-from methods.decay import calculateDecay
+from methods.decay import calculateDecay, calculateCalibratedMouseActivity
 from datetime import datetime
 
 def getMetas():
@@ -16,8 +16,8 @@ def getMetas():
 
 def getBiodiCsvRaw(studyId):
     try:
-        completeStudy, windows = db.getCompleteStudy(studyId)
-        windowsMap = createWindowsMap(windows)
+        completeStudy, isotope = db.getCompleteStudy(studyId)
+        windowsMap = createWindowsMap(completeStudy.windows)
         si = StringIO()
         fieldnames = [
             "Protocol ID", "Protocol name", "Measurement date & time", "Completion status", "Run ID",
@@ -76,8 +76,8 @@ def createWindowsMap(windows):
 def getCompleteStudy(studyId):
     try:
 
-        completeStudy, windows = db.getCompleteStudy(studyId)
-        windowsMap = createWindowsMap(windows)
+        completeStudy, isotope = db.getCompleteStudy(studyId)
+        windowsMap = createWindowsMap(completeStudy.windows)
         si = StringIO()
 
         fieldnames = [
@@ -95,6 +95,7 @@ def getCompleteStudy(studyId):
             fieldnames.append("Window" + currWinNum + " (CPM)")
             fieldnames.append("Normalized Window" + currWinNum + " (CPM)")
             fieldnames.append("Normalized Window" + currWinNum + " (Bq)")
+            fieldnames.append("Window " + currWinNum + " %ID/g @ injectionTime")
 
 
         cw = csv.DictWriter(si, fieldnames=fieldnames)
@@ -108,11 +109,10 @@ def getCompleteStudy(studyId):
                 preInjectionTime = datetime.combine(mouse.injectionDate, mouse.preInjectionTime)
                 postInjectionTime = datetime.combine(mouse.injectionDate, mouse.postInjectionTime)
                 injectionTime = datetime.combine(mouse.injectionDate, mouse.injectionTime)
-                preInjectedActivity = calculateDecay(mouse.preInjectionActivity, preInjectionTime, injectionTime, 110)
-                postInjectedActivity = calculateDecay(mouse.postInjectionActivity, injectionTime, postInjectionTime, 110)
+                preInjectedActivity = calculateDecay(mouse.preInjectionActivity, preInjectionTime, injectionTime, isotope.halfLife)
+                postInjectedActivity = calculateDecay(mouse.postInjectionActivity, injectionTime, postInjectionTime, isotope.halfLife)
                 injectedActivity = preInjectedActivity - postInjectedActivity
 
-                n
 
                 row = {
                     'Isotope': completeStudy.isotopeName,
@@ -145,6 +145,9 @@ def getCompleteStudy(studyId):
                 }
 
                 for k, key in enumerate(windowsMap.keys()):
+                    mouseAcitivty = calculateCalibratedMouseActivity(biodiCsvRow.cpm, isotope.halfLife,
+                                                                     injectionTime, biodiCsvRow.measurementTime, isotope.calibrationFactor)
+
                     currWinNum = str((k + 1))
                     cpm = windowsMap[key][currRow].cpm
                     row['Dead Time Factor' + currWinNum] = "PlaceHolder"
@@ -154,7 +157,7 @@ def getCompleteStudy(studyId):
                     row["Window" + currWinNum + " (CPM)"] = cpm
                     row["Normalized Window" + currWinNum + " (CPM)"] =  windowsMap[key][currRow].cpm
                     row["Normalized Window" + currWinNum + " (Bq)" ] = "PlaceHolder"
-
+                    row["Window " + currWinNum + " %ID/g @ injectionTime"] = (mouseAcitivty / injectedActivity) * 100
 
 
 

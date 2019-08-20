@@ -2,6 +2,7 @@ from app import db
 from calibration_app.biodi_csv.Model import StudyInformation, Vector, Organ, BiodiCsvRow, Protocol, Window, Chelator, CellLine, MouseStrain, TumorModel
 from sqlalchemy.exc import *
 
+from calibration_app.calibration.Model import CalibrationFactor
 from calibration_app.isotope.Model import Isotope
 from exceptions.Exceptions import *
 
@@ -43,16 +44,17 @@ class DatabaseHelper:
     @staticmethod
     def getCompleteStudy(studyId):
         try:
-            completeStudy = StudyInformation.query \
-                .join(Isotope, Isotope.isotopeName == StudyInformation.isotopeName) \
-                .filter(StudyInformation.id == studyId)\
-                .first()
-            windows = Window.query.filter(Window.csvId == studyId).order_by(Window.rowNum).all()
+            result = db.session.query(StudyInformation, Isotope, CalibrationFactor) \
+            .outerjoin(CalibrationFactor, CalibrationFactor.isotopeName == StudyInformation.isotopeName and CalibrationFactor.gammaCounter == StudyInformation.gammaCounter) \
+            .filter(StudyInformation.id == studyId) \
+            .filter(Isotope.isotopeName == StudyInformation.isotopeName) \
+            .order_by(CalibrationFactor.createdOn.desc()).first()
         except SQLAlchemyError as e:
             raise BaseException(e.__str__())
-
-        print(completeStudy)
-        return completeStudy, windows
+        completeStudy = result[0]
+        isotope = result[1]
+        calibrationFactor = 1 if result[2] is None else result[2]
+        return completeStudy, isotope, calibrationFactor
 
     @staticmethod
     def getBiodiCsvRaw(studyId):
