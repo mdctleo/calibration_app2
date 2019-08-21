@@ -5,6 +5,7 @@ from calibration_app.biodi_csv.DatabaseHelper import DatabaseHelper as db
 from exceptions.Exceptions import *
 from methods.decay import calculateDecay, calculateCalibratedMouseActivity
 from datetime import datetime
+import pandas as pd
 
 def getMetas():
     try:
@@ -16,7 +17,7 @@ def getMetas():
 
 def getBiodiCsvRaw(studyId):
     try:
-        completeStudy, isotope = db.getCompleteStudy(studyId)
+        completeStudy, isotope, calibrationFactor = db.getCompleteStudy(studyId)
         windowsMap = createWindowsMap(completeStudy.windows)
         si = StringIO()
         fieldnames = [
@@ -59,7 +60,7 @@ def getBiodiCsvRaw(studyId):
             currRow = currRow + 1
 
         file = si.getvalue()
-
+        print(file)
     except BaseException as e:
         raise e
 
@@ -76,7 +77,7 @@ def createWindowsMap(windows):
 def getCompleteStudy(studyId):
     try:
 
-        completeStudy, isotope = db.getCompleteStudy(studyId)
+        completeStudy, isotope, calibrationFactor = db.getCompleteStudy(studyId)
         windowsMap = createWindowsMap(completeStudy.windows)
         si = StringIO()
 
@@ -145,8 +146,8 @@ def getCompleteStudy(studyId):
                 }
 
                 for k, key in enumerate(windowsMap.keys()):
-                    mouseAcitivty = calculateCalibratedMouseActivity(biodiCsvRow.cpm, isotope.halfLife,
-                                                                     injectionTime, biodiCsvRow.measurementTime, isotope.calibrationFactor)
+                    mouseAcitivty = calculateCalibratedMouseActivity(windowsMap[key][currRow].cpm, isotope.halfLife,
+                                                                     injectionTime, biodiCsvRow.measurementTime, calibrationFactor)
 
                     currWinNum = str((k + 1))
                     cpm = windowsMap[key][currRow].cpm
@@ -157,7 +158,7 @@ def getCompleteStudy(studyId):
                     row["Window" + currWinNum + " (CPM)"] = cpm
                     row["Normalized Window" + currWinNum + " (CPM)"] =  windowsMap[key][currRow].cpm
                     row["Normalized Window" + currWinNum + " (Bq)" ] = "PlaceHolder"
-                    row["Window " + currWinNum + " %ID/g @ injectionTime"] = (mouseAcitivty / injectedActivity) * 100
+                    row["Window " + currWinNum + " %ID/g @ injectionTime"] = ((mouseAcitivty / injectedActivity) * 100) / organ.organMass
 
 
 
@@ -173,6 +174,11 @@ def getCompleteStudy(studyId):
         raise e
 
     return file, completeStudy.studyName
+
+def getStudyAnalysis(studyId):
+    completeStudy, isotope, calibrationFactor = db.getCompleteStudy(studyId)
+    pd.read_sql(db.getCompleteStudy(studyId))
+    return None
 
 def getChelators():
     try:

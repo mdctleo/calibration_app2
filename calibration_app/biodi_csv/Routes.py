@@ -19,44 +19,33 @@ import json
 @jwt_required
 def biodiCsv():
     if request.method == 'POST':
-        try:
-            biodiCsvRequestDict = BiodiCsvRequestSchema().load(request.get_json())
-            createStudy(biodiCsvRequestDict)
-        except ValidationError as e:
-            result = StandardResponse(e.__str__())
-            response = StandardResponseSchema().dump(result)
-            return jsonify(response), 400
-        except BaseException as e:
-            result = StandardResponse(e.message)
-            response = StandardResponseSchema().dump(result)
-            return jsonify(response), 500
+        if request.method =='POST':
+            try:
+                studyInfo = json.load(request.files['studyInfo'])
+                gammaInfo = json.load(request.files['gammaInfo'])
+                mouseInfo = json.load(request.files['mouseInfo'])
+                organInfo = json.load(request.files['organInfo'])
+                biodiFile = request.files['biodiFile']
 
-        result = StandardResponse("Success")
+                if gammaInfo['gammaCounter'] == "Hidex":
+                    handleHidexStudy(biodiFile,studyInfo, gammaInfo, mouseInfo, organInfo)
+                elif gammaInfo['gammaCounter'] == "PE":
+                    handlePEStudy(biodiFile, studyInfo, gammaInfo, mouseInfo, organInfo)
+
+            except BaseException as e:
+                result = BaseException(e.message)
+                response = BaseExceptionSchema().dump(result)
+                return jsonify(response), 200
+
+        result = StandardResponse("success")
         response = StandardResponseSchema().dump(result)
-        return jsonify(response), 200
+        return make_response(response), 200
     elif request.method == 'GET':
-        try:
-            result, studyName = getCompleteStudy(request.args.get('id'))
-        except BaseException as e:
-            result = StandardResponse(e.message)
-            response = StandardResponseSchema.dump(result)
-            return jsonify(response), 500
-
-        response = make_response(result)
-        response.headers["Content-Disposition"] = "attachment; filename=" + studyName
-        response.headers["Content-Type"] = "text/csv; charset=UTF-8"
-
-        return response, 200
-
-@bp.route('/biodicsv-raw')
-@jwt_required
-def biodiCsvRaw():
-    if request.method == 'GET':
         try:
             result, studyName = getBiodiCsvRaw(request.args.get('id'))
         except BaseException as e:
-            result = StandardResponse(e.message)
-            response = StandardResponseSchema.dump(result)
+            result = BaseException(e.message)
+            response = BaseExceptionSchema().dump(result)
             return jsonify(response), 500
 
         response = make_response(result)
@@ -65,7 +54,39 @@ def biodiCsvRaw():
 
         return response, 200
 
+@bp.route('/biodicsv-complete')
+@jwt_required
+def biodiCsvComplete():
+    if request.method == 'GET':
+        try:
+            result, studyName = getCompleteStudy(request.args.get('id'))
+        except BaseException as e:
+            result = BaseException(e.message)
+            response = BaseExceptionSchema().dump(result)
+            return jsonify(response), 500
 
+        response = make_response(result)
+        response.headers["Content-Disposition"] = "attachment; filename=" + studyName
+        response.headers["Content-Type"] = "text/csv; charset=UTF-8"
+
+        return response, 200
+
+@bp.route('/biodicsv-analysis')
+@jwt_required
+def biodiCsvAnalysis():
+    if request.method == 'GET':
+        try:
+            result, studyName = getStudyAnalysis(request.args.get('id'))
+        except BaseException as e:
+            result = BaseException(e.message)
+            response = BaseExceptionSchema().dump(result)
+            return jsonify(response), 500
+
+        response = make_response(result)
+        response.headers["Content-Disposition"] = "attachment; filename=" + studyName
+        response.headers["Content-Type"] = "text/csv; charset=UTF-8"
+
+        return response, 200
 
 @bp.route('/biodicsv-metas', methods=['GET'])
 @jwt_required
@@ -74,8 +95,8 @@ def biodiCsvMetas():
         try:
             result = getMetas()
         except BaseException as e:
-            result = StandardResponse(e.message)
-            response = StandardResponseSchema().dump(result)
+            result = BaseException(e.message)
+            response = BaseExceptionSchema().dump(result)
             return jsonify(response), 500
 
         response = StudyInformationMetaSchema(many=True).dump(result)
@@ -88,8 +109,8 @@ def chelators():
         try:
             result = getChelators()
         except BaseException as e:
-            result = StandardResponse(e.message)
-            response = StandardResponseSchema.dump(result)
+            result = BaseException(e.message)
+            response = BaseExceptionSchema().dump(result)
             return jsonify(response), 500
 
         response = ChelatorSchema(many=True).dump(result)
@@ -102,8 +123,8 @@ def vectors():
         try:
             result = getVectors()
         except BaseException as e:
-            result = StandardResponse(e.message)
-            response = StandardResponseSchema.dump(result)
+            result = BaseException(e.message)
+            response = BaseExceptionSchema().dump(result)
             return jsonify(response), 200
 
         response = VectorSchema(many=True, exclude=['type']).dump(result)
@@ -116,8 +137,8 @@ def cellLines():
         try:
             result = getCellLines()
         except BaseException as e:
-            result = StandardResponse(e.message)
-            response = StandardResponseSchema.dump(result)
+            result = BaseException(e.message)
+            response = StandardResponseSchema().dump(result)
             return jsonify(response), 200
 
         response = CellLineSchema(many=True).dump(result)
@@ -130,8 +151,8 @@ def mouseStrains():
         try:
             result = getMouseStrains()
         except BaseException as e:
-            result = StandardResponse(e.message)
-            response = StandardResponseSchema.dump(result)
+            result = BaseException(e.message)
+            response = BaseExceptionSchema().dump(result)
             return jsonify(response), 200
 
         response = MouseStrainSchema(many=True).dump(result)
@@ -144,8 +165,8 @@ def tumorModels():
         try:
             result = getTumorModels()
         except BaseException as e:
-            result = StandardResponse(e.message)
-            response = StandardResponseSchema.dump(result)
+            result = BaseException(e.message)
+            response = BaseExceptionSchema().dump(result)
             return jsonify(response), 200
 
         response = TumorModelSchema(many=True).dump(result)
@@ -156,19 +177,21 @@ def tumorModels():
 @jwt_required
 def biodiCsvTest():
     if request.method =='POST':
-        studyInfo = json.load(request.files['studyInfo'])
-        gammaInfo = json.load(request.files['gammaInfo'])
-        mouseInfo = json.load(request.files['mouseInfo'])
-        organInfo = json.load(request.files['organInfo'])
-        biodiFile = request.files['biodiFile']
+        try:
+            studyInfo = json.load(request.files['studyInfo'])
+            gammaInfo = json.load(request.files['gammaInfo'])
+            mouseInfo = json.load(request.files['mouseInfo'])
+            organInfo = json.load(request.files['organInfo'])
+            biodiFile = request.files['biodiFile']
 
-        if gammaInfo['gammaCounter'] == "Hidex":
-            handleHidexStudy(biodiFile,studyInfo, gammaInfo, mouseInfo, organInfo)
-        elif gammaInfo['gammaCounter'] == "PE":
-            handlePEStudy(biodiFile, studyInfo, gammaInfo, mouseInfo, organInfo)
+            if gammaInfo['gammaCounter'] == "Hidex":
+                handleHidexStudy(biodiFile,studyInfo, gammaInfo, mouseInfo, organInfo)
+            elif gammaInfo['gammaCounter'] == "PE":
+                handlePEStudy(biodiFile, studyInfo, gammaInfo, mouseInfo, organInfo)
 
-        # print(request.files)
-        # hidex = request.files['hidex']
-        # mouseCsv = request.files['mouseCsv']
-        # organCsv = request.files['organCsv']
+        except BaseException as e:
+            result = BaseException(e.message)
+            response = BaseExceptionSchema().dump(result)
+            return jsonify(response), 200
+
         return "Success", 200

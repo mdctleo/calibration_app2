@@ -35,8 +35,8 @@ export const getCalibrationFactorsGraph = async (model, isotope) => {
 };
 
 // BiodiCsv
-export const postBiodiCsvTest = async (payload) => {
-    let endpoint = BASE_URL + "/biodicsv-test"
+export const postBiodiCsv = async (payload) => {
+    let endpoint = BASE_URL + "/biodicsv"
     let data = new FormData()
     let mouseInfo = JSON.stringify(payload.mouseInfo)
     console.log(mouseInfo)
@@ -51,18 +51,6 @@ export const postBiodiCsvTest = async (payload) => {
         data: data,
         config: { headers: {'Content-Type': 'multipart/form-data'}}
     })
-
-}
-
-export const postBiodiCsv = async (payload) => {
-    let endpoint = BASE_URL + "/biodicsv";
-    return await axios.post(endpoint, {
-        biodiCsv: payload.biodiCsv,
-        studyInfo: payload.studyInfo,
-        gammaInfo: payload.gammaInfo,
-        mouseInfo: payload.mouseInfo,
-        organInfo: payload.organInfo
-    })
 };
 
 export const getBiodiCsvMetas = async () => {
@@ -71,7 +59,7 @@ export const getBiodiCsvMetas = async () => {
 };
 
 export const getBiodiCsvComplete = async (id) => {
-    let endpoint = BASE_URL + "/biodicsv";
+    let endpoint = BASE_URL + "/biodicsv-complete";
     return await axios.get(endpoint, {
         responseType: 'blob',
         params: {
@@ -80,8 +68,18 @@ export const getBiodiCsvComplete = async (id) => {
     })
 };
 
-export const getBiodiCsvRaw = async (id) => {
-    let endpoint = BASE_URL + "/biodicsv-raw"
+export const getBiodiCsv = async (id) => {
+    let endpoint = BASE_URL + "/biodicsv"
+    return await axios.get(endpoint, {
+        responseType: 'blob',
+        params: {
+            id: id
+        }
+    })
+}
+
+export const getStudyAnalysis = async (id) => {
+    let endpoint = BASE_URL + "/study-analysis"
     return await axios.get(endpoint, {
         responseType: 'blob',
         params: {

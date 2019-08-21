@@ -1,4 +1,4 @@
-import {getBiodiCsvComplete, getBiodiCsvRaw, getBiodiCsvMetas} from "../../../api/api";
+import {getBiodiCsvComplete, getBiodiCsv, getBiodiCsvMetas} from "../../../api/api";
 const moment = require('moment/moment');
 
 const getDefaultState = () => {
@@ -51,7 +51,7 @@ const actions = {
     downloadBiodiCsvRaw: (context, payload) => {
         try {
             context.commit('SET_LOADING', {loading: true})
-            let response = getBiodiCsvRaw(payload.biodiCsvRawToDownload)
+            let response = getBiodiCsv(payload.biodiCsvRawToDownload)
             const url = window.URL.createObjectURL(new Blob([response.data]))
             const link = document.createElement('a')
             link.href = url
@@ -60,7 +60,7 @@ const actions = {
             link.click()
             link.parentNode.removeChild(link)
         } catch (error) {
-            console.log(error)
+            console.log(error.response.data.msg)
             context.commit('SET_ERROR', {error: error.response.data.msg})
         } finally {
             context.commit('SET_LOADING', {loading: false})

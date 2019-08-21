@@ -7,7 +7,6 @@ import {
     getTumorModels,
     getVectors,
     postBiodiCsv,
-    postBiodiCsvTest
 } from "../../../api/api";
 
 const moment = require('moment');
@@ -587,7 +586,7 @@ const actions = {
     postBiodiCsvTest(context, payload) {
         try {
             context.commit('SET_LOADING', {loading: true})
-            let result = postBiodiCsvTest(payload)
+            let result = postBiodiCsv(payload)
         } catch (error) {
             context.commit('SET_ERROR', {error: error.response.data.message})
         } finally {

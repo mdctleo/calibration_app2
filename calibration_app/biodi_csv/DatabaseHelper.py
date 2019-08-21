@@ -53,7 +53,7 @@ class DatabaseHelper:
             raise BaseException(e.__str__())
         completeStudy = result[0]
         isotope = result[1]
-        calibrationFactor = 1 if result[2] is None else result[2]
+        calibrationFactor = 1 if result[2] is None else result[2].factor
         return completeStudy, isotope, calibrationFactor
 
     @staticmethod
