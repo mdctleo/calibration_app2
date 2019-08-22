@@ -5,6 +5,7 @@ from sqlalchemy.exc import *
 from calibration_app.calibration.Model import CalibrationFactor
 from calibration_app.isotope.Model import Isotope
 from exceptions.Exceptions import *
+import pandas as pd
 
 class DatabaseHelper:
 

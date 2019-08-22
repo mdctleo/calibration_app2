@@ -78,8 +78,8 @@ export const getBiodiCsv = async (id) => {
     })
 }
 
-export const getStudyAnalysis = async (id) => {
-    let endpoint = BASE_URL + "/study-analysis"
+export const getBiodiCsvAnalysis = async (id) => {
+    let endpoint = BASE_URL + "/biodicsv-analysis"
     return await axios.get(endpoint, {
         responseType: 'blob',
         params: {

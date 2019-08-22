@@ -82,7 +82,9 @@ def biodiCsvAnalysis():
             response = BaseExceptionSchema().dump(result)
             return jsonify(response), 500
 
+        # print(result)
         response = make_response(result)
+        print(response.data)
         response.headers["Content-Disposition"] = "attachment; filename=" + studyName
         response.headers["Content-Type"] = "text/csv; charset=UTF-8"
 

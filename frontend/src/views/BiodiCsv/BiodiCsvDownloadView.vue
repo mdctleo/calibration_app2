@@ -8,7 +8,10 @@
                 @close="setError({error: null})">
         </el-alert>
         <el-row>
-            <BiodiCsvDownload :metas="metas" @download-complete="handleDownloadComplete" @download-raw="handleDownloadRaw"></BiodiCsvDownload>
+            <BiodiCsvDownload :metas="metas" @download-complete="handleDownloadComplete"
+                              @download-raw="handleDownloadRaw"
+                              @download-analysis="handleDownloadAnalysis"
+            ></BiodiCsvDownload>
         </el-row>
     </div>
 </template>
@@ -23,8 +26,7 @@
         computed: {
             ...mapGetters({
                 metas: 'biodiCsvDownload/metas',
-                biodiCsvCompleteToDownload: 'biodiCsvDownload/biodiCsvCompleteToDownload',
-                biodiCsvRawToDownload: 'biodiCsvDownload/biodiCsvRawToDownload',
+                biodiCsvToDownload: 'biodiCsvDownload/biodiCsvToDownload',
                 error: 'biodiCsvDownload/error',
                 loading: 'biodiCsvDownload/loading'
             })
@@ -33,16 +35,25 @@
             ...mapActions({
                 'downloadBiodiCsvComplete': types.DOWNLOAD_BIODI_CSV_COMPLETE,
                 'downloadBiodiCsvRaw': types.DOWNLOAD_BIODI_CSV_RAW,
+                'downloadBiodiCsvAnalysis': types.DOWNLOAD_BIODI_CSV_ANALYSIS,
                 'getBiodiCsvMetas': types.GET_BIODI_CSV_METAS,
                 'setError': types.SET_ERROR
             }),
 
             handleDownloadComplete() {
-                this.downloadBiodiCsvComplete({biodiCsvCompleteToDownload: this.biodiCsvCompleteToDownload})
+                console.log("Got here")
+                console.log(this.biodiCsvToDownload)
+                this.downloadBiodiCsvComplete({biodiCsvToDownload: this.biodiCsvToDownload})
             },
 
             handleDownloadRaw() {
-                this.downloadBiodiCsvRaw({biodiCsvRawToDownload: this.biodiCsvRawToDownload})
+                console.log(this.biodiCsvToDownload)
+                this.downloadBiodiCsvRaw({biodiCsvToDownload: this.biodiCsvToDownload})
+            },
+
+            handleDownloadAnalysis() {
+                console.log(this.biodiCsvToDownload)
+                this.downloadBiodiCsvAnalysis({biodiCsvToDownload: this.biodiCsvToDownload})
             }
 
         },

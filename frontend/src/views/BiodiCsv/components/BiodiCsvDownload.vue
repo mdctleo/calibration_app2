@@ -30,6 +30,11 @@
                             size="mini"
                             type="primary"
                             @click="handleDownloadRaw(scope.$index, scope.row)">Download Raw</el-button>
+                    <el-button
+                        size="mini"
+                        type="primary"
+                        @click="handleDownloadAnalysis(scope.$index, scope.row)"
+                    >Download Analysis</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -47,17 +52,21 @@
 
         methods: {
             ...mapActions({
-                'setBiodiCsvCompleteToDownload': types.SET_BIODI_CSV_COMPLETE_TO_DOWNLOAD,
-                'setBiodiCsvRawToDownload': types.SET_BIODI_CSV_RAW_TO_DOWNLOAD
+                'setBiodiCsvToDownload': types.SET_BIODI_CSV_TO_DOWNLOAD
             }),
             handleDownloadComplete(index, row) {
-                this.setBiodiCsvCompleteToDownload({biodiCsvCompleteToDownload: row.id});
+                this.setBiodiCsvToDownload({biodiCsvToDownload: row.id});
                 this.$emit('download-complete');
             },
 
             handleDownloadRaw(index, row) {
-                this.setBiodiCsvRawToDownload({biodiCsvRawToDownload: row.id})
+                this.setBiodiCsvToDownload({biodiCsvToDownload: row.id})
                 this.$emit('download-raw')
+            },
+
+            handleDownloadAnalysis(index, row) {
+                this.setBiodiCsvToDownload({biodiCsvToDownload: row.id})
+                this.$emit('download-analysis')
             }
         }
     }

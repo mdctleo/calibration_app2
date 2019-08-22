@@ -169,16 +169,24 @@ def getCompleteStudy(studyId):
                 currRow = currRow + 1
 
         file = si.getvalue()
-
+        print(type(file))
     except BaseException as e:
         raise e
 
     return file, completeStudy.studyName
 
 def getStudyAnalysis(studyId):
-    completeStudy, isotope, calibrationFactor = db.getCompleteStudy(studyId)
-    pd.read_sql(db.getCompleteStudy(studyId))
-    return None
+    completeStudyCsv, studyName = getCompleteStudy(studyId)
+    studyPd = pd.read_csv(StringIO(completeStudyCsv))
+    studyPd = studyPd[['Window 1 %ID/g @ injectionTime','Organ','TimePoint (h)']]
+    si = StringIO()
+    csv = studyPd.groupby(['Organ', 'TimePoint (h)']).describe().to_csv()
+    # print(type(csv))
+    # si.seek(0)
+    # print(si)
+    # print(type(si.getvalue()))
+    # file = si.getvalue()
+    return csv, studyName
 
 def getChelators():
     try:

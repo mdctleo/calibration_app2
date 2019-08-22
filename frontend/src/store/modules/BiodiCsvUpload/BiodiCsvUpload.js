@@ -583,10 +583,10 @@ const actions = {
             })
     },
 
-    postBiodiCsvTest(context, payload) {
+    async postBiodiCsvTest(context, payload) {
         try {
             context.commit('SET_LOADING', {loading: true})
-            let result = postBiodiCsv(payload)
+            let result = await postBiodiCsv(payload)
         } catch (error) {
             context.commit('SET_ERROR', {error: error.response.data.message})
         } finally {
