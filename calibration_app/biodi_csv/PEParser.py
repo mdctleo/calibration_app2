@@ -133,7 +133,7 @@ def handlePEStudy(file, studyInfo, gammaInfo, mouseInfo, organInfo):
         with db.getDb().session.no_autoflush:
             df = parsePECsv(file)
             mouseOrgans = assignOrgansToMouse(mouseInfo, organInfo)
-            biodiCsvRows, windows, protocolId, measurementTime = preparePEBiodiCsvRows(df, studyInfo['radioIsotope'])
+            biodiCsvRows, windows, protocolId, measurementTime = preparePEBiodiCsvRows(df, studyInfo['isotopeName'])
             mice = prepareMiceAndOrgans(mouseOrgans)
             study = prepareStudyInformation(studyInfo, gammaInfo, protocolId, measurementTime)
             study.biodiCsvRows = biodiCsvRows

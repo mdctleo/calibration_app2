@@ -8,6 +8,9 @@
                 @close="setError({error: null})">
         </el-alert>
         <el-row>
+            <BiodiCsvDownloadQuery></BiodiCsvDownloadQuery>
+        </el-row>
+        <el-row>
             <BiodiCsvDownload :metas="metas" @download-complete="handleDownloadComplete"
                               @download-raw="handleDownloadRaw"
                               @download-analysis="handleDownloadAnalysis"
@@ -20,9 +23,10 @@
     import {mapActions, mapGetters} from 'vuex';
     import * as types from '../../store/modules/BiodiCsvDownload/BiodiCsvDownloadTypes.js'
     import BiodiCsvDownload from "./components/BiodiCsvDownload";
+    import BiodiCsvDownloadQuery from "./components/BiodiCsvDownloadQuery";
     export default {
         name: "BiodiCsvDownloadView",
-        components: {BiodiCsvDownload},
+        components: {BiodiCsvDownloadQuery, BiodiCsvDownload},
         computed: {
             ...mapGetters({
                 metas: 'biodiCsvDownload/metas',
@@ -41,7 +45,6 @@
             }),
 
             handleDownloadComplete() {
-                console.log("Got here")
                 console.log(this.biodiCsvToDownload)
                 this.downloadBiodiCsvComplete({biodiCsvToDownload: this.biodiCsvToDownload})
             },

@@ -3,8 +3,8 @@ from flask import request
 from marshmallow import ValidationError
 from flask import jsonify
 from flask_jwt_extended import jwt_required
-from calibration_app.biodi_csv.Schema import BiodiCsvRequestSchema, StudyInformationMetaSchema, ChelatorSchema, \
-    VectorSchema, CellLineSchema, MouseStrainSchema, TumorModelSchema
+from calibration_app.biodi_csv.Schema import BiodiCsvRequestSchema, ChelatorSchema, \
+    VectorSchema, CellLineSchema, MouseStrainSchema, TumorModelSchema, StudyInfoSchema
 from response.response import StandardResponse, StandardResponseSchema
 from flask import make_response
 from calibration_app.biodi_csv.Controller import *
@@ -37,9 +37,10 @@ def biodiCsv():
                 response = BaseExceptionSchema().dump(result)
                 return jsonify(response), 200
 
+        print("GOT HERE FINE")
         result = StandardResponse("success")
         response = StandardResponseSchema().dump(result)
-        return make_response(response), 200
+        return jsonify(response), 200
     elif request.method == 'GET':
         try:
             result, studyName = getBiodiCsvRaw(request.args.get('id'))
@@ -82,9 +83,7 @@ def biodiCsvAnalysis():
             response = BaseExceptionSchema().dump(result)
             return jsonify(response), 500
 
-        # print(result)
         response = make_response(result)
-        print(response.data)
         response.headers["Content-Disposition"] = "attachment; filename=" + studyName
         response.headers["Content-Type"] = "text/csv; charset=UTF-8"
 
@@ -101,8 +100,9 @@ def biodiCsvMetas():
             response = BaseExceptionSchema().dump(result)
             return jsonify(response), 500
 
-        response = StudyInformationMetaSchema(many=True).dump(result)
-        return make_response(jsonify(response), 200)
+        response = StudyInfoSchema(many=True).dump(result)
+        print(response)
+        return jsonify(response), 200
 
 @bp.route('/chelators', methods=['GET'])
 @jwt_required

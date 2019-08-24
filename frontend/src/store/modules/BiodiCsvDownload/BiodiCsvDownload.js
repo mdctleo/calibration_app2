@@ -87,7 +87,7 @@ const actions = {
             context.commit('SET_LOADING', {loading: true});
             let response = await getBiodiCsvMetas()
             let metas = response.data
-            console.log('got to fulfilled')
+            console.log(metas)
             metas.forEach((meta) => {
                 meta.createdOn = moment(meta.createdOn).format('DD-MM-YYYY, h:mm:ss');
             });

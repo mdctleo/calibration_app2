@@ -25,6 +25,5 @@ Returns:
 def calculateCalibratedMouseActivity(cpm, halfLife, tref, t, calibrationFactor):
     deltaT = t - tref
     deltaT = deltaT.total_seconds() / 60.0
-    print(deltaT)
     mouseActivity = cpm * exp((log(2) / halfLife) * deltaT) * calibrationFactor
     return mouseActivity

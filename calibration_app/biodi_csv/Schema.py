@@ -22,11 +22,11 @@ class CellLineSchema(Schema):
 
 
 
-class StudyInformationMetaSchema(Schema):
-    id = fields.Integer(required=True)
-    studyName = fields.Str(required=True)
-    researcherName = fields.Str(required=True)
-    createdOn = fields.DateTime(required=True)
+# class StudyInformationMetaSchema(Schema):
+#     id = fields.Integer(required=True)
+#     studyName = fields.Str(required=True)
+#     researcherName = fields.Str(required=True)
+#     createdOn = fields.DateTime(required=True)
 
 
 class BiodiCsvRowSchema(Schema):
@@ -52,18 +52,20 @@ class BiodiCsvFileSchema(Schema):
 
 
 class StudyInfoSchema(Schema):
+    id = fields.Integer(required=True, dump_only=True)
     studyName = fields.Str(required=True)
-    studyDate = fields.DateTime(required=True)
+    studyDate = fields.DateTime('%Y-%m-%d', required=True)
     researcherName = fields.Str(required=True)
     piName = fields.Str(required=True)
-    radioIsotope = fields.Str(required=True)
-    chelator = fields.Str(required=True)
-    vector = fields.Str(required=True)
+    isotopeName = fields.Str(required=True)
+    chelatorName = fields.Str(required=True)
+    vectorName = fields.Str(required=True)
     target = fields.Str(required=True)
-    cellLine = fields.Str(required=True)
-    mouseStrain = fields.Str(required=True)
-    tumorModel = fields.Str(required=True)
+    cellLineName = fields.Str(required=True)
+    mouseStrainName = fields.Str(required=True)
+    tumorModelName = fields.Str(required=True)
     radioPurity = fields.Float(required=True)
+    gammaCounter = fields.Str(required=True, dump_only=True)
     comments = fields.Str()
 
 

@@ -20,13 +20,13 @@ const getDefaultState = () => {
             studyDate: "",
             researcherName: "",
             piName: "",
-            radioIsotope: "",
-            chelator: "",
-            vector: "",
+            isotopeName: "",
+            chelatorName: "",
+            vectorName: "",
             target: "",
-            cellLine: "",
-            mouseStrain: "",
-            tumorModel: "",
+            cellLineName: "",
+            mouseStrainName: "",
+            tumorModelName: "",
             radioPurity: "",
             comments: "",
         },
@@ -93,32 +93,32 @@ const actions = {
         context.commit('SET_PI_NAME', payload)
     },
 
-    setRadioIsotope: (context, payload) => {
-        context.commit('SET_RADIO_ISOTOPE', payload)
+    setIsotopeName: (context, payload) => {
+        context.commit('SET_ISOTOPE_NAME', payload)
     },
 
-    setChelator: (context, payload) => {
-        context.commit('SET_CHELATOR', payload)
+    setChelatorName: (context, payload) => {
+        context.commit('SET_CHELATOR_NAME', payload)
     },
 
-    setVector: (context, payload) => {
-        context.commit('SET_VECTOR', payload)
+    setVectorName: (context, payload) => {
+        context.commit('SET_VECTOR_NAME', payload)
     },
 
     setTarget: (context, payload) => {
         context.commit('SET_TARGET', payload)
     },
 
-    setCellLine: (context, payload) => {
-        context.commit('SET_CELL_LINE', payload)
+    setCellLineName: (context, payload) => {
+        context.commit('SET_CELL_LINE_NAME', payload)
     },
 
-    setMouseStrain: (context, payload) => {
-        context.commit('SET_MOUSE_STRAIN', payload)
+    setMouseStrainName: (context, payload) => {
+        context.commit('SET_MOUSE_STRAIN_NAME', payload)
     },
 
-    setTumorModel: (context, payload) => {
-        context.commit('SET_TUMOR_MODEL', payload)
+    setTumorModelName: (context, payload) => {
+        context.commit('SET_TUMOR_MODEL_NAME', payload)
     },
 
     setRadioPurity: (context, payload) => {
@@ -627,32 +627,32 @@ const mutations = {
         return state.studyForm.piName = payload.piName
     },
 
-    SET_RADIO_ISOTOPE: (state, payload) => {
-        return state.studyForm.radioIsotope = payload.radioIsotope
+    SET_ISOTOPE_NAME: (state, payload) => {
+        return state.studyForm.isotopeName = payload.isotopeName
     },
 
-    SET_CHELATOR: (state, payload) => {
-        return state.studyForm.chelator = payload.chelator
+    SET_CHELATOR_NAME: (state, payload) => {
+        return state.studyForm.chelatorName = payload.chelatorName
     },
 
-    SET_VECTOR: (state, payload) => {
-        return state.studyForm.vector = payload.vector
+    SET_VECTOR_NAME: (state, payload) => {
+        return state.studyForm.vectorName = payload.vectorName
     },
 
     SET_TARGET: (state, payload) => {
         return state.studyForm.target = payload.target
     },
 
-    SET_CELL_LINE: (state, payload) => {
-        return state.studyForm.cellLine = payload.cellLine
+    SET_CELL_LINE_NAME: (state, payload) => {
+        return state.studyForm.cellLineName = payload.cellLineName
     },
 
-    SET_MOUSE_STRAIN: (state, payload) => {
-        return state.studyForm.mouseStrain = payload.mouseStrain
+    SET_MOUSE_STRAIN_NAME: (state, payload) => {
+        return state.studyForm.mouseStrainName = payload.mouseStrainName
     },
 
-    SET_TUMOR_MODEL: (state, payload) => {
-        return state.studyForm.tumorModel = payload.tumorModel
+    SET_TUMOR_MODEL_NAME: (state, payload) => {
+        return state.studyForm.tumorModelName = payload.tumorModelName
     },
 
     SET_RADIO_PURITY: (state, payload) => {
@@ -752,13 +752,13 @@ const getters = {
     studyDate: state => state.studyForm.studyDate,
     researcherName: state => state.studyForm.researcherName,
     piName: state => state.studyForm.piName,
-    radioIsotope: state => state.studyForm.radioIsotope,
-    chelator: state => state.studyForm.chelator,
-    vector: state => state.studyForm.vector,
+    isotopeName: state => state.studyForm.isotopeName,
+    chelatorName: state => state.studyForm.chelatorName,
+    vectorName: state => state.studyForm.vectorName,
     target: state => state.studyForm.target,
-    cellLine: state => state.studyForm.cellLine,
-    mouseStrain: state => state.studyForm.mouseStrain,
-    tumorModel: state => state.studyForm.tumorModel,
+    cellLineName: state => state.studyForm.cellLineName,
+    mouseStrainName: state => state.studyForm.mouseStrainName,
+    tumorModelName: state => state.studyForm.tumorModelName,
     radioPurity: state => state.studyForm.radioPurity,
     comments: state => state.studyForm.comments,
 

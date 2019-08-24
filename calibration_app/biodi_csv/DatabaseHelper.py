@@ -72,8 +72,17 @@ class DatabaseHelper:
         try:
             result = StudyInformation.query.with_entities(StudyInformation.id,
                                                           StudyInformation.studyName,
+                                                          StudyInformation.studyDate,
                                                           StudyInformation.researcherName,
-                                                          StudyInformation.createdOn).all()
+                                                          StudyInformation.piName,
+                                                          StudyInformation.isotopeName,
+                                                          StudyInformation.chelatorName,
+                                                          StudyInformation.vectorName,
+                                                          StudyInformation.target,
+                                                          StudyInformation.cellLineName,
+                                                          StudyInformation.tumorModelName,
+                                                          StudyInformation.mouseStrainName,
+                                                          StudyInformation.gammaCounter).all()
         except SQLAlchemyError as e:
             raise BaseException(e.__str__())
 

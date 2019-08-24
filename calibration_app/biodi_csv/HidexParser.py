@@ -43,7 +43,7 @@ def prepareHidexWindow(row, rowNum, studyIsotope):
 
     return windows
 
-def prepareHidexBiodiCsvRows(df):
+def prepareHidexBiodiCsvRows(df, studyIsotope):
     try:
         windows = []
         biodiCsvRows = []
@@ -58,7 +58,7 @@ def prepareHidexBiodiCsvRows(df):
                 rack=row["Rack"],
                 pos=row["Vial"],
             ))
-            windows.extend(prepareHidexWindow(row, rowNum))
+            windows.extend(prepareHidexWindow(row, rowNum, studyIsotope))
     except BaseException as e:
         raise e
 
@@ -114,7 +114,7 @@ def handleHidexStudy(file, studyInfo, gammaInfo, mouseInfo, organInfo):
         with db.getDb().session.no_autoflush:
             df = parseHidexExcel(file)
             mouseOrgans = assignOrgansToMouse(mouseInfo, organInfo)
-            biodiCsvRows, windows, measurementTime = prepareHidexBiodiCsvRows(df)
+            biodiCsvRows, windows, measurementTime = prepareHidexBiodiCsvRows(df, studyInfo['isotopeName'])
             mice = prepareMiceAndOrgans(mouseOrgans)
             study = prepareStudyInformation(studyInfo, gammaInfo, None, measurementTime)
             study.biodiCsvRows = biodiCsvRows

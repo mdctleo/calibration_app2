@@ -10,6 +10,7 @@ import pandas as pd
 def getMetas():
     try:
         metas = db.getBiodiCsvMetas()
+        print(metas)
     except BaseException as e:
         raise e
 
@@ -20,10 +21,19 @@ def getBiodiCsvRaw(studyId):
         completeStudy, isotope, calibrationFactor = db.getCompleteStudy(studyId)
         windowsMap = createWindowsMap(completeStudy.windows)
         si = StringIO()
-        fieldnames = [
-            "Protocol ID", "Protocol name", "Measurement date & time", "Completion status", "Run ID",
-            "Rack", "Det", "Pos", "Time", "Sample code"
-        ]
+        fieldnames = []
+        if completeStudy.protocolId is not None:
+            fieldnames.append("Protocol ID")
+            fieldnames.append("Protocol name")
+
+        fieldnames.append("Measurement date & time")
+        fieldnames.append("Completion status")
+        fieldnames.append("Run ID")
+        fieldnames.append("Rack")
+        fieldnames.append("Det")
+        fieldnames.append("Pos")
+        fieldnames.append("Time")
+        fieldnames.append("Sample code")
 
         for i, key in enumerate(windowsMap.keys()):
             fieldnames.append(key + " Counts")
@@ -36,26 +46,31 @@ def getBiodiCsvRaw(studyId):
         currRow=0
 
         for i, row in enumerate(completeStudy.biodiCsvRows):
-            row = {
-                "Protocol ID": completeStudy.protocolId,
-                "Protocol name": db.getProtocolName(completeStudy.protocolId),
-                "Measurement date & time": row.measurementTime,
-                "Completion status": row.completionStatus,
-                "Run ID": row.runId,
-                "Rack": row.rack,
-                "Det": row.det,
-                "Pos": row.pos,
-                "Time": row.time,
-                "Sample code": row.sampleCode
-            }
+            csvRow = {}
+            completionStatus = row.completionStatus
+            if completeStudy.protocolId is not None:
+                csvRow["Protocol ID"] = completeStudy.protocolId,
+                csvRow["Protocol name"] = db.getProtocolName(completeStudy.protocolId),
+            # csvRow["Measurement date & time"] = row.measurementTime,
+            csvRow.update({"Measurement date & time": row.measurementTime})
+            csvRow.update({"Completion status": completionStatus}),
+            csvRow.update({"Run ID": row.runId}),
+            csvRow.update({"Rack": row.rack}),
+            csvRow.update({"Det": row.det}),
+            csvRow.update({"Pos": row.pos}),
+            csvRow.update({"Time": row.time}),
+            csvRow.update({"Sample code": row.sampleCode})
+
+            print(row.completionStatus)
+            print(csvRow)
 
             for i, key in enumerate(windowsMap.keys()):
-                row[key + " Counts"] = windowsMap[key][currRow].counts
-                row[key + " Error %"] = windowsMap[key][currRow].error
-                row[key + " CPM"] = windowsMap[key][currRow].cpm
-                row[key + " Info"] = windowsMap[key][currRow].info
+                csvRow[key + " Counts"] = windowsMap[key][currRow].counts
+                csvRow[key + " Error %"] = windowsMap[key][currRow].error
+                csvRow[key + " CPM"] = windowsMap[key][currRow].cpm
+                csvRow[key + " Info"] = windowsMap[key][currRow].info
 
-            cw.writerow(row)
+            cw.writerow(csvRow)
 
             currRow = currRow + 1
 
@@ -157,7 +172,6 @@ def getCompleteStudy(studyId):
                     row["Window" + currWinNum + " corrected (counts)"] = windowsMap[key][currRow].counts
                     row["Window" + currWinNum + " (CPM)"] = cpm
                     row["Normalized Window" + currWinNum + " (CPM)"] =  windowsMap[key][currRow].cpm
-                    row["Normalized Window" + currWinNum + " (Bq)" ] = "PlaceHolder"
                     row["Window " + currWinNum + " %ID/g @ injectionTime"] = ((mouseAcitivty / injectedActivity) * 100) / organ.organMass
 
 
@@ -169,7 +183,6 @@ def getCompleteStudy(studyId):
                 currRow = currRow + 1
 
         file = si.getvalue()
-        print(type(file))
     except BaseException as e:
         raise e
 
@@ -178,14 +191,14 @@ def getCompleteStudy(studyId):
 def getStudyAnalysis(studyId):
     completeStudyCsv, studyName = getCompleteStudy(studyId)
     studyPd = pd.read_csv(StringIO(completeStudyCsv))
-    studyPd = studyPd[['Window 1 %ID/g @ injectionTime','Organ','TimePoint (h)']]
-    si = StringIO()
+    columnsToSlice = []
+    for column in studyPd.columns:
+        if column.find("%ID/g @ injectionTime") != -1:
+            columnsToSlice.append(column)
+    columnsToSlice.append("Organ")
+    columnsToSlice.append("TimePoint (h)")
+    studyPd = studyPd[columnsToSlice]
     csv = studyPd.groupby(['Organ', 'TimePoint (h)']).describe().to_csv()
-    # print(type(csv))
-    # si.seek(0)
-    # print(si)
-    # print(type(si.getvalue()))
-    # file = si.getvalue()
     return csv, studyName
 
 def getChelators():

@@ -35,8 +35,8 @@
             </el-row>
             <el-row>
                 <el-col :span="12" :offset="6">
-                    <el-form-item label="Radioisotope" prop="radioIsotope">
-                        <el-select v-model="radioIsotope" placeholder="Please select the radio isotope">
+                    <el-form-item label="Radioisotope" prop="isotopeName">
+                        <el-select v-model="isotopeName" placeholder="Please select the radio isotope">
                            <el-option
                                v-for="isotope in isotopes"
                                :key="isotope.isotopeName"
@@ -49,8 +49,8 @@
             </el-row>
             <el-row>
                 <el-col :span="12" :offset="6">
-                    <el-form-item label="Chelator" prop="chelator">
-                        <el-select v-model="chelator" placeholder="Please select the chelator">
+                    <el-form-item label="Chelator" prop="chelatorName">
+                        <el-select v-model="chelatorName" placeholder="Please select the chelator">
                             <el-option
                                 v-for="chelator in chelators"
                                 :key="chelator.name"
@@ -63,8 +63,8 @@
             </el-row>
             <el-row>
                 <el-col :span="12" :offset="6">
-                    <el-form-item label="Vector" prop="vector">
-                        <el-select v-model="vector" placeholder="Please select the vector">
+                    <el-form-item label="Vector" prop="vectorName">
+                        <el-select v-model="vectorName" placeholder="Please select the vector">
                             <el-option
                                 v-for="vector in vectors"
                                 :key="vector.name"
@@ -84,8 +84,8 @@
             </el-row>
             <el-row>
                 <el-col :span="12" :offset="6">
-                    <el-form-item label="Cell Line" prop="cellLine">
-                        <el-select v-model="cellLine"
+                    <el-form-item label="Cell Line" prop="cellLineName">
+                        <el-select v-model="cellLineName"
                                    placeholder="Please select the cell line">
                             <el-option
                                 v-for="cellLine in cellLines"
@@ -99,8 +99,8 @@
             </el-row>
             <el-row>
                 <el-col :span="12" :offset="6">
-                    <el-form-item label="Mouse Strain" prop="mouseStrain">
-                        <el-select v-model="mouseStrain"
+                    <el-form-item label="Mouse Strain" prop="mouseStrainName">
+                        <el-select v-model="mouseStrainName"
                                    placeholder="Please select a mouseStrain">
                             <el-option
                                 v-for="mouseStrain in mouseStrains"
@@ -114,8 +114,8 @@
             </el-row>
             <el-row>
                 <el-col :span="12" :offset="6">
-                    <el-form-item label="Tumor Model" prop="tumorModel">
-                        <el-select v-model="tumorModel"
+                    <el-form-item label="Tumor Model" prop="tumorModelName">
+                        <el-select v-model="tumorModelName"
                                    placeholder="Please select a tumor model">
                             <el-option
                                     v-for="tumorModel in tumorModels"
@@ -170,25 +170,25 @@
                     piName: [
                         {required: true, message: 'Please input a principal investigator name', trigger: 'change'}
                     ],
-                    radioIsotope: [
+                    isotopeName: [
                         {required: true, message: 'Please select an isotope', trigger: 'change'}
                     ],
-                    chelator: [
+                    chelatorName: [
                         {required: true, message: 'Please select a chelator', trigger: 'change'}
                     ],
-                    vector: [
+                    vectorName: [
                         {required: true, message: 'Please select a vector', trigger: 'change'},
                     ],
                     target: [
                         {required: true, message: 'Please input a target', trigger: 'blur'}
                     ],
-                    cellLine: [
+                    cellLineName: [
                         {required: true, message: 'Please input a cell line', trigger: 'change'}
                     ],
-                    mouseStrain: [
+                    mouseStrainName: [
                         {required: true, message: 'Please select a mouse strain', trigger: 'change'}
                     ],
-                    tumorModel: [
+                    tumorModelName: [
                         {required: true, message: 'Please select a tumor model', trigger: 'change'}
                     ],
                     radioPurity: [
@@ -209,13 +209,13 @@
                 getStudyDate: 'biodiCsvUpload/studyDate',
                 getResearcherName: 'biodiCsvUpload/researcherName',
                 getPiName: 'biodiCsvUpload/piName',
-                getRadioIsotope: 'biodiCsvUpload/radioIsotope',
-                getChelator: 'biodiCsvUpload/chelator',
-                getVector: 'biodiCsvUpload/vector',
+                getIsotopeName: 'biodiCsvUpload/isotopeName',
+                getChelatorName: 'biodiCsvUpload/chelatorName',
+                getVectorName: 'biodiCsvUpload/vectorName',
                 getTarget: 'biodiCsvUpload/target',
-                getCellLine: 'biodiCsvUpload/cellLine',
-                getMouseStrain: 'biodiCsvUpload/mouseStrain',
-                getTumorModel: 'biodiCsvUpload/tumorModel',
+                getCellLineName: 'biodiCsvUpload/cellLineName',
+                getMouseStrainName: 'biodiCsvUpload/mouseStrainName',
+                getTumorModelName: 'biodiCsvUpload/tumorModelName',
                 getRadioPurity: 'biodiCsvUpload/radioPurity',
                 getComments: 'biodiCsvUpload/comments',
                 isotopes: 'biodiCsvUpload/isotopes',
@@ -275,33 +275,33 @@
                 }
             },
 
-            radioIsotope: {
+            isotopeName: {
                 get() {
-                    return this.getRadioIsotope
+                    return this.getIsotopeName
                 },
 
                 set(value) {
-                    this.setRadioIsotope({radioIsotope: value})
+                    this.setIsotopeName({isotopeName: value})
                 }
             },
 
-            chelator: {
+            chelatorName: {
                 get() {
-                    return this.getChelator
+                    return this.getChelatorName
                 },
 
                 set(value) {
-                    this.setChelator({chelator: value})
+                    this.setChelatorName({chelatorName: value})
                 }
             },
 
-            vector: {
+            vectorName: {
                 get() {
-                    return this.getVector
+                    return this.getVectorName
                 },
 
                 set(value) {
-                    this.setVector({vector: value})
+                    this.setVectorName({vectorName: value})
                 }
             },
 
@@ -315,33 +315,33 @@
                 }
             },
 
-            cellLine: {
+            cellLineName: {
                 get() {
-                    return this.getCellLine
+                    return this.getCellLineName
                 },
 
                 set(value) {
-                    this.setCellLine({cellLine: value})
+                    this.setCellLineName({cellLineName: value})
                 }
             },
 
-            mouseStrain: {
+            mouseStrainName: {
                 get() {
-                    return this.getMouseStrain
+                    return this.getMouseStrainName
                 },
 
                 set(value) {
-                    this.setMouseStrain({mouseStrain: value})
+                    this.setMouseStrainName({mouseStrainName: value})
                 }
             },
 
-            tumorModel: {
+            tumorModelName: {
                 get() {
-                    return this.getTumorModel
+                    return this.getTumorModelName
                 },
 
                 set(value) {
-                    this.setTumorModel({tumorModel: value})
+                    this.setTumorModelName({tumorModelName: value})
                 }
 
             },
@@ -381,13 +381,13 @@
                 'setStudyDate': types.SET_STUDY_DATE,
                 'setResearcherName': types.SET_RESEARCHER_NAME,
                 'setPiName': types.SET_PI_NAME,
-                'setRadioIsotope': types.SET_RADIO_ISOTOPE,
-                'setChelator': types.SET_CHELATOR,
-                'setVector': types.SET_VECTOR,
+                'setIsotopeName': types.SET_RADIO_ISOTOPE,
+                'setChelatorName': types.SET_CHELATOR,
+                'setVectorName': types.SET_VECTOR,
                 'setTarget': types.SET_TARGET,
-                'setCellLine': types.SET_CELL_LINE,
-                'setMouseStrain': types.SET_MOUSE_STRAIN,
-                'setTumorModel': types.SET_TUMOR_MODEL,
+                'setCellLineName': types.SET_CELL_LINE,
+                'setMouseStrainName': types.SET_MOUSE_STRAIN,
+                'setTumorModelName': types.SET_TUMOR_MODEL,
                 'setRadioPurity': types.SET_RADIO_PURITY,
                 'setComments': types.SET_COMMENTS,
                 'getIsotopes': types.GET_ISOTOPES,
