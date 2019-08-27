@@ -78,11 +78,11 @@ def make_shell_context():
             'TumorModel': biodiCsvCompleteModel.TumorModel,
             'MouseStrain': biodiCsvCompleteModel.MouseStrain,
             'Organ': biodiCsvCompleteModel.Organ,
-            'CellLine': biodiCsvCompleteModel.CellLine,
             'StudyInformation': biodiCsvCompleteModel.StudyInformation,
             'Mouse': biodiCsvCompleteModel.Mouse,
             'MouseOrgan': biodiCsvCompleteModel.MouseOrgan,
-            'Window': biodiCsvCompleteModel.Window
+            'Window': biodiCsvCompleteModel.Window,
+            'GammaCounterRun': biodiCsvCompleteModel.GammaCounterRun
             }
 
 

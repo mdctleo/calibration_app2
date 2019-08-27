@@ -61,9 +61,6 @@ def getBiodiCsvRaw(studyId):
             csvRow.update({"Time": row.time}),
             csvRow.update({"Sample code": row.sampleCode})
 
-            print(row.completionStatus)
-            print(csvRow)
-
             for i, key in enumerate(windowsMap.keys()):
                 csvRow[key + " Counts"] = windowsMap[key][currRow].counts
                 csvRow[key + " Error %"] = windowsMap[key][currRow].error
@@ -75,7 +72,6 @@ def getBiodiCsvRaw(studyId):
             currRow = currRow + 1
 
         file = si.getvalue()
-        print(file)
     except BaseException as e:
         raise e
 
@@ -212,14 +208,6 @@ def getChelators():
 def getVectors():
     try:
         result = db.getVectors()
-    except BaseException as e:
-        raise e
-
-    return result
-
-def getCellLines():
-    try:
-        result = db.getCellLines()
     except BaseException as e:
         raise e
 

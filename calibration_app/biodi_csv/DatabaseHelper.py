@@ -1,5 +1,5 @@
 from app import db
-from calibration_app.biodi_csv.Model import StudyInformation, Vector, Organ, BiodiCsvRow, Protocol, Window, Chelator, CellLine, MouseStrain, TumorModel
+from calibration_app.biodi_csv.Model import StudyInformation, Vector, Organ, BiodiCsvRow, Protocol, Window, Chelator, MouseStrain, TumorModel
 from sqlalchemy.exc import *
 
 from calibration_app.calibration.Model import CalibrationFactor
@@ -143,15 +143,6 @@ class DatabaseHelper:
             raise BaseException(e.__str__())
 
         return vectors
-
-    @staticmethod
-    def getCellLines():
-        try:
-            cellLines = CellLine.query.all()
-        except SQLAlchemyError as e:
-            raise BaseException(e.__str__())
-
-        return cellLines
 
     @staticmethod
     def getMouseStrains():

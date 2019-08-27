@@ -98,11 +98,6 @@ export const getVectors = async () => {
     return await axios.get(endpoint)
 }
 
-export const getCellLines = async () => {
-    let endpoint = BASE_URL + "/cell-lines"
-    return await axios.get(endpoint)
-}
-
 export const getMouseStrains = async () => {
     let endpoint = BASE_URL + "/mouse-strains"
     return await axios.get(endpoint)

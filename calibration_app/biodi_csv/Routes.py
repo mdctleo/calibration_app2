@@ -132,20 +132,6 @@ def vectors():
         response = VectorSchema(many=True, exclude=['type']).dump(result)
         return jsonify(response), 200
 
-@bp.route('/cell-lines', methods=['GET'])
-@jwt_required
-def cellLines():
-    if request.method == 'GET':
-        try:
-            result = getCellLines()
-        except BaseException as e:
-            result = BaseException(e.message)
-            response = StandardResponseSchema().dump(result)
-            return jsonify(response), 200
-
-        response = CellLineSchema(many=True).dump(result)
-        return jsonify(response), 200
-
 @bp.route('/mouse-strains', methods=['GET'])
 @jwt_required
 def mouseStrains():

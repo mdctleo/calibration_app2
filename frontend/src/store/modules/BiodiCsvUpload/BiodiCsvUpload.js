@@ -1,5 +1,4 @@
 import {
-    getCellLines,
     getChelators,
     getCounters,
     getIsotopes,
@@ -24,11 +23,11 @@ const getDefaultState = () => {
             chelatorName: "",
             vectorName: "",
             target: "",
-            cellLineName: "",
             mouseStrainName: "",
             tumorModelName: "",
             radioPurity: "",
-            comments: "",
+            comment: "",
+            numGammaRuns: ""
         },
 
         gammaForm: {
@@ -109,10 +108,6 @@ const actions = {
         context.commit('SET_TARGET', payload)
     },
 
-    setCellLineName: (context, payload) => {
-        context.commit('SET_CELL_LINE_NAME', payload)
-    },
-
     setMouseStrainName: (context, payload) => {
         context.commit('SET_MOUSE_STRAIN_NAME', payload)
     },
@@ -125,8 +120,12 @@ const actions = {
         context.commit('SET_RADIO_PURITY', payload)
     },
 
-    setComments: (context, payload) => {
-        context.commit('SET_COMMENTS', payload)
+    setComment: (context, payload) => {
+        context.commit('SET_COMMENT', payload)
+    },
+
+    setNumGammaRuns: (context, payload) => {
+        context.commit('SET_NUM_GAMMA_RUNS', payload)
     },
 
     setGammaCounter: (context, payload) => {
@@ -194,20 +193,6 @@ const actions = {
         getVectors()
             .then((response) => {
                 context.commit('SET_VECTORS', {vectors: response.data})
-            })
-            .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.msg})
-            })
-            .finally(() => {
-                context.commit('SET_LOADING', {loading: false});
-            });
-    },
-
-    getCellLines: (context) => {
-        context.commit('SET_LOADING', {loading: true});
-        getCellLines()
-            .then((response) => {
-                context.commit('SET_CELL_LINES', {cellLines: response.data})
             })
             .catch((error) => {
                 context.commit('SET_ERROR', {error: error.response.data.msg})
@@ -515,60 +500,6 @@ const actions = {
         }
     },
 
-
-    // handleBiodiCsvs: async (context, payload) => {
-    //     try {
-    //         context.commit('SET_LOADING', {loading: true});
-    //         if (payload.biodiCsvs.length === 0) {
-    //             context.commit('SET_ERROR', {error: "biodi csv not uploaded"})
-    //             return false
-    //         }
-    //         let biodiCsvFile = payload.biodiCsvs[0]
-    //         let csvFile = await context.dispatch('readFile', biodiCsvFile.raw)
-    //         let csvFileJson = await csv().fromString(csvFile)
-    //         let rowValidated = true
-    //         let indexHolder = 0
-    //
-    //
-    //         if (csvFileJson.length === 0) {
-    //             context.commit('SET_ERROR', {error: "biodii csv empty"})
-    //             return false
-    //         }
-    //
-    //
-    //         for (let i = 0; i < csvFileJson.length; i++) {
-    //             let row = csvFileJson[i]
-    //             rowValidated = await context.dispatch('validateBiodiCsvs', row)
-    //
-    //             if (!rowValidated) {
-    //                 break
-    //             }
-    //         }
-    //
-    //
-    //
-    //         if (rowValidated) {
-    //             let fileFormat = {
-    //                 fileName: biodiCsvFile.name,
-    //                 file: csvFileJson
-    //             };
-    //
-    //             context.commit('SET_BIODI_CSV_JSON', {biodiCsvJson: fileFormat})
-    //             return true
-    //         } else {
-    //             context.commit('SET_ERROR', {error: "There is an error in biodi csv on row " + (indexHolder + 2)})
-    //             return false
-    //
-    //         }
-    //
-    //     } catch (error) {
-    //         context.commit('SET_ERROR', {error: error.response.data.message})
-    //         return false
-    //     } finally {
-    //         context.commit('SET_LOADING', {loading: false});
-    //     }
-    // },
-
     postBiodiCsv(context, payload) {
         context.commit('SET_LOADING', {loading: true})
         postBiodiCsv(payload)
@@ -643,10 +574,6 @@ const mutations = {
         return state.studyForm.target = payload.target
     },
 
-    SET_CELL_LINE_NAME: (state, payload) => {
-        return state.studyForm.cellLineName = payload.cellLineName
-    },
-
     SET_MOUSE_STRAIN_NAME: (state, payload) => {
         return state.studyForm.mouseStrainName = payload.mouseStrainName
     },
@@ -659,8 +586,12 @@ const mutations = {
         return state.studyForm.radioPurity = payload.radioPurity
     },
 
-    SET_COMMENTS: (state, payload) => {
-        return state.studyForm.comments = payload.comments
+    SET_COMMENT: (state, payload) => {
+        return state.studyForm.comment = payload.comment
+    },
+
+    SET_NUM_GAMMA_RUNS: (state, payload) => {
+        return state.studyForm.numGammaRuns = payload.numGammaRuns
     },
 
     SET_GAMMA_COUNTER: (state, payload) => {
@@ -756,11 +687,11 @@ const getters = {
     chelatorName: state => state.studyForm.chelatorName,
     vectorName: state => state.studyForm.vectorName,
     target: state => state.studyForm.target,
-    cellLineName: state => state.studyForm.cellLineName,
     mouseStrainName: state => state.studyForm.mouseStrainName,
     tumorModelName: state => state.studyForm.tumorModelName,
     radioPurity: state => state.studyForm.radioPurity,
-    comments: state => state.studyForm.comments,
+    comment: state => state.studyForm.comment,
+    numGammaRuns: state => state.studyForm.numGammaRuns,
 
     gammaForm: state => state.gammaForm,
     gammaCounter: state => state.gammaForm.gammaCounter,

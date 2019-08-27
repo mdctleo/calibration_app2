@@ -84,21 +84,6 @@
             </el-row>
             <el-row>
                 <el-col :span="12" :offset="6">
-                    <el-form-item label="Cell Line" prop="cellLineName">
-                        <el-select v-model="cellLineName"
-                                   placeholder="Please select the cell line">
-                            <el-option
-                                v-for="cellLine in cellLines"
-                                :key="cellLine.name"
-                                :label="cellLine.name"
-                                :value="cellLine.name"
-                            ></el-option>
-                        </el-select>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-            <el-row>
-                <el-col :span="12" :offset="6">
                     <el-form-item label="Mouse Strain" prop="mouseStrainName">
                         <el-select v-model="mouseStrainName"
                                    placeholder="Please select a mouseStrain">
@@ -129,7 +114,7 @@
             </el-row>
             <el-row>
                 <el-col :span="12" :offset="6">
-                    <el-form-item label="Radio Purity" prop="radioPurity">
+                    <el-form-item label="Specific Activity" prop="radioPurity">
                         <el-input v-model.number="radioPurity" type="number"></el-input>
                     </el-form-item>
                 </el-col>
@@ -138,6 +123,13 @@
                 <el-col :span="12" :offset="6">
                     <el-form-item label="Comments">
                         <el-input type="textarea" v-model="comments"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="12" :offset="6">
+                    <el-form-item label="Gamma Runs" prop="numGammaRuns">
+                        <el-input v-model.number="numGammaRuns" placeholder="Please input number of gamma runs"></el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -197,6 +189,11 @@
                     ],
                     comments: [
                         {min: 0, max: 5000, message: 'Length should be less than 5000', trigger: 'blur'}
+                    ],
+
+                    numGammaRuns: [
+                        {required: true, message: 'Please input the number of gamma runs you plan to upload', trigger: 'blur'},
+                        {type: 'number', min: 1, max: 100, message: 'You must upload between 1 to 100 files'}
                     ]
                 }
             };
@@ -213,11 +210,11 @@
                 getChelatorName: 'biodiCsvUpload/chelatorName',
                 getVectorName: 'biodiCsvUpload/vectorName',
                 getTarget: 'biodiCsvUpload/target',
-                getCellLineName: 'biodiCsvUpload/cellLineName',
                 getMouseStrainName: 'biodiCsvUpload/mouseStrainName',
                 getTumorModelName: 'biodiCsvUpload/tumorModelName',
                 getRadioPurity: 'biodiCsvUpload/radioPurity',
-                getComments: 'biodiCsvUpload/comments',
+                getComment: 'biodiCsvUpload/comment',
+                getNumGammaRuns: 'biodiCsvUpload/numGammaRuns',
                 isotopes: 'biodiCsvUpload/isotopes',
                 chelators: 'biodiCsvUpload/chelators',
                 vectors: 'biodiCsvUpload/vectors',
@@ -358,11 +355,21 @@
 
             comments: {
                 get() {
-                    return this.getComments
+                    return this.getComment
                 },
 
                 set(value) {
-                    this.setComments({comments: value})
+                    this.setComment({comment: value})
+                }
+            },
+
+            numGammaRuns: {
+                get() {
+                    return this.getNumGammaRuns
+                },
+
+                set(value) {
+                    this.setNumGammaRuns({numGammaRuns: value})
                 }
             }
         },
@@ -385,15 +392,14 @@
                 'setChelatorName': types.SET_CHELATOR,
                 'setVectorName': types.SET_VECTOR,
                 'setTarget': types.SET_TARGET,
-                'setCellLineName': types.SET_CELL_LINE,
                 'setMouseStrainName': types.SET_MOUSE_STRAIN,
                 'setTumorModelName': types.SET_TUMOR_MODEL,
                 'setRadioPurity': types.SET_RADIO_PURITY,
-                'setComments': types.SET_COMMENTS,
+                'setComment': types.SET_COMMENT,
+                'setNumGammaRuns': types.SET_NUM_GAMMA_RUNS,
                 'getIsotopes': types.GET_ISOTOPES,
                 'getChelators': types.GET_CHELATORS,
                 'getVectors': types.GET_VECTORS,
-                'getCellLines': types.GET_CELL_LINES,
                 'getMouseStrains': types.GET_MOUSE_STRAINS,
                 'getTumorModels': types.GET_TUMOR_MODELS
             }),
@@ -415,7 +421,6 @@
             this.getIsotopes()
             this.getChelators()
             this.getVectors()
-            this.getCellLines()
             this.getMouseStrains()
             this.getTumorModels()
         }
