@@ -28,20 +28,11 @@
             }),
 
             handleSubmit() {
-                console.log(this.biodiCsvFile)
-                console.log(this.mouseCsvJson)
-                console.log(this.organCsvJson)
                 this.postBiodiCsv({studyInfo: this.studyForm,
                                        gammaInfo: this.gammaForm,
                                        biodiCsvs: this.biodiCsvs,
                                        mouseCsvs: this.mouseCsvs,
                                        organCsvs: this.organCsvs })
-                // this.postBiodiCsv({
-                //     biodiCsv: this.biodiCsvJson,
-                //     studyInfo: this.studyForm,
-                //     gammaInfo: this.gammaForm,
-                //     mouseInfo: this.mouseCsvJson,
-                //     organInfo: this.organCsvJson})
             }
         }
     }

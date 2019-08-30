@@ -4,7 +4,7 @@ from marshmallow import ValidationError
 from flask import jsonify
 from flask_jwt_extended import jwt_required
 from calibration_app.biodi_csv.Schema import BiodiCsvRequestSchema, ChelatorSchema, \
-    VectorSchema, CellLineSchema, MouseStrainSchema, TumorModelSchema, StudyInfoSchema
+    VectorSchema, CellLineSchema, MouseStrainSchema, TumorModelSchema, StudyInfoSchema, GammaInfoSchema
 from response.response import StandardResponse, StandardResponseSchema
 from flask import make_response
 from calibration_app.biodi_csv.Controller import *
@@ -22,10 +22,15 @@ def biodiCsv():
         if request.method =='POST':
             try:
 
+                # print(json.load(request.files['studyInfo']))
+                # print(json.load(request.files['gammaInfo']))
                 studyInfo = StudyInfoSchema().load(json.load(request.files['studyInfo']))
-                gammaInfo = json.load(request.files['gammaInfo'])
                 print(studyInfo)
+                gammaInfo = GammaInfoSchema().load(json.load(request.files['gammaInfo']))
                 print(gammaInfo)
+                mouseCsvs = request.files['mouseCsvs']
+                organCsvs = request.files['organCsvs']
+                biodiCsvs = request.files['biodiCsvs']
                 # studyInfo = StudyInfoSchema().load(json.load(request.files['studyInfo']))
                 # gammaInfo = json.load(request.files['gammaInfo'])
                 # mouseInfo = json.load(request.files['mouseInfo'])

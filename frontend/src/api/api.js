@@ -44,7 +44,7 @@ export const postBiodiCsv = async (payload) => {
 
     data.append("studyInfo", new Blob([JSON.stringify(payload.studyInfo)], {type: 'application/json'}))
     data.append("gammaInfo", new Blob([JSON.stringify(payload.gammaInfo)], {type: 'application/json'}))
-    data.append("biodiFile", new Blob([payload.biodiCsvs], {type: payload.biodiCsvs[0].type}))
+    data.append("biodiCsvs", new Blob([payload.biodiCsvs], {type: payload.biodiCsvs[0].type}))
     data.append("mouseCsvs", new Blob([payload.mouseCsvs], {type: payload.mouseCsvs[0].type}))
     data.append("organCsvs", new Blob([payload.organCsvs], {type: payload.organCsvs[0].type}))
 

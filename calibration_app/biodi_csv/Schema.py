@@ -46,7 +46,7 @@ class BiodiCsvFileSchema(Schema):
 class StudyInfoSchema(Schema):
     id = fields.Integer(required=True, dump_only=True)
     studyName = fields.Str(required=True)
-    studyDate = fields.DateTime('%Y-%m-%d', required=True)
+    studyDate = fields.DateTime(required=True)
     researcherName = fields.Str(required=True)
     piName = fields.Str(required=True)
     isotopeName = fields.Str(required=True)
@@ -57,8 +57,8 @@ class StudyInfoSchema(Schema):
     tumorModelName = fields.Str(required=True)
     radioPurity = fields.Float(required=True)
     gammaCounter = fields.Str(required=True, dump_only=True)
-    numGammaRun = fields.Integer(required=True, load_only=True)
-    comments = fields.Str()
+    numGammaRuns = fields.Integer(required=True, load_only=True)
+    comment = fields.Str()
 
 
 class GammaInfoSchema(Schema):
