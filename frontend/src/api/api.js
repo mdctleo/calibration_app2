@@ -38,13 +38,17 @@ export const getCalibrationFactorsGraph = async (model, isotope) => {
 export const postBiodiCsv = async (payload) => {
     let endpoint = BASE_URL + "/biodicsv"
     let data = new FormData()
-    let mouseInfo = JSON.stringify(payload.mouseInfo)
-    console.log(mouseInfo)
+    console.log(payload.biodiCsvs)
+    console.log(payload.mouseCsvs)
+    console.log(payload.organCsvs)
+
     data.append("studyInfo", new Blob([JSON.stringify(payload.studyInfo)], {type: 'application/json'}))
     data.append("gammaInfo", new Blob([JSON.stringify(payload.gammaInfo)], {type: 'application/json'}))
-    data.append("biodiFile", new Blob([payload.biodiCsv], {type: payload.biodiCsv.type}))
-    data.append("mouseInfo", new Blob([JSON.stringify(payload.mouseInfo)], {type: 'application/json'}))
-    data.append("organInfo", new Blob([JSON.stringify(payload.organInfo)], {type: 'application/json'}))
+    data.append("biodiFile", new Blob([payload.biodiCsvs], {type: payload.biodiCsvs[0].type}))
+    data.append("mouseCsvs", new Blob([payload.mouseCsvs], {type: payload.mouseCsvs[0].type}))
+    data.append("organCsvs", new Blob([payload.organCsvs], {type: payload.organCsvs[0].type}))
+
+    console.log(data)
     return await axios({
         method: 'post',
         url: endpoint,

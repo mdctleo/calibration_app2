@@ -2,8 +2,8 @@
     <div>
         <el-button type="primary" class="controls" @click="downloadOrganCsvFormat">Download Organ Csv</el-button>
         <BiodiCsvUploadForm tips="Upload your organ list"
-                        @upload-file="handleUploadfile"
-                        @remove-file="handleRemovefile"
+                        @upload-file="handleUploadFile"
+                        @remove-file="handleRemoveFile(gammaRun)"
                         :fileList="organCsvs"></BiodiCsvUploadForm>
     </div>
 </template>
@@ -17,23 +17,23 @@
         name: "BiodiCsvOrganOrder",
         components: {BiodiCsvUploadForm, OrganForm},
         props: {
-            organCsvs: Array
+            organCsvs: Array,
+            gammaRun: Number
         },
 
         methods: {
             ...mapActions({
                 'downloadOrganCsvFormat': types.DOWNLOAD_ORGAN_CSV_FORMAT,
-                'setOrganCsvs': types.SET_ORGAN_CSVS,
+                'setOrganCsv': types.SET_ORGAN_CSV,
             }),
 
-            handleUploadfile(fileList) {
-                this.setOrganCsvs({organCsvs: fileList})
+            handleUploadFile(fileList) {
+                this.setOrganCsv({index: this.gammaRun, organCsv: fileList[0]})
             },
 
-            handleRemovefile() {
-                this.setOrganCsvs({organCsvs: []})
-            },
-
+            handleRemoveFile(gammaRun) {
+                this.setOrganCsv({index: gammaRun, organCsv: null})
+            }
         }
     }
 </script>

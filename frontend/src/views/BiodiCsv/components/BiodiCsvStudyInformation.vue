@@ -193,7 +193,7 @@
 
                     numGammaRuns: [
                         {required: true, message: 'Please input the number of gamma runs you plan to upload', trigger: 'blur'},
-                        {type: 'number', min: 1, max: 100, message: 'You must upload between 1 to 100 files'}
+                        {type: 'number', min: 1, max: 5, message: 'You must upload between 1 to 5 gamma runs'}
                     ]
                 }
             };

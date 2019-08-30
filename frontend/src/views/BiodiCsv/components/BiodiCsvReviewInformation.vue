@@ -25,18 +25,17 @@
         methods: {
             ...mapActions({
                 'postBiodiCsv': types.POST_BIODI_CSV,
-                'postBiodiCsvTest': types.POST_BIODI_CSV_TEST
             }),
 
             handleSubmit() {
                 console.log(this.biodiCsvFile)
                 console.log(this.mouseCsvJson)
                 console.log(this.organCsvJson)
-                this.postBiodiCsvTest({studyInfo: this.studyForm,
+                this.postBiodiCsv({studyInfo: this.studyForm,
                                        gammaInfo: this.gammaForm,
-                                       biodiCsv: this.biodiCsvFile,
-                                       mouseInfo: this.mouseCsvJson,
-                                       organInfo: this.organCsvJson })
+                                       biodiCsvs: this.biodiCsvs,
+                                       mouseCsvs: this.mouseCsvs,
+                                       organCsvs: this.organCsvs })
                 // this.postBiodiCsv({
                 //     biodiCsv: this.biodiCsvJson,
                 //     studyInfo: this.studyForm,

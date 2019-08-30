@@ -21,16 +21,21 @@ def biodiCsv():
     if request.method == 'POST':
         if request.method =='POST':
             try:
-                studyInfo = json.load(request.files['studyInfo'])
-                gammaInfo = json.load(request.files['gammaInfo'])
-                mouseInfo = json.load(request.files['mouseInfo'])
-                organInfo = json.load(request.files['organInfo'])
-                biodiFile = request.files['biodiFile']
 
-                if gammaInfo['gammaCounter'] == "Hidex":
-                    handleHidexStudy(biodiFile,studyInfo, gammaInfo, mouseInfo, organInfo)
-                elif gammaInfo['gammaCounter'] == "PE":
-                    handlePEStudy(biodiFile, studyInfo, gammaInfo, mouseInfo, organInfo)
+                studyInfo = StudyInfoSchema().load(json.load(request.files['studyInfo']))
+                gammaInfo = json.load(request.files['gammaInfo'])
+                print(studyInfo)
+                print(gammaInfo)
+                # studyInfo = StudyInfoSchema().load(json.load(request.files['studyInfo']))
+                # gammaInfo = json.load(request.files['gammaInfo'])
+                # mouseInfo = json.load(request.files['mouseInfo'])
+                # organInfo = json.load(request.files['organInfo'])
+                # biodiFile = request.files['biodiFile']
+                #
+                # if gammaInfo['gammaCounter'] == "Hidex":
+                #     handleHidexStudy(biodiFile,studyInfo, gammaInfo, mouseInfo, organInfo)
+                # elif gammaInfo['gammaCounter'] == "PE":
+                #     handlePEStudy(biodiFile, studyInfo, gammaInfo, mouseInfo, organInfo)
 
             except BaseException as e:
                 result = BaseException(e.message)

@@ -12,8 +12,16 @@
                 show-icon
                 @close="setError({error: null})">
         </el-alert>
-        <BiodiCsvStudyInformation @validated="moveNext" :bus="bus" v-if="step === 0"></BiodiCsvStudyInformation>
-        <BiodiCsvGammaCounterInformation @validated="moveNext" :bus="bus" v-if="step === 1"></BiodiCsvGammaCounterInformation>
+        <BiodiCsvStudyInformation @validated="moveNext" v-if="step === 0"></BiodiCsvStudyInformation>
+        <BiodiCsvGammaCounterInformation
+                @validated="addValidation"
+                v-for="i in numGammaRuns"
+                v-if="step === 1"
+                v-bind:gamma-run="i - 1"
+                v-bind:index="i"
+                v-bind:key="i"
+        ></BiodiCsvGammaCounterInformation>
+<!--        <BiodiCsvGammaCounterInformation @validated="moveNext" v-if="step === 1"></BiodiCsvGammaCounterInformation>-->
         <BiodiCsvReviewInformation v-if="step === 2"></BiodiCsvReviewInformation>
         <el-button @click="handleNext" class="next">Next</el-button>
         <el-button @click="handlePrevious" class="previous" v-if="this.step !== 0">Previous</el-button>
@@ -41,12 +49,13 @@
         data() {
             return {
                 step: 0,
-                bus: new Vue()
+                validationCount: 0
             }
         },
         computed: {
             ...mapGetters({
-                error: 'biodiCsvUpload/error'
+                error: 'biodiCsvUpload/error',
+                numGammaRuns: 'biodiCsvUpload/numGammaRuns'
             })
         },
         methods: {
@@ -58,10 +67,20 @@
                 this.setStartValidation({startValidation: true})
             },
 
+            addValidation() {
+                this.validationCount = this.validationCount + 1
+                console.log("validation count: " + this.validationCount)
+                if (this.validationCount === this.numGammaRuns) {
+                    console.log("before move next")
+                    this.moveNext(true)
+                }
+            },
+
             moveNext(validated) {
                 this.setStartValidation({startValidation: false});
                 if (validated) {
                     this.step++;
+                    this.validationCount = 0
                 }
             },
 

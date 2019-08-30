@@ -26,14 +26,14 @@ export const SET_GAMMA_COUNTER_RUN_COMMENTS = "biodiCsvUpload/setGammaCounterRun
 
 export const DOWNLOAD_MOUSE_CSV_FORMAT = "biodiCsvUpload/downloadMouseCsvFormat";
 export const HANDLE_MOUSE_CSVS = "biodiCsvUpload/handleMouseCsvs";
-export const SET_MOUSE_CSVS = "biodiCsvUpload/setMouseCsvs";
+export const SET_MOUSE_CSV = "biodiCsvUpload/setMouseCsv";
 
 export const DOWNLOAD_ORGAN_CSV_FORMAT = "biodiCsvUpload/downloadOrganCsvFormat";
 export const HANDLE_ORGAN_CSVS = "biodiCsvUpload/handleOrganCsvs";
-export const SET_ORGAN_CSVS = "biodiCsvUpload/setOrganCsvs";
+export const SET_ORGAN_CSV = "biodiCsvUpload/setOrganCsv";
 export const SET_SELECTED_ORGAN = "biodiCsvUpload/setSelectedOrgan";
 
-export const SET_BIODI_CSVS = "biodiCsvUpload/setBiodiCsvs";
+export const SET_BIODI_CSV = "biodiCsvUpload/setBiodiCsv";
 export const HANDLE_BIODI_CSVS = "biodiCsvUpload/handleBiodiCsvs";
 export const HANDLE_HIDEX_BIODI_CSVS = "biodiCsvUpload/handleHidexBiodiCsvs"
 

@@ -21,14 +21,6 @@ class CellLineSchema(Schema):
     name = fields.Str()
 
 
-
-# class StudyInformationMetaSchema(Schema):
-#     id = fields.Integer(required=True)
-#     studyName = fields.Str(required=True)
-#     researcherName = fields.Str(required=True)
-#     createdOn = fields.DateTime(required=True)
-
-
 class BiodiCsvRowSchema(Schema):
     class Meta:
         unknown = INCLUDE
@@ -61,11 +53,11 @@ class StudyInfoSchema(Schema):
     chelatorName = fields.Str(required=True)
     vectorName = fields.Str(required=True)
     target = fields.Str(required=True)
-    cellLineName = fields.Str(required=True)
     mouseStrainName = fields.Str(required=True)
     tumorModelName = fields.Str(required=True)
     radioPurity = fields.Float(required=True)
     gammaCounter = fields.Str(required=True, dump_only=True)
+    numGammaRun = fields.Integer(required=True, load_only=True)
     comments = fields.Str()
 
 

@@ -1,45 +1,46 @@
 <template>
     <div class="form">
-        <el-form :model="gammaForm" :rules="rules" ref="form" label-width="120px" label-position="top"
-                 class="demo-ruleForm">
-            <el-row>
-                <el-col :span="12" :offset="6">
-                    <el-form-item label="Gamma Counter ID" prop="gammaCounter">
-                        <el-select v-model="gammaCounter" placeholder="Please select the gamma counter">
-                            <el-option
-                                    v-for="gammaCounter in gammaCounters"
-                                    :key="gammaCounter.model"
-                                    :label="gammaCounter.model"
-                                    :value="gammaCounter.model"
-                            ></el-option>
-                        </el-select>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-            <el-row>
-                <el-col :span="12" :offset="6">
-                    <el-form-item label="Gamma Counter Run Time Offset" prop="gammaCounterRunTimeOffset">
-                        <el-input v-model="gammaCounterRunTimeOffset"></el-input>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-            <el-row>
-                <el-col :span="12" :offset="6">
-                    <el-form-item label="Gamma Counter Run Comments" prop="gammaCounterRunComments">
-                        <el-input type="textarea" v-model="gammaCounterRunComments"></el-input>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-        </el-form>
-        <el-divider class="divider"></el-divider>
-        <h4>Upload your Mouse Csv</h4>
-        <BiodiCsvMouseInfo :mouseCsvs="mouseCsvs"></BiodiCsvMouseInfo>
-        <el-divider class="divider"></el-divider>
-        <h4>Upload your Organ Csv</h4>
-        <BiodiCsvOrganOrder :organCsvs="organCsvs"></BiodiCsvOrganOrder>
-        <el-divider class="divider"></el-divider>
-        <h4>Upload your Biodi Csv</h4>
-        <BiodiCsvUpload :biodiCsvs="biodiCsvs"></BiodiCsvUpload>
+                <el-form :model="gammaForm" :rules="rules" ref="form" label-width="120px" label-position="top"
+                         class="demo-ruleForm">
+                    <el-row>
+                        <el-col :span="12" :offset="6">
+                            <el-form-item label="Gamma Counter ID" prop="gammaCounter">
+                                <el-select v-model="gammaCounter" placeholder="Please select the gamma counter">
+                                    <el-option
+                                            v-for="gammaCounter in gammaCounters"
+                                            :key="gammaCounter.model"
+                                            :label="gammaCounter.model"
+                                            :value="gammaCounter.model"
+                                    ></el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12" :offset="6">
+                            <el-form-item label="Gamma Counter Run Time Offset" prop="gammaCounterRunTimeOffset">
+                                <el-input v-model="gammaCounterRunTimeOffset"></el-input>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12" :offset="6">
+                            <el-form-item label="Gamma Counter Run Comments" prop="gammaCounterRunComments">
+                                <el-input type="textarea" v-model="gammaCounterRunComments"></el-input>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                </el-form>
+                <el-divider class="divider"></el-divider>
+                <h4>Upload your Mouse Csv</h4>
+                <BiodiCsvMouseInfo :mouseCsvs="mouseCsv(gammaRun)" :gammaRun="gammaRun"></BiodiCsvMouseInfo>
+                <el-divider class="divider"></el-divider>
+                <h4>Upload your Organ Csv</h4>
+                <BiodiCsvOrganOrder :organCsvs="organCsv(gammaRun)" :gammaRun="gammaRun"></BiodiCsvOrganOrder>
+                <el-divider class="divider"></el-divider>
+                <h4>Upload your Biodi Csv</h4>
+                <BiodiCsvUpload :biodiCsvs="biodiCsv(gammaRun)" :gammaRun="gammaRun"></BiodiCsvUpload>
+                <el-divider class="divider"></el-divider>
     </div>
 </template>
 
@@ -54,6 +55,7 @@
         name: "BiodiCsvGammaCounterInformation",
         components: {BiodiCsvOrganOrder, BiodiCsvUpload, BiodiCsvMouseInfo},
         props: {
+            gammaRun: Number,
         },
         data() {
             return {
@@ -77,13 +79,12 @@
                 startValidation: 'biodiCsvUpload/startValidation',
                 getGammaForm: 'biodiCsvUpload/gammaForm',
                 getGammaCounter: 'biodiCsvUpload/gammaCounter',
-                getGammaCounterRunDateTime: 'biodiCsvUpload/gammaCounterRunDateTime',
                 getGammaCounterRunTimeOffset: 'biodiCsvUpload/gammaCounterRunTimeOffset',
                 getGammaCounterRunComments: 'biodiCsvUpload/gammaCounterRunComments',
                 gammaCounters: 'biodiCsvUpload/gammaCounters',
-                mouseCsvs: 'biodiCsvUpload/mouseCsvs',
-                biodiCsvs: 'biodiCsvUpload/biodiCsvs',
-                organCsvs: 'biodiCsvUpload/organCsvs'
+                mouseCsv: 'biodiCsvUpload/mouseCsv',
+                biodiCsv: 'biodiCsvUpload/biodiCsv',
+                organCsv: 'biodiCsvUpload/organCsv'
             }),
 
             gammaForm: {
@@ -97,11 +98,11 @@
 
             gammaCounter: {
                 get() {
-                    return this.getGammaCounter
+                    return this.getGammaCounter(this.gammaRun)
                 },
 
                 set(value) {
-                    this.setGammaCounter({gammaCounter: value})
+                    this.setGammaCounter({index: this.gammaRun, gammaCounter: value})
                 }
             },
 
@@ -139,32 +140,43 @@
         watch: {
             startValidation: function (val) {
                 if (val === true) {
-                    let validationArr = [
-                        this.$refs['form'].validate(),
-                        this.handleMouseCsvs({mouseCsvs: this.mouseCsvs}),
-                        this.handleOrganCsvs({organCsvs: this.organCsvs}),
-                        this.handleBiodiCsvs({biodiCsvs: this.biodiCsvs})
-                    ]
-
-
-                    Promise.all(validationArr)
-                        .then((result) => {
-                            let formValid = result[0]
-                            let mouseCsvValid = result[1]
-                            let organCsvValid = result[2]
-                            // let biodiCsvValid = result[3]
-                            let biodiCsvValid = true
-                            if (formValid && mouseCsvValid && organCsvValid && biodiCsvValid) {
-                                console.log("emittint validated")
-                                this.$emit('validated', true)
-                            } else {
-                                console.log("emitted invalid")
-                                this.$emit('validated', false)
-                            }
-                        })
-                        .catch((error) => {
+                    this.$refs['form'].validate((valid) => {
+                        if (valid) {
+                            console.log("validated")
+                            this.$emit('validated', true)
+                        } else {
+                            console.log("invalidated")
                             this.$emit('validated', false)
-                        })
+                        }
+                    })
+
+                    // let validationArr = [
+                    //     this.$refs['form'].validate(),
+                    //     this.handleMouseCsvs({mouseCsvs: this.mouseCsvs}),
+                    //     this.handleOrganCsvs({organCsvs: this.organCsvs}),
+                    //     // this.handleBiodiCsvs({biodiCsvs: this.biodiCsvs})
+                    // ]
+
+
+                    // Promise.all(validationArr)
+                    //     .then((result) => {
+                    //         let formValid = result[0]
+                    //         let mouseCsvValid = true
+                    //         let organCsvValid = true
+                    //         console.log(result)
+                    //         // let biodiCsvValid = result[3]
+                    //         let biodiCsvValid = true
+                    //         if (formValid && mouseCsvValid && organCsvValid && biodiCsvValid) {
+                    //             console.log("emittint validated")
+                    //             this.$emit('validated', true)
+                    //         } else {
+                    //             console.log("emitted invalid")
+                    //             this.$emit('validated', false)
+                    //         }
+                    //     })
+                    //     .catch((error) => {
+                    //         this.$emit('validated', false)
+                    //     })
                 }
             }
         },
@@ -181,15 +193,6 @@
                 'handleMouseCsvs': types.HANDLE_MOUSE_CSVS,
                 'getCounters': types.GET_COUNTERS
             }),
-            submitForm(formName) {
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        this.$emit('validated', true);
-                    } else {
-                        this.$emit('validated', false);
-                    }
-                });
-            }
         },
 
         created() {

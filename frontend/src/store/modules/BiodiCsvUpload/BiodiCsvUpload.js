@@ -31,29 +31,24 @@ const getDefaultState = () => {
         },
 
         gammaForm: {
-            gammaCounter: "",
+            gammaCounter: [],
             gammaCounterRunTimeOffset: "",
             gammaCounterRunComments: "",
         },
 
-        organForm: {
-            selectedOrgans: []
-        },
-
         mice: [],
-        availableOrgans: ["Lungs", "Liver", "Heart"],
         biodiCsvs: [],
-        biodiCsvFile: null,
-        biodiCsvJson: null,
+        biodiCsvFile: [],
+        biodiCsvJson: [],
         loading: false,
         error: null,
         startValidation: false,
         mouseCsvFormat: "Mouse ID,Cage,Gender,Age,Group ID,Euthanasia Date,Euthanasia Time,Weight (g),Injection Date,Pre-Injection Time,Injection Time,Post-Injection Time,Pre-Injection MBq,Post-Injection MBq,Comments",
         mouseCsvs: [],
-        mouseCsvJson: null,
+        mouseCsvJson: [],
         organCsvFormat: ",Group ID,\nTube ID,Mouse ID",
         organCsvs: [],
-        organCsvJson: null,
+        organCsvJson: [],
 
         gammaCounters: [],
         isotopes: [],
@@ -140,20 +135,16 @@ const actions = {
         context.commit('SET_GAMMA_COUNTER_RUN_COMMENTS', payload)
     },
 
-    setMouseCsvs: (context, payload) => {
-        context.commit('SET_MOUSE_CSVS', payload)
+    setMouseCsv: (context, payload) => {
+        context.commit('SET_MOUSE_CSV', payload)
     },
 
-    setOrganCsvs: (context, payload) => {
-        context.commit('SET_ORGAN_CSVS', payload)
+    setOrganCsv: (context, payload) => {
+        context.commit('SET_ORGAN_CSV', payload)
     },
 
-    setSelectedOrgan: (context, payload) => {
-        context.commit('SET_SELECTED_ORGAN', payload)
-    },
-
-    setBiodiCsvs: (context, payload) => {
-        context.commit('SET_BIODI_CSVS', payload)
+    setBiodiCsv: (context, payload) => {
+        context.commit('SET_BIODI_CSV', payload)
     },
 
     setError: (context, payload) => {
@@ -314,57 +305,69 @@ const actions = {
     },
 
 
-    handleMouseCsvs: async (context, payload) => {
-        try {
-            context.commit('SET_LOADING', {loading: true})
-            // did not upload file
-            if (payload.mouseCsvs.length === 0) {
-                context.commit('SET_ERROR', {error: "mouse csv not uploaded"})
-                return false
-            }
-            let mouseCsv = payload.mouseCsvs[0].raw
-
-            let csvFile = await context.dispatch('readFile', mouseCsv)
-            // validate headers
-            if (csvFile.substring(0, context.state.mouseCsvFormat.length) !== context.state.mouseCsvFormat) {
-                context.commit('SET_ERROR', {error: "Do not mess with mouse csv headers"})
-                return false
-            }
-            let csvFileJson = await csv().fromString(csvFile)
-            console.log(csvFileJson)
-            let indexHolder = 0
-            let rowValidated = true
-
-            if (csvFileJson.length === 0) {
-                context.commit('SET_ERROR', {error: "mouse csv empty"})
-                return false
-            }
-
-            // validate each existing rows for required cells
-            for (let i = 0; i < csvFileJson.length; i++) {
-                let row = csvFileJson[i]
-                indexHolder = i
-                rowValidated = await context.dispatch('validateMouse', row)
-
-                if (!rowValidated.status) {
-                    break
-                }
-            }
-
-            if (rowValidated.status) {
-                context.commit('SET_MOUSE_CSV_JSON', {mouseCsvJson: csvFileJson})
-                return true
-            } else {
-                context.commit('SET_ERROR', {error: rowValidated.error + " in mouse csv on row " + (indexHolder + 2)})
-                return false
-            }
-        } catch (err) {
-            context.commit('SET_ERROR', {error: err.msg})
-            return false
-        } finally {
-            context.commit('SET_LOADING', {loading: false})
-        }
-    },
+    // handleMouseCsvs: async (context, payload) => {
+    //     try {
+    //         console.log("Mouse Csvs")
+    //         context.commit('SET_LOADING', {loading: true})
+    //         // did not upload file
+    //         if (payload.mouseCsvs.length === 0 || payload.mouseCsvs.every((mouseCsv) => {
+    //             return mouseCsv !== null && mouseCsv !== undefined
+    //         })) {
+    //             console.log("Got in here")
+    //             context.commit('SET_ERROR', {error: "mouse csv not uploaded"})
+    //             return false
+    //         }
+    //
+    //         console.log("got here")
+    //
+    //         for (let j = 0; j < payload.mouseCsvs.length; j++) {
+    //
+    //             let mouseCsv = payload.mouseCsvs[j].raw
+    //
+    //             let csvFile = await context.dispatch('readFile', mouseCsv)
+    //             // validate headers
+    //             if (csvFile.substring(0, context.state.mouseCsvFormat.length) !== context.state.mouseCsvFormat) {
+    //                 context.commit('SET_ERROR', {error: "Do not mess with mouse csv headers"})
+    //                 return false
+    //             }
+    //             let csvFileJson = await csv().fromString(csvFile)
+    //             console.log(csvFileJson)
+    //             let indexHolder = 0
+    //             let rowValidated = true
+    //
+    //             if (csvFileJson.length === 0) {
+    //                 context.commit('SET_ERROR', {error: "mouse csv empty"})
+    //                 return false
+    //             }
+    //
+    //             // validate each existing rows for required cells
+    //             for (let i = 0; i < csvFileJson.length; i++) {
+    //                 let row = csvFileJson[i]
+    //                 indexHolder = i
+    //                 rowValidated = await context.dispatch('validateMouse', row)
+    //
+    //                 if (!rowValidated.status) {
+    //                     break
+    //                 }
+    //             }
+    //
+    //             if (rowValidated.status) {
+    //                 context.commit('SET_MOUSE_CSV_JSON', {mouseCsvJson: csvFileJson})
+    //                 return true
+    //             } else {
+    //                 context.commit('SET_ERROR', {error: rowValidated.error + " in mouse csv on row " + (indexHolder + 2)})
+    //                 return false
+    //             }
+    //         }
+    //     } catch (err) {
+    //         console.log(err)
+    //         context.commit('SET_ERROR', {error: err.msg})
+    //         return false
+    //     } finally {
+    //         console.log('Got to finally')
+    //         context.commit('SET_LOADING', {loading: false})
+    //     }
+    // },
 
     validateOrgan: async (context, payload) => {
         let row = payload.row
@@ -415,46 +418,53 @@ const actions = {
         return output
     },
 
-    handleOrganCsvs: async (context, payload) => {
-        try {
-            context.commit('SET_LOADING', {loading: true});
-            if (payload.organCsvs.length === 0) {
-                context.commit('SET_ERROR', {error: "organ csv not uploaded"});
-                return context.commit('SET_SELECTED_ORGANS', {selectedOrgans: []})
-            }
 
-            let organCsv = payload.organCsvs[0].raw;
-
-            organCsv = await context.dispatch('readFile', organCsv);
-
-            let organCsvJson = await context.dispatch('parseOrganCsv', {organCsv: organCsv})
-
-            let rowValidated = true
-            for (let i = 0; i < organCsvJson.length; i++) {
-                let row = organCsvJson[i]
-                rowValidated = await context.dispatch('validateOrgan', {row: row})
-
-                if (!rowValidated) {
-                    break
-                }
-
-            }
-
-            if (rowValidated) {
-                context.commit('SET_ORGAN_CSV_JSON', {organCsvJson: organCsvJson})
-                return true
-            } else {
-                context.commit('SET_ERROR', {error: "There is an error  wirth your organ_order csv"})
-                return false
-            }
-
-        } catch (err) {
-            context.commit('SET_ERROR', {error: err.msg});
-            return false;
-        } finally {
-            context.commit('SET_LOADING', {loading: false});
-        }
-    },
+    // handleOrganCsvs: async (context, payload) => {
+    //     try {
+    //         console.log("Got to organ csvs")
+    //         context.commit('SET_LOADING', {loading: true});
+    //         if (payload.organCsvs.length === 0 || payload.organCsvs.every((organCsv) => {
+    //             return organCsv !== null && organCsv !== undefined
+    //         })) {
+    //             context.commit('SET_ERROR', {error: "organ csv not uploaded"});
+    //             return context.commit('SET_SELECTED_ORGANS', {selectedOrgans: []})
+    //         }
+    //
+    //         for (let j = 0; j < payload.organCsvs.length; j++) {
+    //
+    //             let organCsv = payload.organCsvs[j].raw;
+    //
+    //             organCsv = await context.dispatch('readFile', organCsv);
+    //
+    //             let organCsvJson = await context.dispatch('parseOrganCsv', {organCsv: organCsv})
+    //
+    //             let rowValidated = true
+    //             for (let i = 0; i < organCsvJson.length; i++) {
+    //                 let row = organCsvJson[i]
+    //                 rowValidated = await context.dispatch('validateOrgan', {row: row})
+    //
+    //                 if (!rowValidated) {
+    //                     break
+    //                 }
+    //
+    //             }
+    //
+    //             if (rowValidated) {
+    //                 context.commit('SET_ORGAN_CSV_JSON', {organCsvJson: organCsvJson})
+    //                 return true
+    //             } else {
+    //                 context.commit('SET_ERROR', {error: "There is an error  wirth your organ_order csv"})
+    //                 return false
+    //             }
+    //         }
+    //
+    //     } catch (err) {
+    //         context.commit('SET_ERROR', {error: err.msg});
+    //         return false;
+    //     } finally {
+    //         context.commit('SET_LOADING', {loading: false});
+    //     }
+    // },
 
 
     validateBiodiCsvs: (context, row) => {
@@ -479,42 +489,45 @@ const actions = {
         }
     },
 
-    handleBiodiCsvs: async (context, payload) => {
-        try {
-            context.commit('SET_LOADING', {loading: true})
-            if (payload.biodiCsvs.length === 0) {
-                context.commit('SET_ERROR', {error: "biodi csv not uploaded"})
-                return false
-            }
+    // handleBiodiCsvs: async (context, payload) => {
+    //     try {
+    //         context.commit('SET_LOADING', {loading: true})
+    //         if (payload.biodiCsvs.length === 0) {
+    //             context.commit('SET_ERROR', {error: "biodi csv not uploaded"})
+    //             return false
+    //         }
+    //
+    //         for (let i = 0; i < payload.biodiCsvs.length; i++) {
+    //
+    //             let biodiCsvFile = payload.biodiCsvs[i]
+    //             // let csvFile =  await context.dispatch('readFile', biodiCsvFile.raw)
+    //             context.commit('SET_BIODI_CSV_FILE', {biodiCsvFile: biodiCsvFile.raw})
+    //             return true
+    //         }
+    //     } catch (error) {
+    //         console.log(error)
+    //         context.commit('SET_ERROR', {error: error.response.data.message})
+    //         return false
+    //     } finally {
+    //         context.commit('SET_LOADING', {loading: false});
+    //     }
+    // },
 
-            let biodiCsvFile = payload.biodiCsvs[0]
-            // let csvFile =  await context.dispatch('readFile', biodiCsvFile.raw)
-            context.commit('SET_BIODI_CSV_FILE', {biodiCsvFile: biodiCsvFile.raw})
-            return true
-        } catch (error) {
-            console.log(error)
-            context.commit('SET_ERROR', {error: error.response.data.message})
-            return false
-        } finally {
-            context.commit('SET_LOADING', {loading: false});
-        }
-    },
+    // postBiodiCsv(context, payload) {
+    //     context.commit('SET_LOADING', {loading: true})
+    //     postBiodiCsv(payload)
+    //         .then((response) => {
+    //             console.log(response)
+    //         })
+    //         .catch((error) => {
+    //             context.commit('SET_ERROR', {error: error.response.data.message})
+    //         })
+    //         .finally(() => {
+    //             context.commit('SET_LOADING', {loading: false})
+    //         })
+    // },
 
-    postBiodiCsv(context, payload) {
-        context.commit('SET_LOADING', {loading: true})
-        postBiodiCsv(payload)
-            .then((response) => {
-                console.log(response)
-            })
-            .catch((error) => {
-                context.commit('SET_ERROR', {error: error.response.data.message})
-            })
-            .finally(() => {
-                context.commit('SET_LOADING', {loading: false})
-            })
-    },
-
-    async postBiodiCsvTest(context, payload) {
+    async postBiodiCsv(context, payload) {
         try {
             context.commit('SET_LOADING', {loading: true})
             let result = await postBiodiCsv(payload)
@@ -595,7 +608,7 @@ const mutations = {
     },
 
     SET_GAMMA_COUNTER: (state, payload) => {
-        return state.gammaForm.gammaCounter = payload.gammaCounter
+        return state.gammaForm.gammaCounter.splice(payload.index, 1, payload.gammaCounter)
     },
 
     SET_GAMMA_COUNTER_RUN_TIME_OFFSET: (state, payload) => {
@@ -606,40 +619,28 @@ const mutations = {
         return state.gammaForm.gammaCounterRunComments = payload.gammaCounterRunComments
     },
 
-    SET_AVAILABLE_ORGANS: (state, payload) => {
-        return state.availableOrgans = payload.availableOrgans
-    },
-
-    SET_SELECTED_ORGANS: (state, payload) => {
-        return state.organForm.selectedOrgans = payload.selectedOrgans
-    },
-
-    SET_SELECTED_ORGAN: (state, payload) => {
-        return state.organForm.selectedOrgans[payload.index].value = payload.organ
-    },
-
-    SET_MOUSE_CSVS: (state, payload) => {
-        return state.mouseCsvs = payload.mouseCsvs
+    SET_MOUSE_CSV: (state, payload) => {
+        return state.mouseCsvs.splice(payload.index, 1, payload.mouseCsv)
     },
 
     SET_MOUSE_CSV_JSON: (state, payload) => {
         return state.mouseCsvJson = payload.mouseCsvJson
     },
 
-    SET_ORGAN_CSVS: (state, payload) => {
-        return state.organCsvs = payload.organCsvs
+    SET_ORGAN_CSV: (state, payload) => {
+        return state.organCsvs.splice(payload.index, 1, payload.organCsv)
     },
 
     SET_ORGAN_CSV_JSON: (state, payload) => {
-        return state.organCsvJson = payload.organCsvJson
+        return state.organCsvJson.append(payload.organCsvJson)
     },
 
-    SET_BIODI_CSVS: (state, payload) => {
-        return state.biodiCsvs = payload.biodiCsvs
+    SET_BIODI_CSV: (state, payload) => {
+        return state.biodiCsvs.splice(payload.index, 1, payload.biodiCsv)
     },
 
     SET_BIODI_CSV_JSON: (state, payload) => {
-        return state.biodiCsvJson = payload.biodiCsvJson
+        return state.biodiCsvJson.append(payload.biodiCsvJson)
     },
 
     SET_ISOTOPES: (state, payload) => {
@@ -671,7 +672,7 @@ const mutations = {
     },
 
     SET_BIODI_CSV_FILE: (state, payload) => {
-        return state.biodiCsvFile = payload.biodiCsvFile
+        return state.biodiCsvFile.append(payload.biodiCsvFile)
     }
 };
 
@@ -694,24 +695,31 @@ const getters = {
     numGammaRuns: state => state.studyForm.numGammaRuns,
 
     gammaForm: state => state.gammaForm,
-    gammaCounter: state => state.gammaForm.gammaCounter,
+    gammaCounter: (state) => (gammaRun) => {
+        return state.gammaForm.gammaCounter[gammaRun]
+    },
     gammaCounterRunTimeOffset: state => state.gammaForm.gammaCounterRunTimeOffset,
     gammaCounterRunComments: state => state.gammaForm.gammaCounterRunComments,
 
     mice: state => state.mice,
 
     availableOrgans: state => state.availableOrgans,
+    organCsv: state => gammaRun => {
+        return state.organCsvs[gammaRun] === undefined || state.mouseCsvs[gammaRun] === null? [] : [state.organCsvs[gammaRun]]
+    },
     organCsvs: state => state.organCsvs,
     organCsvJson: state => state.organCsvJson,
-    organForm: state => state.organForm,
-    selectedOrgans: state => index => {
-        return (index === -1) ? state.organForm.selectedOrgans : state.organForm.selectedOrgans[index]
-    },
 
     loading: state => state.loading,
     error: state => state.error,
+    mouseCsv: state => gammaRun => {
+       return  state.mouseCsvs[gammaRun] === undefined || state.mouseCsvs[gammaRun] === null? [] :  [state.mouseCsvs[gammaRun]]
+    },
     mouseCsvs: state => state.mouseCsvs,
     mouseCsvJson: state => state.mouseCsvJson,
+    biodiCsv: state => gammaRun => {
+        return  state.biodiCsvs[gammaRun] === undefined || state.mouseCsvs[gammaRun] === null? [] :  [state.biodiCsvs[gammaRun]]
+    },
     biodiCsvs: state => state.biodiCsvs,
     biodiCsvFile: state => state.biodiCsvFile,
     biodiCsvJson: state => state.biodiCsvJson,
