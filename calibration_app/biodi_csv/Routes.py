@@ -31,6 +31,9 @@ def biodiCsv():
                 mouseCsvs = request.files['mouseCsvs']
                 organCsvs = request.files['organCsvs']
                 biodiCsvs = request.files['biodiCsvs']
+                print(mouseCsvs)
+                print(organCsvs)
+                print(biodiCsvs)
                 # studyInfo = StudyInfoSchema().load(json.load(request.files['studyInfo']))
                 # gammaInfo = json.load(request.files['gammaInfo'])
                 # mouseInfo = json.load(request.files['mouseInfo'])

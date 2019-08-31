@@ -62,7 +62,7 @@ class StudyInfoSchema(Schema):
 
 
 class GammaInfoSchema(Schema):
-    gammaCounter = fields.Str(required=True)
+    gammaCounter = fields.List(fields.Str(), required=True)
     gammaCounterRunTimeOffset = fields.Str()
     gammaCounterRunComments = fields.Str()
 
