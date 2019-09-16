@@ -106,33 +106,23 @@
                 }
             },
 
-            gammaCounterRunDateTime: {
-                get() {
-                    return this.getGammaCounterRunDateTime
-                },
-
-                set(value) {
-                    this.setGammaCounterRunDateTime({gammaCounterRunDateTime: value})
-                }
-            },
-
             gammaCounterRunTimeOffset: {
                 get() {
-                    return this.getGammaCounterRunTimeOffset
+                    return this.getGammaCounterRunTimeOffset(this.gammaRun)
                 },
 
                 set(value) {
-                    this.setGammaCounterRunTimeOffset({gammaCounterRunTimeOffset: value})
+                    this.setGammaCounterRunTimeOffset({index: this.gammaRun, gammaCounterRunTimeOffset: value})
                 }
             },
 
             gammaCounterRunComments: {
                 get() {
-                    return this.getGammaCounterRunComments
+                    return this.getGammaCounterRunComments(this.gammaRun)
                 },
 
                 set(value) {
-                    this.setGammaCounterRunComments({gammaCounterRunComments: value})
+                    this.setGammaCounterRunComments({index: this.gammaRun, gammaCounterRunComments: value})
                 }
             }
         },
@@ -184,7 +174,6 @@
         methods: {
             ...mapActions({
                 'setGammaCounter': types.SET_GAMMA_COUNTER,
-                'setGammaCounterRunDateTime': types.SET_GAMMA_COUNTER_RUN_DATE_TIME,
                 'setGammaCounterRunTimeOffset': types.SET_GAMMA_COUNTER_RUN_TIME_OFFSET,
                 'setGammaCounterRunComments': types.SET_GAMMA_COUNTER_RUN_COMMENTS,
                 'handleHidexBiodiCsvs': types.HANDLE_HIDEX_BIODI_CSVS,

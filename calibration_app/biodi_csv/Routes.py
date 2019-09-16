@@ -9,7 +9,7 @@ from response.response import StandardResponse, StandardResponseSchema
 from flask import make_response
 from calibration_app.biodi_csv.Controller import *
 from calibration_app.biodi_csv.HidexParser import *
-from calibration_app.biodi_csv.MouseParser import *
+from calibration_app.biodi_csv.MouseParser import handleMouseCsv
 from calibration_app.biodi_csv.PEParser import *
 import pandas as pd
 import json
@@ -19,41 +19,36 @@ import json
 @jwt_required
 def biodiCsv():
     if request.method == 'POST':
-        if request.method =='POST':
-            try:
+        try:
+            # print(json.load(request.files['studyInfo']))
+            # print(json.load(request.files['gammaInfo']))
+            studyInfoDict = StudyInfoSchema().load(json.load(request.files['studyInfo']))
 
-                # print(json.load(request.files['studyInfo']))
-                # print(json.load(request.files['gammaInfo']))
-                studyInfo = StudyInfoSchema().load(json.load(request.files['studyInfo']))
-                print(studyInfo)
-                gammaInfo = GammaInfoSchema().load(json.load(request.files['gammaInfo']))
+            studyInfo = prepareStudyInformation(studyInfoDict)
+            print(request.files)
+
+            for i in range(0, studyInfoDict['numGammaRuns']):
+                gammaInfoDict = GammaInfoSchema().load(json.load(request.files['gammaInfo' + str(i)]))
+                print(gammaInfoDict)
+                gammaInfo = prepareGammaRunInformation(gammaInfoDict,i, 0, studyInfo['studyDate'])
                 print(gammaInfo)
-                mouseCsvs = request.files['mouseCsvs']
-                organCsvs = request.files['organCsvs']
-                biodiCsvs = request.files['biodiCsvs']
-                print(mouseCsvs)
-                print(organCsvs)
-                print(biodiCsvs)
-                # studyInfo = StudyInfoSchema().load(json.load(request.files['studyInfo']))
-                # gammaInfo = json.load(request.files['gammaInfo'])
-                # mouseInfo = json.load(request.files['mouseInfo'])
-                # organInfo = json.load(request.files['organInfo'])
-                # biodiFile = request.files['biodiFile']
-                #
-                # if gammaInfo['gammaCounter'] == "Hidex":
-                #     handleHidexStudy(biodiFile,studyInfo, gammaInfo, mouseInfo, organInfo)
-                # elif gammaInfo['gammaCounter'] == "PE":
-                #     handlePEStudy(biodiFile, studyInfo, gammaInfo, mouseInfo, organInfo)
+                handleMouseCsv(request.files['mouseCsvs' + str(i)])
 
-            except BaseException as e:
-                result = BaseException(e.message)
-                response = BaseExceptionSchema().dump(result)
-                return jsonify(response), 200
+            # if gammaInfo['gammaCounter'] == "Hidex":
+            #     handleHidexStudy(biodiFile,studyInfo, gammaInfo, mouseInfo, organInfo)
+            # elif gammaInfo['gammaCounter'] == "PE":
+            #     handlePEStudy(biodiFile, studyInfo, gammaInfo, mouseInfo, organInfo)
+
+        except BaseException as e:
+            result = BaseException(e.message)
+            response = BaseExceptionSchema().dump(result)
+            return jsonify(response), 400
 
         print("GOT HERE FINE")
         result = StandardResponse("success")
         response = StandardResponseSchema().dump(result)
         return jsonify(response), 200
+
     elif request.method == 'GET':
         try:
             result, studyName = getBiodiCsvRaw(request.args.get('id'))
@@ -85,6 +80,7 @@ def biodiCsvComplete():
 
         return response, 200
 
+
 @bp.route('/biodicsv-analysis')
 @jwt_required
 def biodiCsvAnalysis():
@@ -102,6 +98,7 @@ def biodiCsvAnalysis():
 
         return response, 200
 
+
 @bp.route('/biodicsv-metas', methods=['GET'])
 @jwt_required
 def biodiCsvMetas():
@@ -117,6 +114,7 @@ def biodiCsvMetas():
         print(response)
         return jsonify(response), 200
 
+
 @bp.route('/chelators', methods=['GET'])
 @jwt_required
 def chelators():
@@ -130,6 +128,7 @@ def chelators():
 
         response = ChelatorSchema(many=True).dump(result)
         return jsonify(response), 200
+
 
 @bp.route('/vectors', methods=['GET'])
 @jwt_required
@@ -145,6 +144,7 @@ def vectors():
         response = VectorSchema(many=True, exclude=['type']).dump(result)
         return jsonify(response), 200
 
+
 @bp.route('/mouse-strains', methods=['GET'])
 @jwt_required
 def mouseStrains():
@@ -158,6 +158,7 @@ def mouseStrains():
 
         response = MouseStrainSchema(many=True).dump(result)
         return jsonify(response), 200
+
 
 @bp.route('/tumor-models', methods=['GET'])
 @jwt_required
@@ -174,10 +175,11 @@ def tumorModels():
         return jsonify(response), 200
     return None
 
+
 @bp.route('/biodicsv-test', methods=['POST'])
 @jwt_required
 def biodiCsvTest():
-    if request.method =='POST':
+    if request.method == 'POST':
         try:
             studyInfo = json.load(request.files['studyInfo'])
             gammaInfo = json.load(request.files['gammaInfo'])
@@ -186,7 +188,7 @@ def biodiCsvTest():
             biodiFile = request.files['biodiFile']
 
             if gammaInfo['gammaCounter'] == "Hidex":
-                handleHidexStudy(biodiFile,studyInfo, gammaInfo, mouseInfo, organInfo)
+                handleHidexStudy(biodiFile, studyInfo, gammaInfo, mouseInfo, organInfo)
             elif gammaInfo['gammaCounter'] == "PE":
                 handlePEStudy(biodiFile, studyInfo, gammaInfo, mouseInfo, organInfo)
 

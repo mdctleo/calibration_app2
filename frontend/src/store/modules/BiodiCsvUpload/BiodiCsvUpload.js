@@ -32,8 +32,8 @@ const getDefaultState = () => {
 
         gammaForm: {
             gammaCounter: [],
-            gammaCounterRunTimeOffset: "",
-            gammaCounterRunComments: "",
+            gammaCounterRunTimeOffset: [],
+            gammaCounterRunComments: [],
         },
 
         mice: [],
@@ -612,11 +612,11 @@ const mutations = {
     },
 
     SET_GAMMA_COUNTER_RUN_TIME_OFFSET: (state, payload) => {
-        return state.gammaForm.gammaCounterRunTimeOffset = payload.gammaCounterRunTimeOffset
+        return state.gammaForm.gammaCounterRunTimeOffset.splice(payload.index, 1, payload.gammaCounterRunTimeOffset)
     },
 
     SET_GAMMA_COUNTER_RUN_COMMENTS: (state, payload) => {
-        return state.gammaForm.gammaCounterRunComments = payload.gammaCounterRunComments
+        return state.gammaForm.gammaCounterRunComments.splice(payload.index, 1, payload.gammaCounterRunComments)
     },
 
     SET_MOUSE_CSV: (state, payload) => {
@@ -698,8 +698,12 @@ const getters = {
     gammaCounter: (state) => (gammaRun) => {
         return state.gammaForm.gammaCounter[gammaRun]
     },
-    gammaCounterRunTimeOffset: state => state.gammaForm.gammaCounterRunTimeOffset,
-    gammaCounterRunComments: state => state.gammaForm.gammaCounterRunComments,
+    gammaCounterRunTimeOffset: state => gammaRun => {
+        return state.gammaForm.gammaCounterRunTimeOffset[gammaRun]
+    },
+    gammaCounterRunComments: state => gammaRun => {
+        return state.gammaForm.gammaCounterRunComments[gammaRun]
+    },
 
     mice: state => state.mice,
 
