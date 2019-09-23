@@ -46,7 +46,11 @@ export const postBiodiCsv = async (payload) => {
     // data.append("gammaInfo", new Blob([JSON.stringify(payload.gammaInfo)], {type: 'application/json'}))
 
     for (let i = 0; i < payload.biodiCsvs.length; i++) {
-        data.append("gammaInfo", new Blob([JSON.stringify(payload.gammaInfo[i])], {type: 'application/json'}))
+        data.append("gammaInfo" + i, new Blob([JSON.stringify(
+            {gammaCounter: payload.gammaInfo.gammaCounter[i],
+             gammaCounterRunTimeOffset: payload.gammaInfo.gammaCounterRunTimeOffset[i] === undefined ? '' : payload.gammaInfo.gammaCounterRunTimeOffset[i],
+             gammaCounterRunComments: payload.gammaInfo.gammaCounterRunComments[i] === undefined ? '' : payload.gammaInfo.gammaCounterRunComments[i]
+        })], {type: 'application/json'}))
         data.append("biodiCsvs" + i, new Blob([payload.biodiCsvs[i]], {type: payload.biodiCsvs[i].type}))
         data.append("mouseCsvs" + i, new Blob([payload.mouseCsvs[i]],  {type: payload.mouseCsvs[i].type}))
         data.append("organCsvs" + i, new Blob([payload.organCsvs[i]], {type: payload.organCsvs[i].type}))

@@ -30,9 +30,9 @@ def biodiCsv():
             for i in range(0, studyInfoDict['numGammaRuns']):
                 gammaInfoDict = GammaInfoSchema().load(json.load(request.files['gammaInfo' + str(i)]))
                 print(gammaInfoDict)
-                gammaInfo = prepareGammaRunInformation(gammaInfoDict,i, 0, studyInfo['studyDate'])
+                gammaInfo = prepareGammaRunInformation(gammaInfoDict,i, 0, studyInfo.studyDate)
                 print(gammaInfo)
-                handleMouseCsv(request.files['mouseCsvs' + str(i)])
+                # handleMouseCsv(request.files['mouseCsvs' + str(i)])
 
             # if gammaInfo['gammaCounter'] == "Hidex":
             #     handleHidexStudy(biodiFile,studyInfo, gammaInfo, mouseInfo, organInfo)

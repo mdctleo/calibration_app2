@@ -28,7 +28,7 @@ def prepareGammaRunInformation(gammaInfoDict, runId, protocolId, measurementTime
                            gammaCounter=gammaInfoDict['gammaCounter'],
                            protocolId=protocolId,
                            runDateTime=measurementTime,
-                           gammaRunComments=gammaInfoDict['gammaRunComments']
+                           gammaRunComments=gammaInfoDict['gammaCounterRunComments']
                            )
 
     return None
