@@ -9,7 +9,6 @@ from response.response import StandardResponse, StandardResponseSchema
 from flask import make_response
 from calibration_app.biodi_csv.Controller import *
 from calibration_app.biodi_csv.HidexParser import *
-from calibration_app.biodi_csv.MouseParser import handleMouseCsv
 from calibration_app.biodi_csv.PEParser import *
 import pandas as pd
 import json
@@ -32,7 +31,8 @@ def biodiCsv():
                 print(gammaInfoDict)
                 gammaInfo = prepareGammaRunInformation(gammaInfoDict,i, 0, studyInfo.studyDate)
                 print(gammaInfo)
-                # handleMouseCsv(request.files['mouseCsvs' + str(i)])
+                # mouseInfo = handleMouseCsv(request.files['mouseCsvs' + str(i)])
+                organInfo = handleMouseAndOrganCsv(request.files['mouseCsvs' + str(i)], request.files['organCsvs' + str(i)])
 
             # if gammaInfo['gammaCounter'] == "Hidex":
             #     handleHidexStudy(biodiFile,studyInfo, gammaInfo, mouseInfo, organInfo)

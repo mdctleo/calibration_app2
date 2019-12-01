@@ -1,14 +1,32 @@
+from io import BytesIO
+from io import StringIO
 from calibration_app.biodi_csv.Model import MouseOrgan, Mouse
 from exceptions.Exceptions import *
 from datetime import datetime
+import numpy as np
+import pandas as pd
 
-def handleMouseOrganCsv():
+
+def handleMouseAndOrganCsv(mouseCsv, organCsv):
+    mouseDf = pd.read_csv(mouseCsv)
+    subset = list(mouseDf.columns.values)
+    mouseDf = mouseDf.dropna(subset=subset, how='all')
+    mouseDf = mouseDf.transpose()
+    print(mouseDf)
+    organDf = pd.read_csv(organCsv)
     
     return None
 
-def handleMouseCsv(mouseCsv):
-
-    return None
+# def handleMouseCsv(mouseCsv):
+#     try:
+#         print(mouseCsv)
+#         df = pd.read_csv(mouseCsv)
+#         print(df)
+#     except Exception as e:
+#         raise e
+#
+#
+#     return None
 
 
 def assignOrgansToMouse(mouseInfo, organInfo):

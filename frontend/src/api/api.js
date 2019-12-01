@@ -51,9 +51,9 @@ export const postBiodiCsv = async (payload) => {
              gammaCounterRunTimeOffset: payload.gammaInfo.gammaCounterRunTimeOffset[i] === undefined ? '' : payload.gammaInfo.gammaCounterRunTimeOffset[i],
              gammaCounterRunComments: payload.gammaInfo.gammaCounterRunComments[i] === undefined ? '' : payload.gammaInfo.gammaCounterRunComments[i]
         })], {type: 'application/json'}))
-        data.append("biodiCsvs" + i, new Blob([payload.biodiCsvs[i]], {type: payload.biodiCsvs[i].type}))
-        data.append("mouseCsvs" + i, new Blob([payload.mouseCsvs[i]],  {type: payload.mouseCsvs[i].type}))
-        data.append("organCsvs" + i, new Blob([payload.organCsvs[i]], {type: payload.organCsvs[i].type}))
+        data.append("biodiCsvs" + i, new Blob([payload.biodiCsvs[i].raw], {type: payload.biodiCsvs[i].type}))
+        data.append("mouseCsvs" + i, new Blob([payload.mouseCsvs[i].raw],  {type: payload.mouseCsvs[i].type}))
+        data.append("organCsvs" + i, new Blob([payload.organCsvs[i].raw], {type: payload.organCsvs[i].type}))
     }
     console.log(data)
     return await axios({
