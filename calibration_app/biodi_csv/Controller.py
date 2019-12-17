@@ -1,192 +1,16 @@
-from flask_jwt_extended import jwt_required, get_jwt_identity, get_raw_jwt
-from flask_login import login_required
-
-from calibration_app.biodi_csv import bp
-from flask import request
 import csv
 from io import StringIO
 from calibration_app.biodi_csv.Model import MouseOrgan, BiodiCsvRow, StudyInformation, Mouse, Window
 from calibration_app.biodi_csv.DatabaseHelper import DatabaseHelper as db
-from calibration_app.biodi_csv.Schema import BiodiCsvRequestSchema, StudyInformationMetaSchema, ChelatorSchema, \
-    VectorSchema, CellLineSchema, MouseStrainSchema, TumorModelSchema
-from flask import jsonify
-from response.response import StandardResponse, StandardResponseSchema
 from exceptions.Exceptions import *
-from marshmallow import ValidationError
-from flask import make_response
-import datetime
-import io
-import numpy as np
+from methods.decay import calculateDecay, calculateCalibratedMouseActivity
+from datetime import datetime
 import pandas as pd
-
-
-def prepareBiodiCsvRows(biodiCsvFile):
-    biodiCsvRows = []
-    protocolId = biodiCsvFile[0]['protocolId']
-    for i, row in enumerate(biodiCsvFile):
-        rowNum = i + 1
-        biodiCsvRows.append(BiodiCsvRow(
-                                        rowNum=rowNum,
-                                        measurementTime=row["measurementTime"],
-                                        completionStatus=row["completionStatus"],
-                                        runId=row["runId"],
-                                        rack=row["rack"],
-                                        det=row["det"],
-                                        pos=row["pos"],
-                                        time=row["time"],
-                                        sampleCode=row["sampleCode"]
-                                        ))
-
-
-    return biodiCsvRows, protocolId
-
-
-def prepareStudyInformation(studyInfo, gammaInfo, protocolId, measurementTime):
-        return StudyInformation(studyName=studyInfo['studyName'],
-                                studyDate=studyInfo['studyDate'],
-                                researcherName=studyInfo['researcherName'],
-                                piName=studyInfo['piName'],
-                                isotopeName=studyInfo['radioIsotope'],
-                                chelatorName=studyInfo['chelator'],
-                                vectorName=studyInfo['vector'],
-                                target=studyInfo['target'],
-                                cellLineName=studyInfo['cellLine'],
-                                mouseStrainName=studyInfo['mouseStrain'],
-                                tumorModelName=studyInfo['tumorModel'],
-                                radioPurity=studyInfo['radioPurity'],
-                                comments=studyInfo['comments'],
-                                gammaCounter=gammaInfo['gammaCounter'],
-                                runDateTime=measurementTime,
-                                gammaRunComments=gammaInfo['gammaCounterRunComments'],
-                                protocolId=protocolId
-                                )
-
-def assignOrgansToMouse(mouseInfo, organInfo):
-    mouseOrgans = []
-    for i, organObject in enumerate(organInfo):
-        for i, mouseObject in enumerate(mouseInfo):
-            if (mouseObject['mouseId'] == organObject['mouseId']):
-                mouseObject['organs'] = organObject['organs']
-                mouseOrgans.append(mouseObject)
-                break
-
-    return mouseOrgans
-
-def prepareWindows(biodiCsvRows):
-    try:
-        windows = []
-        for rowNum, row in enumerate(biodiCsvRows):
-            windowHolder = {}
-            for key in (row.keys()):
-                if (key.find("Counts") != -1):
-                    isotopeCounts = key.split(" ")
-
-                    if (len(isotopeCounts) != 2):
-                        raise BaseException("Invalid counts key")
-
-                    isotopeName = isotopeCounts[0]
-                    windowHolder.setdefault(isotopeName, Window())
-
-                    windowHolder[isotopeName].counts = row.get(key)
-
-                elif (key.find("Error %") != -1):
-                    isotopeError = key.split(" ")
-
-                    if (len(isotopeError) != 3):
-                        raise BaseException("Invalid Error % key")
-
-                    isotopeName = isotopeError[0]
-                    windowHolder.setdefault(isotopeName, Window())
-
-                    windowHolder[isotopeName].error = row.get(key)
-
-                elif (key.find("CPM") != -1):
-                    isotopeCPM = key.split(" ")
-
-                    if (len(isotopeCPM) != 2):
-                        raise BaseException("Invalid CPM key")
-
-                    isotopeName = isotopeCPM[0]
-                    windowHolder.setdefault(isotopeName, Window())
-
-                    windowHolder[isotopeName].cpm = row.get(key)
-
-                elif (key.find("Info") != -1):
-                    isotopeInfo = key.split(" ")
-
-                    if (len(isotopeInfo) != 2):
-                        raise BaseException("Invalid Info key")
-
-                    isotopeName = isotopeInfo[0]
-                    windowHolder.setdefault(isotopeName, Window())
-
-                    windowHolder[isotopeName].info = row.get(key)
-
-            for isotopeWindow in windowHolder.items():
-                isotopeWindow[1].isotopeName = isotopeWindow[0]
-                isotopeWindow[1].rowNum = rowNum
-                windows.append(isotopeWindow[1])
-
-
-    except Exception as e:
-        raise e
-
-    return windows
-
-def prepareMiceAndOrgans(mouseOrgans):
-    mice = []
-    for mouse in mouseOrgans:
-        mouseHolder = Mouse(
-            mouseId=mouse['mouseId'],
-            groupId=mouse['groupId'],
-            euthanizeDateTime=datetime.datetime.combine(mouse['euthanasiaDate'],
-                                                        mouse['euthanasiaTime']),
-            gender=mouse['gender'],
-            cage=mouse['cage'],
-            age=mouse['age'],
-            injectionDate=mouse['injectionDate'],
-            preInjectionTime=mouse['preInjectionTime'],
-            injectionTime=mouse['injectionTime'],
-            postInjectionTime=mouse['postInjectionTime'],
-            preInjectionActivity=mouse['preInjectionActivity'],
-            postInjectionActivity=mouse['postInjectionActivity']
-        )
-        for organ in mouse['organs']:
-            mouseHolder.mouseOrgans.append(
-                MouseOrgan(
-                    organName=organ['organ'],
-                    organMass=organ['organMass']
-                )
-            )
-        mice.append(mouseHolder)
-
-    return mice
-
-def createStudy(biodiCsvRequestDict):
-    try:
-
-        with db.getDb().session.no_autoflush:
-            mouseOrgans = assignOrgansToMouse(biodiCsvRequestDict['mouseInfo'], biodiCsvRequestDict['organInfo'])
-            biodiCsvRows, protocolId = prepareBiodiCsvRows(biodiCsvRequestDict['biodiCsv']['file'])
-            mice = prepareMiceAndOrgans(mouseOrgans)
-            windows = prepareWindows(biodiCsvRequestDict['biodiCsv']['file'])
-            study = prepareStudyInformation(biodiCsvRequestDict['studyInfo'],
-                                            biodiCsvRequestDict['gammaInfo'],
-                                            biodiCsvRequestDict['biodiCsv']['file'][0]['protocolId'],
-                                            biodiCsvRequestDict['biodiCsv']['file'][0]['measurementTime'])
-            study.biodiCsvRows = biodiCsvRows
-            study.windows = windows
-            study.mice = mice
-    #
-            db.createStudy(study)
-    except BaseException as e:
-        raise e
-    return None
-
 
 def getMetas():
     try:
         metas = db.getBiodiCsvMetas()
+        print(metas)
     except BaseException as e:
         raise e
 
@@ -194,13 +18,22 @@ def getMetas():
 
 def getBiodiCsvRaw(studyId):
     try:
-        completeStudy, windows = db.getCompleteStudy(studyId)
-        windowsMap = createWindowsMap(windows)
+        completeStudy, isotope, calibrationFactor = db.getCompleteStudy(studyId)
+        windowsMap = createWindowsMap(completeStudy.windows)
         si = StringIO()
-        fieldnames = [
-            "Protocol ID", "Protocol name", "Measurement date & time", "Completion status", "Run ID",
-            "Rack", "Det", "Pos", "Time", "Sample code"
-        ]
+        fieldnames = []
+        if completeStudy.protocolId is not None:
+            fieldnames.append("Protocol ID")
+            fieldnames.append("Protocol name")
+
+        fieldnames.append("Measurement date & time")
+        fieldnames.append("Completion status")
+        fieldnames.append("Run ID")
+        fieldnames.append("Rack")
+        fieldnames.append("Det")
+        fieldnames.append("Pos")
+        fieldnames.append("Time")
+        fieldnames.append("Sample code")
 
         for i, key in enumerate(windowsMap.keys()):
             fieldnames.append(key + " Counts")
@@ -213,39 +46,36 @@ def getBiodiCsvRaw(studyId):
         currRow=0
 
         for i, row in enumerate(completeStudy.biodiCsvRows):
-            row = {
-                "Protocol ID": completeStudy.protocolId,
-                "Protocol name": db.getProtocolName(completeStudy.protocolId),
-                "Measurement date & time": row.measurementTime,
-                "Completion status": row.completionStatus,
-                "Run ID": row.runId,
-                "Rack": row.rack,
-                "Det": row.det,
-                "Pos": row.pos,
-                "Time": row.time,
-                "Sample code": row.sampleCode
-            }
+            csvRow = {}
+            completionStatus = row.completionStatus
+            if completeStudy.protocolId is not None:
+                csvRow["Protocol ID"] = completeStudy.protocolId,
+                csvRow["Protocol name"] = db.getProtocolName(completeStudy.protocolId),
+            # csvRow["Measurement date & time"] = row.measurementTime,
+            csvRow.update({"Measurement date & time": row.measurementTime})
+            csvRow.update({"Completion status": completionStatus}),
+            csvRow.update({"Run ID": row.runId}),
+            csvRow.update({"Rack": row.rack}),
+            csvRow.update({"Det": row.det}),
+            csvRow.update({"Pos": row.pos}),
+            csvRow.update({"Time": row.time}),
+            csvRow.update({"Sample code": row.sampleCode})
 
             for i, key in enumerate(windowsMap.keys()):
-                row[key + " Counts"] = windowsMap[key][currRow].counts
-                row[key + " Error %"] = windowsMap[key][currRow].error
-                row[key + " CPM"] = windowsMap[key][currRow].cpm
-                row[key + " Info"] = windowsMap[key][currRow].info
+                csvRow[key + " Counts"] = windowsMap[key][currRow].counts
+                csvRow[key + " Error %"] = windowsMap[key][currRow].error
+                csvRow[key + " CPM"] = windowsMap[key][currRow].cpm
+                csvRow[key + " Info"] = windowsMap[key][currRow].info
 
-            cw.writerow(row)
+            cw.writerow(csvRow)
 
             currRow = currRow + 1
 
         file = si.getvalue()
-
     except BaseException as e:
         raise e
 
     return file, completeStudy.studyName
-
-def createCompleteStudyRow(biodiCsvRow, mouse, organ):
-
-    return None
 
 def createWindowsMap(windows):
     windowsMap = {}
@@ -258,12 +88,13 @@ def createWindowsMap(windows):
 def getCompleteStudy(studyId):
     try:
 
-        completeStudy, windows = db.getCompleteStudy(studyId)
-        windowsMap = createWindowsMap(windows)
+        completeStudy, isotope, calibrationFactor = db.getCompleteStudy(studyId)
+        windowsMap = createWindowsMap(completeStudy.windows)
         si = StringIO()
 
         fieldnames = [
-            "Isotope", "Chelator", "Vector", "VectorType", "Tumor Model", "Mouse Strain", "Mouse Gender", "Cage", "Mouse ID", "Injection Date",
+            "Isotope", "Chelator", "Vector", "Target", "VectorType", "Tumor Model", "Mouse Strain", "Mouse Gender", "Cage", "Mouse ID", "Injection Date",
+            "Pre-injection (MBq)", "Pre-injection Time", "Post-injection (MBq)", "Post-injection Time", "Injection Time", "Injected Activity (kBq)",
             "Injection Time", "Injected Activity (kBq)", "Organ", "OrganMass(g)", "Euthanasia Date", "Euthanasia Time", "TimePoint (h)",
             "Count#", "Rack", "Vial", "Time", "Counted Time (s)", "Dead Time Factor"]
 
@@ -276,6 +107,7 @@ def getCompleteStudy(studyId):
             fieldnames.append("Window" + currWinNum + " (CPM)")
             fieldnames.append("Normalized Window" + currWinNum + " (CPM)")
             fieldnames.append("Normalized Window" + currWinNum + " (Bq)")
+            fieldnames.append("Window " + currWinNum + " %ID/g @ injectionTime")
 
 
         cw = csv.DictWriter(si, fieldnames=fieldnames)
@@ -285,11 +117,20 @@ def getCompleteStudy(studyId):
         for i, mouse in enumerate(completeStudy.mice):
             for j, organ in enumerate(mouse.mouseOrgans):
                 biodiCsvRow = completeStudy.biodiCsvRows[currRow]
-                createCompleteStudyRow(biodiCsvRow, mouse, organ)
+
+                preInjectionTime = datetime.combine(mouse.injectionDate, mouse.preInjectionTime)
+                postInjectionTime = datetime.combine(mouse.injectionDate, mouse.postInjectionTime)
+                injectionTime = datetime.combine(mouse.injectionDate, mouse.injectionTime)
+                preInjectedActivity = calculateDecay(mouse.preInjectionActivity, preInjectionTime, injectionTime, isotope.halfLife)
+                postInjectedActivity = calculateDecay(mouse.postInjectionActivity, injectionTime, postInjectionTime, isotope.halfLife)
+                injectedActivity = preInjectedActivity - postInjectedActivity
+
+
                 row = {
                     'Isotope': completeStudy.isotopeName,
                     'Chelator': completeStudy.chelatorName,
                     'Vector': completeStudy.vectorName,
+                    'Target': completeStudy.target,
                     'VectorType': db.getVector(completeStudy.vectorName).type,
                     'Tumor Model': completeStudy.tumorModelName,
                     'Mouse Strain': completeStudy.mouseStrainName,
@@ -297,8 +138,12 @@ def getCompleteStudy(studyId):
                     'Cage': mouse.cage,
                     'Mouse ID': mouse.mouseId,
                     'Injection Date': mouse.injectionDate,
+                    'Pre-injection (MBq)': mouse.preInjectionActivity,
+                    'Pre-injection Time': mouse.preInjectionTime,
+                    'Post-injection (MBq)': mouse.postInjectionActivity,
+                    'Post-injection Time': mouse.postInjectionTime,
                     'Injection Time': mouse.injectionTime,
-                    'Injected Activity (kBq)': "PlaceHolder",
+                    'Injected Activity (kBq)': injectedActivity,
                     'Organ': organ.organName,
                     'OrganMass(g)': organ.organMass,
                     'Euthanasia Date': mouse.euthanizeDateTime.date(),
@@ -312,6 +157,9 @@ def getCompleteStudy(studyId):
                 }
 
                 for k, key in enumerate(windowsMap.keys()):
+                    mouseAcitivty = calculateCalibratedMouseActivity(windowsMap[key][currRow].cpm, isotope.halfLife,
+                                                                     injectionTime, biodiCsvRow.measurementTime, calibrationFactor)
+
                     currWinNum = str((k + 1))
                     cpm = windowsMap[key][currRow].cpm
                     row['Dead Time Factor' + currWinNum] = "PlaceHolder"
@@ -319,8 +167,11 @@ def getCompleteStudy(studyId):
                     row["Window" + currWinNum + " (counts)"] = windowsMap[key][currRow].counts
                     row["Window" + currWinNum + " corrected (counts)"] = windowsMap[key][currRow].counts
                     row["Window" + currWinNum + " (CPM)"] = cpm
-                    row["Normalized Window" + currWinNum + " (CPM)"] =  "PlaceHolder"
-                    row["Normalized Window" + currWinNum + " (Bq)" ] = "PlaceHolder"
+                    row["Normalized Window" + currWinNum + " (CPM)"] =  windowsMap[key][currRow].cpm
+                    row["Window " + currWinNum + " %ID/g @ injectionTime"] = ((mouseAcitivty / injectedActivity) * 100) / organ.organMass
+
+
+
 
 
                 cw.writerow(row)
@@ -328,11 +179,23 @@ def getCompleteStudy(studyId):
                 currRow = currRow + 1
 
         file = si.getvalue()
-
     except BaseException as e:
         raise e
 
     return file, completeStudy.studyName
+
+def getStudyAnalysis(studyId):
+    completeStudyCsv, studyName = getCompleteStudy(studyId)
+    studyPd = pd.read_csv(StringIO(completeStudyCsv))
+    columnsToSlice = []
+    for column in studyPd.columns:
+        if column.find("%ID/g @ injectionTime") != -1:
+            columnsToSlice.append(column)
+    columnsToSlice.append("Organ")
+    columnsToSlice.append("TimePoint (h)")
+    studyPd = studyPd[columnsToSlice]
+    csv = studyPd.groupby(['Organ', 'TimePoint (h)']).describe().to_csv()
+    return csv, studyName
 
 def getChelators():
     try:
@@ -345,14 +208,6 @@ def getChelators():
 def getVectors():
     try:
         result = db.getVectors()
-    except BaseException as e:
-        raise e
-
-    return result
-
-def getCellLines():
-    try:
-        result = db.getCellLines()
     except BaseException as e:
         raise e
 
@@ -373,199 +228,3 @@ def getTumorModels():
         raise e
 
     return result
-
-def createStudyHidex(df):
-
-    return None
-
-
-def formatStudy(df, startRow):
-    try:
-        # prepare data
-        df = df.truncate(before=startRow, copy=False)
-        # become slicing is [closed : open]
-        lastColumnIndex = df.head(1).size
-        columns = df.head(1).to_numpy()[0]
-        columnsAfterTags = columns[lastColumnIndex:]
-        columnsToDelete = []
-
-        for colName in columnsAfterTags:
-            columnsToDelete.append(colName)
-
-        df.drop(columnsToDelete, axis=1, inplace=True)
-        # rename the columns
-        df.columns = columns
-        # get rid off extra row that is now the column
-        df = df.truncate(before=(startRow + 1), copy=False)
-
-        return df
-    except Exception as e:
-        raise e
-
-def parseExcel(file):
-    try:
-        df = pd.read_excel(file)
-        startRow = -1
-        for row in df.itertuples():
-            if (row[1] == 'Results'):
-                startRow = row[0] + 1
-                break
-
-
-        if (startRow == -1):
-            # TODO: Create an exception for this
-            print("Throw an exception here")
-
-        df = formatStudy(df, startRow)
-        createStudyHidex(df)
-
-    except Exception as e:
-        raise e
-
-
-@bp.route('/biodicsv', methods=['POST', 'GET'])
-@jwt_required
-def biodiCsv():
-    if request.method == 'POST':
-        try:
-            biodiCsvRequestDict = BiodiCsvRequestSchema().load(request.get_json())
-            createStudy(biodiCsvRequestDict)
-        except ValidationError as e:
-            result = StandardResponse(e.__str__())
-            response = StandardResponseSchema().dump(result)
-            return jsonify(response), 400
-        except BaseException as e:
-            result = StandardResponse(e.message)
-            response = StandardResponseSchema().dump(result)
-            return jsonify(response), 500
-
-        result = StandardResponse("Success")
-        response = StandardResponseSchema().dump(result)
-        return jsonify(response), 200
-    elif request.method == 'GET':
-        try:
-            result, studyName = getCompleteStudy(request.args.get('id'))
-        except BaseException as e:
-            result = StandardResponse(e.message)
-            response = StandardResponseSchema.dump(result)
-            return jsonify(response), 500
-
-        response = make_response(result)
-        response.headers["Content-Disposition"] = "attachment; filename=" + studyName
-        response.headers["Content-Type"] = "text/csv; charset=UTF-8"
-
-        return response, 200
-
-@bp.route('/biodicsv-raw')
-@jwt_required
-def biodiCsvRaw():
-    if request.method == 'GET':
-        try:
-            result, studyName = getBiodiCsvRaw(request.args.get('id'))
-        except BaseException as e:
-            result = StandardResponse(e.message)
-            response = StandardResponseSchema.dump(result)
-            return jsonify(response), 500
-
-        response = make_response(result)
-        response.headers["Content-Disposition"] = "attachment; filename=" + studyName
-        response.headers["Content-Type"] = "text/csv; charset=UTF-8"
-
-        return response, 200
-
-
-
-@bp.route('/biodicsv-metas', methods=['GET'])
-@jwt_required
-def biodiCsvMetas():
-    if request.method == 'GET':
-        try:
-            result = getMetas()
-        except BaseException as e:
-            result = StandardResponse(e.message)
-            response = StandardResponseSchema().dump(result)
-            return jsonify(response), 500
-
-        response = StudyInformationMetaSchema(many=True).dump(result)
-        return make_response(jsonify(response), 200)
-
-@bp.route('/chelators', methods=['GET'])
-@jwt_required
-def chelators():
-    if request.method == 'GET':
-        try:
-            result = getChelators()
-        except BaseException as e:
-            result = StandardResponse(e.message)
-            response = StandardResponseSchema.dump(result)
-            return jsonify(response), 500
-
-        response = ChelatorSchema(many=True).dump(result)
-        return jsonify(response), 200
-
-@bp.route('/vectors', methods=['GET'])
-@jwt_required
-def vectors():
-    if request.method == 'GET':
-        try:
-            result = getVectors()
-        except BaseException as e:
-            result = StandardResponse(e.message)
-            response = StandardResponseSchema.dump(result)
-            return jsonify(response), 200
-
-        response = VectorSchema(many=True, exclude=['type']).dump(result)
-        return jsonify(response), 200
-
-@bp.route('/cell-lines', methods=['GET'])
-@jwt_required
-def cellLines():
-    if request.method == 'GET':
-        try:
-            result = getCellLines()
-        except BaseException as e:
-            result = StandardResponse(e.message)
-            response = StandardResponseSchema.dump(result)
-            return jsonify(response), 200
-
-        response = CellLineSchema(many=True).dump(result)
-        return jsonify(response), 200
-
-@bp.route('/mouse-strains', methods=['GET'])
-@jwt_required
-def mouseStrains():
-    if request.method == 'GET':
-        try:
-            result = getMouseStrains()
-        except BaseException as e:
-            result = StandardResponse(e.message)
-            response = StandardResponseSchema.dump(result)
-            return jsonify(response), 200
-
-        response = MouseStrainSchema(many=True).dump(result)
-        return jsonify(response), 200
-
-@bp.route('/tumor-models', methods=['GET'])
-@jwt_required
-def tumorModels():
-    if request.method == 'GET':
-        try:
-            result = getTumorModels()
-        except BaseException as e:
-            result = StandardResponse(e.message)
-            response = StandardResponseSchema.dump(result)
-            return jsonify(response), 200
-
-        response = TumorModelSchema(many=True).dump(result)
-        return jsonify(response), 200
-    return None
-
-@bp.route('/biodicsv-test', methods=['POST'])
-@jwt_required
-def biodiCsvTest():
-    if request.method =='POST':
-        print('Got here')
-        print(request.files)
-        file = request.files['file']
-        parseExcel(file)
-        return "Success", 200

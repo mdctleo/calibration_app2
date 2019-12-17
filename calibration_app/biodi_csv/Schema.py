@@ -21,14 +21,6 @@ class CellLineSchema(Schema):
     name = fields.Str()
 
 
-
-class StudyInformationMetaSchema(Schema):
-    id = fields.Integer(required=True)
-    studyName = fields.Str(required=True)
-    researcherName = fields.Str(required=True)
-    createdOn = fields.DateTime(required=True)
-
-
 class BiodiCsvRowSchema(Schema):
     class Meta:
         unknown = INCLUDE
@@ -52,23 +44,25 @@ class BiodiCsvFileSchema(Schema):
 
 
 class StudyInfoSchema(Schema):
+    id = fields.Integer(required=True, dump_only=True)
     studyName = fields.Str(required=True)
     studyDate = fields.DateTime(required=True)
     researcherName = fields.Str(required=True)
     piName = fields.Str(required=True)
-    radioIsotope = fields.Str(required=True)
-    chelator = fields.Str(required=True)
-    vector = fields.Str(required=True)
+    isotopeName = fields.Str(required=True)
+    chelatorName = fields.Str(required=True)
+    vectorName = fields.Str(required=True)
     target = fields.Str(required=True)
-    cellLine = fields.Str(required=True)
-    mouseStrain = fields.Str(required=True)
-    tumorModel = fields.Str(required=True)
+    mouseStrainName = fields.Str(required=True)
+    tumorModelName = fields.Str(required=True)
     radioPurity = fields.Float(required=True)
-    comments = fields.Str()
+    gammaCounter = fields.Str(required=True, dump_only=True)
+    numGammaRuns = fields.Integer(required=True, load_only=True)
+    comment = fields.Str()
 
 
 class GammaInfoSchema(Schema):
-    gammaCounter = fields.Str(required=True)
+    gammaCounter =fields.Str(required=True)
     gammaCounterRunTimeOffset = fields.Str()
     gammaCounterRunComments = fields.Str()
 

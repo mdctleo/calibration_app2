@@ -13,6 +13,8 @@
                 studyForm: "biodiCsvUpload/studyForm",
                 gammaForm: "biodiCsvUpload/gammaForm",
                 biodiCsvs: "biodiCsvUpload/biodiCsvs",
+                mouseCsvs: "biodiCsvUpload/mouseCsvs",
+                organCsvs: "biodiCsvUpload/organCsvs",
                 biodiCsvFile: "biodiCsvUpload/biodiCsvFile",
                 mouseCsvJson: "biodiCsvUpload/mouseCsvJson",
                 organCsvJson: "biodiCsvUpload/organCsvJson",
@@ -23,18 +25,14 @@
         methods: {
             ...mapActions({
                 'postBiodiCsv': types.POST_BIODI_CSV,
-                'postBiodiCsvTest': types.POST_BIODI_CSV_TEST
             }),
 
             handleSubmit() {
-                console.log(this.biodiCsvFile)
-                this.postBiodiCsvTest({file: this.biodiCsvFile})
-                // this.postBiodiCsv({
-                //     biodiCsv: this.biodiCsvJson,
-                //     studyInfo: this.studyForm,
-                //     gammaInfo: this.gammaForm,
-                //     mouseInfo: this.mouseCsvJson,
-                //     organInfo: this.organCsvJson})
+                this.postBiodiCsv({studyInfo: this.studyForm,
+                                       gammaInfo: this.gammaForm,
+                                       biodiCsvs: this.biodiCsvs,
+                                       mouseCsvs: this.mouseCsvs,
+                                       organCsvs: this.organCsvs })
             }
         }
     }

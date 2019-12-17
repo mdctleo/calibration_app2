@@ -1,11 +1,10 @@
-import {getBiodiCsvComplete, getBiodiCsvRaw, getBiodiCsvMetas} from "../../../api/api";
+import {getBiodiCsvComplete, getBiodiCsv, getBiodiCsvMetas, getBiodiCsvAnalysis} from "../../../api/api";
 const moment = require('moment/moment');
 
 const getDefaultState = () => {
     return {
         metas: [],
-        biodiCsvCompleteToDownload: "",
-        biodiCsvRawToDownload: "",
+        biodiCsvToDownload: "",
         error: null,
         loading: false,
     }
@@ -18,12 +17,8 @@ const actions = {
         context.commit('RESET_STATE')
     },
 
-    setBiodiCsvCompleteToDownload: (context, payload) => {
-      context.commit('SET_BIODI_CSV_COMPLETE_TO_DOWNLOAD', payload)
-    },
-
-    setBiodiCsvRawToDownload: (context, payload) => {
-        context.commit('SET_BIODI_CSV_RAW_TO_DOWNLOAD', payload)
+    setBiodiCsvToDownload: (context, payload) => {
+        context.commit('SET_BIODI_CSV_TO_DOWNLOAD', payload)
     },
 
     setError: (context, payload) => {
@@ -33,7 +28,8 @@ const actions = {
     downloadBiodiCsvComplete: async (context, payload) => {
         try {
             context.commit('SET_LOADING', {loading: true})
-            let response = await getBiodiCsvComplete(payload.biodiCsvCompleteToDownload)
+            let response = await getBiodiCsvComplete(payload.biodiCsvToDownload)
+            console.log(response)
             const url = window.URL.createObjectURL(new Blob([response.data]))
             const link = document.createElement('a')
             link.href = url;
@@ -48,10 +44,10 @@ const actions = {
         }
     },
 
-    downloadBiodiCsvRaw: (context, payload) => {
+    downloadBiodiCsvRaw: async (context, payload) => {
         try {
             context.commit('SET_LOADING', {loading: true})
-            let response = getBiodiCsvRaw(payload.biodiCsvRawToDownload)
+            let response = await getBiodiCsv(payload.biodiCsvToDownload)
             const url = window.URL.createObjectURL(new Blob([response.data]))
             const link = document.createElement('a')
             link.href = url
@@ -60,7 +56,26 @@ const actions = {
             link.click()
             link.parentNode.removeChild(link)
         } catch (error) {
-            console.log(error)
+            console.log(error.response.data.msg)
+            context.commit('SET_ERROR', {error: error.response.data.msg})
+        } finally {
+            context.commit('SET_LOADING', {loading: false})
+        }
+    },
+
+    downloadBiodiCsvAnalysis: async (context, payload) => {
+        try {
+            context.commit('SET_LOADING', {loading: true})
+            let response = await getBiodiCsvAnalysis(payload.biodiCsvToDownload)
+            console.log(response)
+            const url = window.URL.createObjectURL(new Blob([response.data]))
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download', 'file.csv')
+            document.body.appendChild(link)
+            link.click()
+            link.parentNode.removeChild(link)
+        } catch (error) {
             context.commit('SET_ERROR', {error: error.response.data.msg})
         } finally {
             context.commit('SET_LOADING', {loading: false})
@@ -72,7 +87,7 @@ const actions = {
             context.commit('SET_LOADING', {loading: true});
             let response = await getBiodiCsvMetas()
             let metas = response.data
-            console.log('got to fulfilled')
+            console.log(metas)
             metas.forEach((meta) => {
                 meta.createdOn = moment(meta.createdOn).format('DD-MM-YYYY, h:mm:ss');
             });
@@ -103,20 +118,15 @@ const mutations = {
         return state.metas = payload.metas
     },
 
-    SET_BIODI_CSV_COMPLETE_TO_DOWNLOAD: (state, payload) => {
-        return state.biodiCsvCompleteToDownload = payload.biodiCsvCompleteToDownload
-    },
-
-    SET_BIODI_CSV_RAW_TO_DOWNLOAD: (state, payload) => {
-        return state.biodiCsvRawToDownload = payload.biodiCsvRawToDownload
+    SET_BIODI_CSV_TO_DOWNLOAD: (state, payload) => {
+        return state.biodiCsvToDownload = payload.biodiCsvToDownload
     }
 };
 
 const getters = {
     error: state => state.error,
     loading: state => state.loading,
-    biodiCsvCompleteToDownload: state => state.biodiCsvCompleteToDownload,
-    biodiCsvRawToDownload: state => state.biodiCsvRawToDownload,
+    biodiCsvToDownload: state => state.biodiCsvToDownload,
     metas: state => state.metas
 };
 

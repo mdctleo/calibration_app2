@@ -35,29 +35,32 @@ export const getCalibrationFactorsGraph = async (model, isotope) => {
 };
 
 // BiodiCsv
-export const postBiodiCsvTest = async (payload) => {
-    let endpoint = BASE_URL + "/biodicsv-test"
+export const postBiodiCsv = async (payload) => {
+    let endpoint = BASE_URL + "/biodicsv"
     let data = new FormData()
-    console.log(payload.file)
-    data.append("file", new Blob([payload.file], {type: payload.file.type}))
+    console.log(payload.biodiCsvs)
+    console.log(payload.mouseCsvs)
+    console.log(payload.organCsvs)
+
+    data.append("studyInfo", new Blob([JSON.stringify(payload.studyInfo)], {type: 'application/json'}))
+    // data.append("gammaInfo", new Blob([JSON.stringify(payload.gammaInfo)], {type: 'application/json'}))
+
+    for (let i = 0; i < payload.biodiCsvs.length; i++) {
+        data.append("gammaInfo" + i, new Blob([JSON.stringify(
+            {gammaCounter: payload.gammaInfo.gammaCounter[i],
+             gammaCounterRunTimeOffset: payload.gammaInfo.gammaCounterRunTimeOffset[i] === undefined ? '' : payload.gammaInfo.gammaCounterRunTimeOffset[i],
+             gammaCounterRunComments: payload.gammaInfo.gammaCounterRunComments[i] === undefined ? '' : payload.gammaInfo.gammaCounterRunComments[i]
+        })], {type: 'application/json'}))
+        data.append("biodiCsvs" + i, new Blob([payload.biodiCsvs[i].raw], {type: payload.biodiCsvs[i].type}))
+        data.append("mouseCsvs" + i, new Blob([payload.mouseCsvs[i].raw],  {type: payload.mouseCsvs[i].type}))
+        data.append("organCsvs" + i, new Blob([payload.organCsvs[i].raw], {type: payload.organCsvs[i].type}))
+    }
     console.log(data)
     return await axios({
         method: 'post',
         url: endpoint,
         data: data,
         config: { headers: {'Content-Type': 'multipart/form-data'}}
-    })
-
-}
-
-export const postBiodiCsv = async (payload) => {
-    let endpoint = BASE_URL + "/biodicsv";
-    return await axios.post(endpoint, {
-        biodiCsv: payload.biodiCsv,
-        studyInfo: payload.studyInfo,
-        gammaInfo: payload.gammaInfo,
-        mouseInfo: payload.mouseInfo,
-        organInfo: payload.organInfo
     })
 };
 
@@ -67,7 +70,7 @@ export const getBiodiCsvMetas = async () => {
 };
 
 export const getBiodiCsvComplete = async (id) => {
-    let endpoint = BASE_URL + "/biodicsv";
+    let endpoint = BASE_URL + "/biodicsv-complete";
     return await axios.get(endpoint, {
         responseType: 'blob',
         params: {
@@ -76,8 +79,18 @@ export const getBiodiCsvComplete = async (id) => {
     })
 };
 
-export const getBiodiCsvRaw = async (id) => {
-    let endpoint = BASE_URL + "/biodicsv-raw"
+export const getBiodiCsv = async (id) => {
+    let endpoint = BASE_URL + "/biodicsv"
+    return await axios.get(endpoint, {
+        responseType: 'blob',
+        params: {
+            id: id
+        }
+    })
+}
+
+export const getBiodiCsvAnalysis = async (id) => {
+    let endpoint = BASE_URL + "/biodicsv-analysis"
     return await axios.get(endpoint, {
         responseType: 'blob',
         params: {
@@ -93,11 +106,6 @@ export const getChelators = async () => {
 
 export const getVectors = async () => {
     let endpoint = BASE_URL + "/vectors"
-    return await axios.get(endpoint)
-}
-
-export const getCellLines = async () => {
-    let endpoint = BASE_URL + "/cell-lines"
     return await axios.get(endpoint)
 }
 

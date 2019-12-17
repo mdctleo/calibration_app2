@@ -7,6 +7,7 @@ class GammaCounter(db.Model):
     __tablename__ = GAMMA_COUNTERS_T_NAME
     model = db.Column(GAMMA_COUNTERS_C_MODEL,db.String(100), primary_key=True)
     calibrationFactor = db.relationship('CalibrationFactor', backref=GAMMA_COUNTERS_T_NAME)
+    gammaCounterRun = db.relationship('GammaCounterRun', backref=db.backref(GAMMA_COUNTERS_T_NAME, lazy='joined'), lazy=True)
 
     def __init__(self, model):
         self.model = model

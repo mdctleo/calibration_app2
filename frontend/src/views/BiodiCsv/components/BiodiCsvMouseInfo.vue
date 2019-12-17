@@ -2,7 +2,7 @@
     <div>
         <el-button type="primary" class="controls" @click="downloadMouseCsvFormat">Download Mouse Csv</el-button>
         <BiodiCsvUploadForm tips="Upload your completed mouse info file" @upload-file="handleUploadfile"
-                        @remove-file="handleRemovefile"
+                        @remove-file="handleRemoveFile(gammaRun)"
         :fileList="mouseCsvs"></BiodiCsvUploadForm>
     </div>
 </template>
@@ -17,22 +17,23 @@
         name: "BiodiCsvMouseInfo",
         components: {BiodiCsvUploadForm, MouseForm},
         props: {
-            mouseCsvs: Array
+            mouseCsvs: Array,
+            gammaRun: Number
         },
 
         methods: {
             ...mapActions({
                 'downloadMouseCsvFormat': types.DOWNLOAD_MOUSE_CSV_FORMAT,
-                'setMouseCsvs': types.SET_MOUSE_CSVS
+                'setMouseCsv': types.SET_MOUSE_CSV,
             }),
 
             handleUploadfile(fileList) {
-                this.setMouseCsvs({mouseCsvs: fileList})
+                this.setMouseCsv({index: this.gammaRun, mouseCsv: fileList[0]})
             },
 
-            handleRemovefile() {
-                this.setMouseCsvs({mouseCsvs: []})
-            },
+            handleRemoveFile(gammaRun) {
+                this.setMouseCsv({index: gammaRun, mouseCsv: null})
+            }
         },
     }
 </script>

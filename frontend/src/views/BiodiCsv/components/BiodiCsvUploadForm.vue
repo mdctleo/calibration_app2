@@ -9,7 +9,7 @@
                 :on-remove="handleRemove"
                 :on-change="handleUpload"
                 ref="upload"
-                :multiple="false">
+                :multiple="true">
             <i class="el-icon-upload"></i>
             <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
             <div class="el-upload__tip" slot="tip">{{tips}}</div>
